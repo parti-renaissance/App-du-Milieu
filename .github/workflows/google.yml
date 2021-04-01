@@ -1,0 +1,70 @@
+name: Build and Deploy to Cloud Run
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  # Google Cloud Env
+  GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  GCP_ZONE: ${{ secrets.GCP_ZONE }}
+  GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+
+  # Cloud SQL Env
+  SQL_INST: ${{ secrets.SQL_INST_STAGING }}
+  DB_NAME: ${{ secrets.DB_NAME_STAGING }}
+  DB_USER: ${{ secrets.DB_USER_STAGING }}
+  DB_PASS: ${{ secrets.DB_PASS_STAGING }}
+
+  # Image Env
+  IMAGE: middleware-api
+  TAG: staging
+
+jobs:
+  Deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Extract branch name
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: extract_branch
+
+    # Setup gcloud CLI
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@master
+      with:
+        project_id: $GCP_PROJECT_ID
+        service_account_key: $GCP_SA_KEY
+        export_default_credentials: true
+
+    - run: gcloud --quiet auth configure-docker
+
+    - name: Build
+      run: |-
+        docker build \
+          --tag "eu.gcr.io/$GCP_PROJECT_ID/$IMAGE:$TAG" \
+          --build-arg GITHUB_SHA="$GITHUB_SHA" \
+          --build-arg GITHUB_REF="$GITHUB_REF" \
+          .
+
+    - name: Publish
+      run: |-
+        docker
+        --push eu.gcr.io/$GCP_PROJECT_ID/$IMAGE:$TAG
+
+    - name : Deploy Cloud Run
+      run : |-
+        gcloud run deploy $IMAGE \
+        --image eu.gcr.io/$GCP_PROJECT_ID/$IMAGE:$TAG \
+        --platform managed \
+        --region $GCP_ZONE \
+        --no-allow-unauthenticated \
+        --memory 128Mi \
+        --set-cloudsql-instances $SQL_INST \
+        --set-env-vars=DB_USER=$DB_USER,DB_PASS=$DB_PASS,DB_NAME=$DB_NAME,CLOUD_SQL_CONNECTION_NAME=$GCP_PROJECT_ID:$GCP_ZONE:$SQL_INST
