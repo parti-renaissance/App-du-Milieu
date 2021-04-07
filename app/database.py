@@ -23,7 +23,6 @@ engine = create_engine(
             "unix_socket": "/cloudsql/{}".format(CLOUDSQL_CONN)
         }
     ),
-    connect_args={"check_same_thread": False},
     pool_size=5,
     pool_timeout=30,
     pool_recycle=1800,
