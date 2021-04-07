@@ -1,6 +1,6 @@
-fastapi == 0.63.0
-sqlalchemy == 1.4.3
-pydantic == 1.7.3
+fastapi
+sqlalchemy
+pydantic
 uvicorn[standard]
-requests == 2.22.0
+requests
 gunicorn
