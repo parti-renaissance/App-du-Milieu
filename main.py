@@ -13,7 +13,7 @@ from app.database import SessionLocal, engine
 
 import uvicorn
 
-models.Base.metadata.create_all(bind=engine)
+#models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
