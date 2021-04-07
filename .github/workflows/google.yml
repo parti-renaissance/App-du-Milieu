@@ -54,7 +54,7 @@ jobs:
           .
 
     - name: Publish
-      run: docker -- push eu.gcr.io/$PROJECT_ID/$IMAGE:$TAG
+      run: docker -- push eu.gcr.io/$GCP_PROJECT_ID/$IMAGE:$TAG
 
     - name : Deploy Cloud Run
       run : |-
