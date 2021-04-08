@@ -6,7 +6,7 @@ from os import environ
 from typing import List
 
 from fastapi import Depends, FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
