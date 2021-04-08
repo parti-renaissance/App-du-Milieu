@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app import models, schemas
 
 
-def get_contacts(db: Session, skip: int = 0, limit: int = 100):
+def get_contacts(db: Session, skip: int = 0, limit: int = 100000):
     return [
         contact.serialize() for contact in 
         db.query(models.Contact).offset(skip).limit(limit).all()
