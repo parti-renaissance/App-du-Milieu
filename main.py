@@ -46,7 +46,7 @@ def home():
 
 
 @app.get("/contacts/") #, response_model=List[schemas.Contact])
-def read_contacts(skip: int = 0, limit: int = 1000, db: Session = Depends(get_db)):
+def read_contacts(skip: int = 0, limit: int = 100000, db: Session = Depends(get_db)):
     contacts = crud.get_contacts(db, skip=skip, limit=limit)
     return contacts
 
