@@ -6,6 +6,7 @@ from os import environ
 from typing import List
 
 from fastapi import Depends, FastAPI, HTTPException
+from fastapi.middleware.gzip import GZipMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
@@ -18,6 +19,7 @@ import uvicorn
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 origins = ["*"]
 
