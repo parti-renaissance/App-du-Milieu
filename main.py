@@ -9,9 +9,9 @@ from fastapi import Depends, FastAPI, HTTPException
 from starlette.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
-import crud, models, schemas
-from database import SessionLocal, engine
-from dependencies import CommonQueryParams
+from app import crud, models, schemas
+from app.database import SessionLocal, engine
+from app.dependencies import CommonQueryParams
 
 import uvicorn
 

@@ -4,8 +4,8 @@ Endpoints de notre api
 from sqlalchemy.orm import Session
 
 from typing import Optional
-import models, schemas, dependencies
-from dependencies import CommonQueryParams
+from app import models, schemas
+from app.dependencies import CommonQueryParams
 
 
 def get_contacts(db: Session, commons: CommonQueryParams):

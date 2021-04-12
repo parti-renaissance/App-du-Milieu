@@ -3,7 +3,7 @@ SQLAlchemy de notre base de données
 """
 from sqlalchemy import Column, Integer, String
 
-from database import Base
+from app.database import Base
 
 # import datetime
 # 'tim': int ((self.tim - datetime.datetime (1970, 1, 1)).total_seconds ()),
