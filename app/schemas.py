@@ -14,6 +14,12 @@ class Contact(BaseModel):
     telephones: str = None
     sub_tel: str = None
     code_postal: str = None
+    code_commune: str = None
+    commune: str = None
+    code_departement: str = None
+    departement: str = None
+    code_region: str = None
+    region: str = None
     centres_interet: str = None
     typeforms: str = None
 
