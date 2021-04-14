@@ -49,7 +49,7 @@ class Contact(Base):
             'Département': self.departement,
             'Code_région': self.code_region,
             'Région': self.region,
-            'Centres_d\'intérêt': self.centres_interet
+            'Centres_d\'intérêt': self.centres_interet.split(',')
         }
 
 
@@ -72,7 +72,7 @@ class Contact(Base):
             'Département': self.departement,
             'Code_région': self.code_region,
             'Région': self.region,
-            'Centres_d\'intérêt': self.centres_interet,
+            'Centres_d\'intérêt': self.centres_interet.split(','),
             'Typeforms': self.typeforms
         }
 
