@@ -40,8 +40,8 @@ class Contact(Base):
             'Genre': self.genre,
             'Prénom': self.prenom,
             'Nom': self.nom,
-            'Abonné_email': 'Oui' if self.sub_tel is not None else 'Non',
-            'Abonné_tel': self.sub_tel,
+            'Abonné_email': False if self.sub_email == '' else True,
+            'Abonné_tel': True if self.sub_tel == 'Oui' else False,
             'Code_postal': self.code_postal,
             'Code_commune': self.code_commune,
             'Commune': self.commune,
@@ -73,7 +73,7 @@ class Contact(Base):
             'Code_région': self.code_region,
             'Région': self.region,
             'Centres_d\'intérêt': self.centres_interet.split(','),
-            'Typeforms': self.typeforms
+            'Typeforms': self.typeforms.split(',')
         }
 
 
