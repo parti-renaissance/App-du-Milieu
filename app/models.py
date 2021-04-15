@@ -41,7 +41,7 @@ class Contact(Base):
             'Prénom': self.prenom,
             'Nom': self.nom,
             'Abonné_email': False if self.sub_email == '' else True,
-            'Abonné_tel': True if self.sub_tel == 'Oui' else False,
+            'Abonné_tel': self.sub_tel,
             'Code_postal': self.code_postal,
             'Code_commune': self.code_commune,
             'Commune': self.commune,
