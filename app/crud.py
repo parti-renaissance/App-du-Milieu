@@ -9,6 +9,10 @@ from app.dependencies import CommonQueryParams
 
 
 def get_contacts(db: Session, commons: CommonQueryParams):
+    meta = {}
+    meta.update({'interests_choices': schemas.Interests_choices.list()})
+    meta.update({'gender_choices': schemas.Gender.list()})
+
     filter_query = {}
     if commons.code_postal:
         filter_query.update({'code_postal': commons.code_postal})
@@ -17,8 +21,12 @@ def get_contacts(db: Session, commons: CommonQueryParams):
     if commons.code_region:
         filter_query.update({'code_region': commons.code_region})
 
-    return [contact.serialize() for contact in
-            db.query(models.Contact).filter_by(**filter_query).all()]
+    contacts = {'contacts' : [contact.serialize() for contact in
+            db.query(models.Contact).filter_by(**filter_query).all()]}
+    meta.update({'total_items': len(contacts['contacts'])})
+    meta.update(contacts)
+
+    return meta
 
 
 def get_contact(db: Session, id: int):

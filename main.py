@@ -18,7 +18,11 @@ import uvicorn
 
 models.Base.metadata.create_all(bind=engine)
 
-app = FastAPI()
+app = FastAPI(
+    title="API pour le CRM de LaREM",
+    description="GET uniquements pour récupérer les données des contacts de notre base",
+    version="1.0.0"
+)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 origins = ["*"]
