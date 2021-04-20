@@ -15,9 +15,9 @@ def get_contacts(db: Session, commons: CommonQueryParams, adherent: models.Adher
 
     filter_query = {'code_region': adherent_region.get_code()}
     if commons.code_postal:
-        filter_query.update({'code_postal': commons.code_postal})
+        filter_query = {**filter_query, 'code_postal': commons.code_postal}
     if commons.code_departement:
-        filter_query.update({'code_departement': commons.code_departement})
+        filter_query = {**filter_query, 'code_departement': commons.code_departement}
 
     contacts = {'contacts' : [contact.serialize() for contact in
             db.query(models.Contact).filter_by(**filter_query).all()]}
