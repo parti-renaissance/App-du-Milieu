@@ -48,7 +48,7 @@ jobs:
         --platform managed \
         --region $GCP_ZONE \
         --allow-unauthenticated \
-        --service-account ${{ secrets.GCP_SA_KEY }} \
+        --service-account $GCP_SA_KEY \
         --ingress internal-and-cloud-load-balancing \
         --memory 128Mi \
         --set-cloudsql-instances $SQL_INST \
