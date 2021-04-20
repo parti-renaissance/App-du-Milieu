@@ -67,7 +67,7 @@ def read_contacts(
 
     contacts = crud.get_contacts(db, commons, adherent=me)
     if contacts is None:
-        raise HTTPException(status_code=404, detail="No contact found")
+        raise HTTPException(status_code=404, detail='No contact found')
     return contacts
 
 
@@ -85,7 +85,7 @@ def read_contact(contact_id: int,
 
     contact = crud.get_contact(db, id=contact_id, adherent=me)
     if contact is None:
-        raise HTTPException(status_code=404, detail="Contact not found")
+        raise HTTPException(status_code=404, detail='Contact not found')
     return contact
 
 
