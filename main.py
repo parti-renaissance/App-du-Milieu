@@ -56,12 +56,12 @@ def home():
 def read_contacts(
     db: Session = Depends(get_db),
     commons: CommonQueryParams = Depends(CommonQueryParams),
-    uuid: Optional[str] = Header(None)
+    X_User_UUID: Optional[str] = Header(None)
     ):
-    if uuid is None:
+    if X_User_UUID is None:
         return HTTPException(status_code=401, detail='You are not authenticated.')
 
-    me = crud.me(db, uuid)
+    me = crud.me(db, X_User_UUID)
     if me is None:
         return HTTPException(status_code=403, detail='You are not allowed to access these datas.')
 
