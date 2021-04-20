@@ -40,7 +40,7 @@ class Contact(Base):
             'Genre': self.genre,
             'Prénom': self.prenom,
             'Nom': self.nom,
-            'Abonné_email': False if self.sub_email == '' else True,
+            'Abonné_email': True if self.sub_email is not None else False,
             'Abonné_tel': True if self.sub_tel else False,
             'Code_postal': self.code_postal,
             'Code_commune': self.code_commune,
