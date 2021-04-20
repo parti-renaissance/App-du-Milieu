@@ -12,7 +12,6 @@ env:
   # Google Cloud Env
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   GCP_ZONE: ${{ secrets.GCP_ZONE }}
-  GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
 
   # Cloud SQL Env
   SQL_INST: ${{ secrets.SQL_INST_STAGING }}
@@ -30,17 +29,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-
-    # Setup gcloud CLI
-    - name: Set up Cloud SDK
-      uses: google-github-actions/setup-gcloud@master
-      with:
-        project_id: ${{ secrets.GCP_PROJECT_ID }}
-        service_account_key: ${{ secrets.GCP_SA_KEY }}
-        export_default_credentials: true
-
     - name : Deploy Cloud Run
       run : |-
         gcloud run deploy $IMAGE \
@@ -48,7 +36,7 @@ jobs:
         --platform managed \
         --region $GCP_ZONE \
         --allow-unauthenticated \
-        --service-account $GCP_SA_KEY \
+        --service-account ${{ secrets.GCP_SA_KEY }} \
         --ingress internal-and-cloud-load-balancing \
         --memory 128Mi \
         --set-cloudsql-instances $SQL_INST \
