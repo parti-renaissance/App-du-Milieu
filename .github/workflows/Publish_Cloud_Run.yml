@@ -46,6 +46,6 @@ jobs:
         --region $GCP_ZONE \
         --allow-unauthenticated \
         --ingress internal-and-cloud-load-balancing \
-        --memory 128Mi \
+        --memory 1024Mi \
         --set-cloudsql-instances $SQL_INST \
         --set-env-vars=DB_USER=$DB_USER,DB_PASS=$DB_PASS,DB_NAME=$DB_NAME,CLOUD_SQL_CONNECTION_NAME=$GCP_PROJECT_ID:$GCP_ZONE:$SQL_INST
