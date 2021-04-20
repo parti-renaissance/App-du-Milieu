@@ -25,18 +25,10 @@ env:
   TAG: staging
 
 jobs:
-  Build:
-    name: Build
+  Deploy:
+    name: Deploy Cloud Run
     runs-on: ubuntu-latest
-
-     # Setup gcloud CLI
-#    - name: Set up Cloud SDK
-#      uses: google-github-actions/setup-gcloud@master
-#      with:
-#        project_id: ${{ secrets.GCP_PROJECT_ID }}
-#        service_account_key: ${{ secrets.GCP_SA_KEY }}
-#        export_default_credentials: true
-
+    steps:
     - name : Deploy Cloud Run
       run : |-
         gcloud run deploy $IMAGE \
