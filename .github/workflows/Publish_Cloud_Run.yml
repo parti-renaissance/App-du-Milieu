@@ -29,6 +29,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    # Setup gcloud CLI
+    - name: Set up Cloud SDK
+      uses: google-github-actions/setup-gcloud@master
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true
+
     - name : Deploy Cloud Run
       run : |-
         gcloud run deploy $IMAGE \
@@ -36,7 +44,6 @@ jobs:
         --platform managed \
         --region $GCP_ZONE \
         --allow-unauthenticated \
-        --service-account ${{ secrets.GCP_SA_KEY }} \
         --ingress internal-and-cloud-load-balancing \
         --memory 128Mi \
         --set-cloudsql-instances $SQL_INST \
