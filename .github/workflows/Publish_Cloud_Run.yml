@@ -24,14 +24,14 @@ env:
   TAG: staging
 
 jobs:
-  Build:
-    name: Build
+  Deploy:
+    name: Deploy
     runs-on: ubuntu-latest
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
     # Setup gcloud CLI
-    - name: Set up Cloud SDK
+    - name: Set up Cloud credentials
       uses: google-github-actions/setup-gcloud@master
       with:
         project_id: ${{ secrets.GCP_PROJECT_ID }}
