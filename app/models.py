@@ -3,15 +3,15 @@ SQLAlchemy de notre base de données
 """
 from sqlalchemy import Column, Integer, String, UniqueConstraint
 
-from app.database import Base
+from app.database import CRM, Base
 
 # import datetime
 # 'tim': int ((self.tim - datetime.datetime (1970, 1, 1)).total_seconds ()),
 
 
-class Contact(Base):
+class Contact(CRM):
     """ Table contacts """
-    __tablename__ = "contacts"
+    __tablename__ = 'contacts'
 
     id = Column(Integer, primary_key=True, index=True)
     adherent_id = Column(Integer, nullable=True)
@@ -83,7 +83,7 @@ class Contact(Base):
 
 class Adherents(Base):
     """ Table adherents id/uuid """
-    __tablename__ = "adherents"
+    __tablename__ = 'adherents'
 
     id = Column(Integer, primary_key=True, index=True)
     uuid = Column(String(36), unique=True, nullable=False, index=True)
@@ -96,7 +96,7 @@ class Adherents(Base):
 
 class CandidateManagedArea(Base):
     """ Table candidate_managed_area pour retrouver la zone_id """
-    __tablename__ = "candidate_managed_area"
+    __tablename__ = 'candidate_managed_area'
 
     id = Column(Integer, primary_key=True, index=True)
     zone_id = Column(Integer, nullable=False)
@@ -108,7 +108,7 @@ class CandidateManagedArea(Base):
 
 class GeoZone(Base):
     """ Table candidate_managed_area pour retrouver la zone_id """
-    __tablename__ = "geo_zone"
+    __tablename__ = 'geo_zone'
 
     id = Column(Integer, primary_key=True, index=True)
     type = Column(String(255), nullable=False)
@@ -124,7 +124,7 @@ class GeoZone(Base):
 
 class GeoRegion(Base):
     """ Table candidate_managed_area pour retrouver la zone_id """
-    __tablename__ = "geo_region"
+    __tablename__ = 'geo_region'
 
     id = Column(Integer, primary_key=True, index=True)
     code = Column(String(255), unique=True, nullable=False, index=True)
