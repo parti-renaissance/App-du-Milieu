@@ -41,8 +41,7 @@ engine_read_only = create_engine(
         query={
             "unix_socket": "/cloudsql/{}".format(CLOUDSQL_CONN)
         }
-    ), 
-    connect_args={'readonly': True},
+    ),
     pool_size=5,
     pool_timeout=30,
     pool_recycle=1800,
