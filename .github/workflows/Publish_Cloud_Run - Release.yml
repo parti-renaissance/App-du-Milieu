@@ -1,4 +1,4 @@
-name: Deploy to Cloud Run
+name: Release to Cloud Run
 
 on:
   release:
