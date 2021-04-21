@@ -49,7 +49,7 @@ class Contact(Base):
             'Département': self.departement,
             'Code_région': self.code_region,
             'Région': self.region,
-            'Centres_d\'intérêt': self.centres_interet.split(',')
+            'Centres_d\'intérêt': None if self.centres_interet is None else self.centres_interet.split(',')
         }
 
 
@@ -72,8 +72,8 @@ class Contact(Base):
             'Département': self.departement,
             'Code_région': self.code_region,
             'Région': self.region,
-            'Centres_d\'intérêt': self.centres_interet.split(','),
-            'Typeforms': self.typeforms.split(',')
+            'Centres_d\'intérêt': None if self.centres_interet is None else self.centres_interet.split(','),
+            'Typeforms': None if self.typeforms is None else self.typeforms.split(',')
         }
 
 
