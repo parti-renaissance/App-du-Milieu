@@ -15,6 +15,7 @@ env:
 
   # Cloud SQL Env
   SQL_INST: ${{ secrets.SQL_INST_STAGING }}
+  DB_READ: ${{ secrets.DB_READ_STAGING }}
   DB_NAME: ${{ secrets.DB_NAME_STAGING }}
   DB_USER: ${{ secrets.DB_USER_STAGING }}
   DB_PASS: ${{ secrets.DB_PASS_STAGING }}
@@ -48,4 +49,4 @@ jobs:
         --ingress internal-and-cloud-load-balancing \
         --memory 1024Mi \
         --set-cloudsql-instances $SQL_INST \
-        --set-env-vars=DB_USER=$DB_USER,DB_PASS=$DB_PASS,DB_NAME=$DB_NAME,CLOUD_SQL_CONNECTION_NAME=$GCP_PROJECT_ID:$GCP_ZONE:$SQL_INST
+        --set-env-vars=DB_USER=$DB_USER,DB_PASS=$DB_PASS,DB_NAME=$DB_NAME,CLOUDSQL_CONN=$GCP_PROJECT_ID:$GCP_ZONE:$SQL_INST
