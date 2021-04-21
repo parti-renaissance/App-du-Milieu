@@ -11,12 +11,13 @@ from starlette.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from app import crud, models, schemas
-from app.database import SessionLocal, engine
+from app.database import SessionLocal, engine_crm, engine_read_only
 from app.dependencies import CommonQueryParams
 
 import uvicorn
 
-models.Base.metadata.create_all(bind=engine)
+models.CRM.metadata.create_all(bind=engine_crm)
+models.Base.metadata.create_all(bind=engine_read_only)
 
 app = FastAPI(
     title="API pour le CRM de LaREM",
