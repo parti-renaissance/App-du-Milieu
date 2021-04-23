@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from typing import Optional
 from app.models import Contact, Adherents, CandidateManagedArea, GeoZone
-from app import Schemas
+from app import schemas
 
 import numpy as np
 

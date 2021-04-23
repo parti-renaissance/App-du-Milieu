@@ -10,7 +10,7 @@ from fastapi.middleware.gzip import GZipMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
-from app import crud, schemas
+from app import crud, models, schemas
 from app.database import SessionLocal, engine_crm, engine_read_only
 
 import uvicorn
