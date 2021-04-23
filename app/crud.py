@@ -4,77 +4,64 @@ Endpoints de notre api
 from sqlalchemy.orm import Session
 
 from typing import Optional
-from app import models, schemas
-from app.dependencies import CommonQueryParams
+from app.models import Contact, Adherents, CandidateManagedArea, GeoZone
+from app import schemas
+
+import numpy as np
 
 
-def get_contacts(db: Session, commons: CommonQueryParams, adherent: models.Adherents):
-    adherent_region = get_candidate_region(db, adherent)
-    if adherent_region is None:
+def get_contacts(db: Session, adherent: Adherents):
+    zone = get_candidate_zone(db, adherent)
+    if zone is None:
         return None
 
-    filter_query = {'code_region': adherent_region.get_code()}
-    if commons.code_postal:
-        filter_query = {**filter_query, 'code_postal': commons.code_postal}
-    if commons.code_departement:
-        filter_query = {**filter_query, 'code_departement': commons.code_departement}
+    filter_zone = {
+        'region': 'code_region',
+        'department': 'code_departement',
+        'city': 'code_commune'
+    }.get(zone.get_type(), None)
+    if filter_zone is None:
+        return None
+    filter_zone = {filter_zone: zone.get_code()}
 
-    contacts = {'contacts' : [contact.serialize() for contact in
-            db.query(models.Contact).filter_by(**filter_query).all()]}
+    contacts = np.array([contact.serialize() for contact in
+            db.query(Contact).filter_by(**filter_zone).all()])
 
     """ metadata list of choices """
     interests = {'interests_choices': schemas.Interests_choices.list()}
     gender = {'gender_choices': schemas.Gender.list()}
 
     return {
-        'total_items': len(contacts['contacts']),
+        'total_items': len(contacts),
         **interests,
         **gender,
-        **contacts
+        'contacts': [*contacts]
         }
 
 
-def get_contact(db: Session, id: int, adherent: models.Adherents) -> models.Contact:
-    adherent_region = get_candidate_region(db, adherent)
-    if adherent_region is None:
-        return None
-
-    filter_query = {'code_region': adherent_region.get_code()}
-    filter_query = {**filter_query, 'id': id}
-    return db.query(models.Contact) \
-             .filter_by(**filter_query) \
-             .first()
-
-
-def me(db: Session, uuid: str) -> models.Adherents:
-    adherent = db.query(models.Adherents) \
-                 .filter(models.Adherents.uuid == uuid) \
+def me(db: Session, uuid: str) -> Adherents:
+    adherent = db.query(Adherents) \
+                 .filter(Adherents.uuid == uuid) \
                  .first()
     if adherent is None:
         return None
     return adherent
 
 
-def get_candidate_region(db: Session, adherent: models.Adherents):
+def get_candidate_zone(db: Session, adherent: Adherents):
     if adherent is None:
         return None
 
-    managedArea = db.query(models.CandidateManagedArea) \
-                    .filter(models.CandidateManagedArea.id == adherent.get_candidate_managed_area()) \
+    managedArea = db.query(CandidateManagedArea) \
+                    .filter(CandidateManagedArea.id == adherent.get_candidate_managed_area()) \
                     .first()
     if managedArea is None:
         return None
 
-    geoZone = db.query(models.GeoZone) \
-                .filter(models.GeoZone.id == managedArea.get_zone_id()) \
+    geoZone = db.query(GeoZone) \
+                .filter(GeoZone.id == managedArea.get_zone_id()) \
                 .first()
     if geoZone is None:
         return None
 
-    geoRegion = db.query(models.GeoRegion) \
-                .filter(models.GeoRegion.code == geoZone.get_code()) \
-                .first()
-    if geoRegion is None:
-        return None
-
-    return geoRegion
+    return geoZone
