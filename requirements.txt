@@ -5,3 +5,4 @@ uvicorn[standard]
 requests
 gunicorn
 pymysql
+numpy
