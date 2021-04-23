@@ -22,7 +22,7 @@ env:
 
   # Image Env
   IMAGE: middleware-api
-  TAG: staging
+  TAG: prod
 
 jobs:
   Deploy:
