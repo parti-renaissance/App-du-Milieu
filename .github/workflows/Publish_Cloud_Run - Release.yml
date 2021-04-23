@@ -20,6 +20,7 @@ env:
 
   # Image Env
   IMAGE: middleware-api
+  IMAGE_NAME: middleware-api
   TAG: staging
 
 jobs:
@@ -37,7 +38,7 @@ jobs:
 
     - name : Deploy Cloud Run
       run : |-
-        gcloud run deploy app-du-milieu \
+        gcloud run deploy $IMAGE_NAME \
         --image eu.gcr.io/$GCP_PROJECT_ID/$IMAGE:$TAG \
         --platform managed \
         --region $GCP_ZONE \
