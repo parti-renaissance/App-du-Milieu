@@ -94,8 +94,7 @@ def jemengage_downloads(
 
 if __name__ == "__main__":
     uvicorn.run(
-        "main:app",
-    	reload=True,
+        app,
     	host="0.0.0.0",
         port=int(environ.get("PORT", 8080))
     	)
