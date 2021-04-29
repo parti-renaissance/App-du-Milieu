@@ -33,7 +33,7 @@ def get_downloads(
                 .filter_by(**filter_zone) \
                 .filter(DownloadsReg.date < before - timedelta(days=range)) \
                 .order_by(desc(DownloadsReg.date)) \
-                .first().cumsum
+                .first().cumsum if not None else 0
 
         query = db.query(DownloadsReg) \
                 .filter_by(**filter_zone) \
@@ -45,7 +45,7 @@ def get_downloads(
                 .filter_by(**filter_zone) \
                 .filter(DownloadsDpt.date < before - timedelta(days=range)) \
                 .order_by(desc(DownloadsDpt.date)) \
-                .first().cumsum
+                .first().cumsum if not None else 0
 
         query = db.query(DownloadsDpt) \
                 .filter_by(**filter_zone) \
