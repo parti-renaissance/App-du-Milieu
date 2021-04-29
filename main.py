@@ -65,7 +65,7 @@ def read_contacts(
 
     contacts = contact.get_contacts(db, adherent=me)
     if not contacts:
-        raise HTTPException(status_code=404, detail='No contact found')
+        raise HTTPException(status_code=204, detail='No contact found')
     return contacts
 
 
@@ -88,7 +88,11 @@ def jemengage_downloads(
     if not me:
         return HTTPException(status_code=403, detail='You are not allowed to access these datas.')
 
-    res = jemengage.get_downloads(db, me).to_json(orient='records')
+    res = jemengage.get_downloads(db, me)
+    if not res:
+        raise HTTPException(status_code=204, detail='No content')
+        
+    res = res.to_json(orient='records')
     return json.loads(res)
 
 
