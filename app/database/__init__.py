@@ -4,5 +4,6 @@ from app.database.database_enmarche import Base, engine_read_only
 
 SessionLocal = sessionmaker(
     autocommit=False,
-    autoflush=False)
-SessionLocal.configure(binds={CRM: engine_crm, Base: engine_read_only})
+    autoflush=False,
+    binds={CRM: engine_crm, Base: engine_read_only})
+

@@ -10,16 +10,12 @@ from fastapi.middleware.gzip import GZipMiddleware
 from starlette.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
-from app.crud import contact
-from app.models import models_crm, models_enmarche
+from app.crud import contact, enmarche, jemengage
 from app.schemas import schemas
 from app.database import SessionLocal
-from app.dependencies import CommonQueryParams
 
 import uvicorn
-
-models.CRM.metadata.create_all(bind=engine_crm)
-models.Base.metadata.create_all(bind=engine_read_only)
+import json
 
 app = FastAPI(
     title="API pour le CRM de LaREM",
@@ -58,26 +54,49 @@ def home():
 @app.get("/contacts")
 def read_contacts(
     db: Session = Depends(get_db),
-    commons: CommonQueryParams = Depends(CommonQueryParams),
     X_User_UUID: Optional[str] = Header(None)
     ):
-    if X_User_UUID is None:
+    if not X_User_UUID:
         return HTTPException(status_code=401, detail='You are not authenticated.')
 
     me = contact.me(db, X_User_UUID)
-    if me is None:
+    if not me:
         return HTTPException(status_code=403, detail='You are not allowed to access these datas.')
 
-    contacts = contact.get_contacts(db, commons, adherent=me)
-    if contacts is None:
+    contacts = contact.get_contacts(db, adherent=me)
+    if not contacts:
         raise HTTPException(status_code=404, detail='No contact found')
     return contacts
 
 
+@app.get('/adherents')
+def get_adherents(
+    db: Session = Depends(get_db)
+    ):
+    return enmarche.total_adherents(db)
+
+
+@app.get('/jemengage/downloads')
+def jemengage_downloads(
+    db: Session = Depends(get_db),
+    X_User_UUID: Optional[str] = Header(None)
+    ):
+    if not X_User_UUID:
+        return HTTPException(status_code=401, detail='You are not authenticated.')
+
+    me = contact.me(db, X_User_UUID)
+    if not me:
+        return HTTPException(status_code=403, detail='You are not allowed to access these datas.')
+
+    res = jemengage.get_downloads(db, me).to_json(orient='records')
+    return json.loads(res)
+
+
 if __name__ == "__main__":
     uvicorn.run(
-        app,
-    	debug=True,
-    	host="0.0.0.0",
-        port=int(environ.get("PORT", 8080))
+        "main:app",
+    	reload=True,
+    	#host="0.0.0.0",
+        #port=int(environ.get("PORT", 8080))
+        port=8080
     	)

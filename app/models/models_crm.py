@@ -1,7 +1,7 @@
 """
 SQLAlchemy de notre base de données CRM
 """
-from sqlalchemy import Column, Integer, String
+from sqlalchemy import Column, Integer, String, Date, DateTime
 
 from app.database import CRM
 
@@ -54,3 +54,26 @@ class ContactFull(Contact):
     email = Column(String, nullable=False, unique=True)
     telephones = Column(String, nullable=True)
     typeforms = Column(String, nullable=True)
+
+
+class DownloadsDpt(CRM):
+    """ Table crm_downloads_dpt """
+    __tablename__ = 'crm_downloads_dpt'
+
+    index = Column(Integer, primary_key=True, index=True)
+    date = Column(Date, nullable=False)
+    region = Column(String, nullable=False)
+    departement = Column(String, nullable=False)
+    unique_user = Column(Integer, nullable=False)
+    cumsum = Column(Integer, nullable=False)
+
+
+class DownloadsReg(CRM):
+    """ Table crm_downloads_region """
+    __tablename__ = 'crm_downloads_region'
+
+    index = Column(Integer, primary_key=True, index=True)
+    date = Column(Date, nullable=False)
+    region = Column(String, nullable=False)
+    unique_user = Column(Integer, nullable=False)
+    cumsum = Column(Integer, nullable=False)

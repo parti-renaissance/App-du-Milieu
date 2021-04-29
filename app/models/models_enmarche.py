@@ -1,7 +1,7 @@
 """
 SQLAlchemy de notre base de données Globale
 """
-from sqlalchemy import Column, Integer, String, UniqueConstraint
+from sqlalchemy import Column, Integer, String, DateTime, Date, UniqueConstraint
 
 from app.database import Base
 
@@ -17,7 +17,6 @@ class Adherents(Base):
     uuid = Column(String(36), unique=True, nullable=False, index=True)
     candidate_managed_area_id = Column(Integer)
 
-
     def get_candidate_managed_area(self):
         return self.candidate_managed_area_id
 
@@ -28,7 +27,6 @@ class CandidateManagedArea(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     zone_id = Column(Integer, nullable=False)
-
 
     def get_zone_id(self):
         return self.zone_id
@@ -45,23 +43,18 @@ class GeoZone(Base):
     
     UniqueConstraint('code', 'type', name='geo_zone_code_type_unique')
 
-
     def get_code(self):
         return self.code
 
+    def get_type(self):
+        return self.type
 
-class GeoRegion(Base):
-    """ Table candidate_managed_area pour retrouver la zone_id """
-    __tablename__ = 'geo_region'
+
+class OauthAccessTokens(Base):
+    """ Table oauth_access_tokens """
+    __tablename__ = 'oauth_access_tokens'
 
     id = Column(Integer, primary_key=True, index=True)
-    code = Column(String(255), unique=True, nullable=False, index=True)
-    name = Column(String(255), nullable=False)
-
-
-    def get_code(self):
-        return self.code
-
-
-    def get_name(self):
-        return self.name
+    client_id = Column(Integer, nullable=False, index=True)
+    user_id = Column(Integer, index=True)
+    created_at = Column(DateTime, nullable=False, index=True)
