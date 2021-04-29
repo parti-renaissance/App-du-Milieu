@@ -59,13 +59,15 @@ def read_contacts(
     if not X_User_UUID:
         return HTTPException(status_code=401, detail='You are not authenticated.')
 
-    me = contact.me(db, X_User_UUID)
-    if not me:
+    try:
+        me = contact.me(db, X_User_UUID)
+    except:
         return HTTPException(status_code=403, detail='You are not allowed to access these datas.')
 
-    contacts = contact.get_contacts(db, adherent=me)
-    if not contacts:
-        raise HTTPException(status_code=204, detail='No contact found')
+    try:
+        contacts = contact.get_contacts(db, adherent=me)
+    except:
+        return HTTPException(status_code=204, detail='No contact found')
     return contacts
 
 
@@ -84,14 +86,15 @@ def jemengage_downloads(
     if not X_User_UUID:
         return HTTPException(status_code=401, detail='You are not authenticated.')
 
-    me = contact.me(db, X_User_UUID)
-    if not me:
+    try:
+        me = contact.me(db, X_User_UUID)
+    except:
         return HTTPException(status_code=403, detail='You are not allowed to access these datas.')
 
     res = jemengage.get_downloads(db, me)
-    if not res:
-        raise HTTPException(status_code=204, detail='No content')
-        
+    if res.empty:
+        return HTTPException(status_code=204, detail='No content')
+
     res = res.to_json(orient='records')
     return json.loads(res)
 

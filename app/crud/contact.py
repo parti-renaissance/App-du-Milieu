@@ -13,8 +13,6 @@ import numpy as np
 
 def get_contacts(db: Session, adherent: Adherents):
     zone = get_candidate_zone(db, adherent)
-    if zone is None:
-        return None
 
     filter_zone = {zone.type: zone.name}
 

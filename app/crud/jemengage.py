@@ -53,9 +53,8 @@ def get_downloads(
                 .filter(DownloadsDpt.date >= before - timedelta(days=range)) \
                 .statement
 
-    df = pd.read_sql(query, engine_crm).drop(columns=['index', zone.type]) if not None else None
-    if not df:
-        return None
-    df['cumsum'] = df['cumsum'].astype(int) - int(sum_ori)
-    df['date'] = pd.to_datetime(df['date']).dt.strftime('%Y-%m-%d')
+    df = pd.read_sql(query, engine_crm).drop(columns=['index', zone.type])
+    if not df.empty:
+        df['cumsum'] = df['cumsum'].astype(int) - int(sum_ori)
+        df['date'] = pd.to_datetime(df['date']).dt.strftime('%Y-%m-%d')
     return df
