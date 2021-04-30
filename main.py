@@ -75,7 +75,15 @@ def read_contacts(
 def get_adherents(
     db: Session = Depends(get_db)
     ):
-    return enmarche.total_adherents(db)
+    if not X_User_UUID:
+        return HTTPException(status_code=401, detail='You are not authenticated.')
+
+    try:
+        me = contact.me(db, X_User_UUID)
+    except:
+        return HTTPException(status_code=403, detail='You are not allowed to access these datas.')
+
+    return {'nombre d\'adhérents': contact.get_number_of_contacts(db, me)}
 
 
 @app.get('/jemengage/downloads')
