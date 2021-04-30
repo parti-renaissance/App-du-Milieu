@@ -55,6 +55,14 @@ def get_downloads(
 
     df = pd.read_sql(query, engine_crm).drop(columns=['index', zone.type])
     if not df.empty:
+        # series of all date from min to max
+        s_date = pd.date_range(df.date.min(), df.date.max())
+        # fill missing date
+        df = df.set_index('date').reindex(s_date).rename_axis('date').reset_index()
+        # fill unique user to 0
+        df['unique_user'] = df['unique_user'].fillna(0)
+        # fill cumulative to previous value (minus first value)
+        df['cumsum'] = df['cumsum'].fillna(method='ffill')
         df['cumsum'] = df['cumsum'].astype(int) - int(sum_ori)
         df['date'] = pd.to_datetime(df['date']).dt.strftime('%Y-%m-%d')
     return df
