@@ -20,11 +20,11 @@ def get_contacts(db: Session, adherent: Adherents):
             db.query(Contact).filter_by(**filter_zone).all()])
 
     """ metadata list of choices """
-    interests = {'interests_choices': schemas.Interests_choices.list()}
-    gender = {'gender_choices': schemas.Gender.list()}
+    interests = {'interestsChoices': schemas.Interests_choices.list()}
+    gender = {'genderChoices': schemas.Gender.list()}
 
     return {
-        'total_items': len(contacts),
+        'totalItems': len(contacts),
         **interests,
         **gender,
         'contacts': [*contacts]
@@ -36,6 +36,6 @@ def get_number_of_contacts(db: Session, adherent: Adherents):
     filter_zone = {zone.type: zone.name}
 
     return {
-        'Nombre-adherents': db.query(Contact).filter_by(**filter_zone).count(),
-        'Zone': zone.name
+        'adherentCount': db.query(Contact).filter_by(**filter_zone).count(),
+        'zoneName': zone.name
     }
