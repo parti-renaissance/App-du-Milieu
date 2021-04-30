@@ -27,13 +27,15 @@ def get_downloads(
     # We first add filter by geo_zone
     filter_zone = {zone.type: zone.name}
 
-    sum_ori = 0
     if zone.type == 'region':
-        sum_ori = db.query(DownloadsReg) \
-                .filter_by(**filter_zone) \
-                .filter(DownloadsReg.date < before - timedelta(days=range)) \
-                .order_by(desc(DownloadsReg.date)) \
-                .first().cumsum if not None else 0
+        try:
+            sum_ori = int(db.query(DownloadsReg) \
+                            .filter_by(**filter_zone) \
+                            .filter(DownloadsReg.date < before - timedelta(days=range)) \
+                            .order_by(desc(DownloadsReg.date)) \
+                            .first().cumsum)
+        except:
+            sum_ori = 0
 
         query = db.query(DownloadsReg) \
                 .filter_by(**filter_zone) \
@@ -41,11 +43,14 @@ def get_downloads(
                 .filter(DownloadsReg.date >= before - timedelta(days=range)) \
                 .statement
     else:
-        sum_ori = db.query(DownloadsDpt) \
-                .filter_by(**filter_zone) \
-                .filter(DownloadsDpt.date < before - timedelta(days=range)) \
-                .order_by(desc(DownloadsDpt.date)) \
-                .first().cumsum if not None else 0
+        try:
+            sum_ori = int(db.query(DownloadsDpt) \
+                            .filter_by(**filter_zone) \
+                            .filter(DownloadsDpt.date < before - timedelta(days=range)) \
+                            .order_by(desc(DownloadsDpt.date)) \
+                            .first().cumsum)
+        except:
+            sum_ori = 0
 
         query = db.query(DownloadsDpt) \
                 .filter_by(**filter_zone) \
@@ -62,7 +67,7 @@ def get_downloads(
         # fill unique user to 0
         df['unique_user'] = df['unique_user'].fillna(0)
         # fill cumulative to previous value (minus first value)
-        df['cumsum'] = df['cumsum'].fillna(method='ffill')
+        df['cumsum'] = df['cumsum'].fillna(method='ffill').fillna(0)
         df['cumsum'] = df['cumsum'].astype(int) - int(sum_ori)
         df['date'] = pd.to_datetime(df['date']).dt.strftime('%Y-%m-%d')
     return df
