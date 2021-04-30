@@ -84,7 +84,7 @@ def get_adherents(
     except:
         return HTTPException(status_code=403, detail='You are not allowed to access these datas.')
 
-    return {'nombre d\'adhérents': contact.get_number_of_contacts(db, me)}
+    return contact.get_number_of_contacts(db, me)
 
 
 
