@@ -3,11 +3,10 @@ Endpoints de notre api
 """
 from sqlalchemy.orm import Session
 
-from typing import Optional
 from app.models.models_crm import Contact
 from app.models.models_enmarche import Adherents
 from app.schemas import schemas
-from app.crud.enmarche import me, get_candidate_zone
+from app.crud.enmarche import get_candidate_zone
 import numpy as np
 
 
