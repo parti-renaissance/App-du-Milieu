@@ -36,6 +36,6 @@ def get_number_of_contacts(db: Session, adherent: Adherents):
     filter_zone = {zone.type: zone.name}
 
     return {
-        'Nombre d\'adhérents': db.query(Contact).filter_by(**filter_zone).count(),
+        'Nombre-adherents': db.query(Contact).filter_by(**filter_zone).count(),
         'Zone': zone.name
     }
