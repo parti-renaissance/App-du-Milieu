@@ -56,24 +56,23 @@ class ContactFull(Contact):
     typeforms = Column(String, nullable=True)
 
 
-class DownloadsDpt(CRM):
-    """ Table crm_downloads_dpt """
-    __tablename__ = 'crm_downloads_dpt'
+class Downloads(CRM):
+    """ Table crm_downloads """
+    __tablename__ = 'crm_downloads'
 
     index = Column(Integer, primary_key=True, index=True)
     date = Column(Date, nullable=False)
-    region = Column(String, nullable=False)
-    departement = Column(String, nullable=False)
+    zone_type = Column(String, nullable=False)
+    zone_name = Column(String, nullable=False)
     unique_user = Column(Integer, nullable=False)
-    cumsum = Column(Integer, nullable=False)
 
 
-class DownloadsReg(CRM):
-    """ Table crm_downloads_region """
-    __tablename__ = 'crm_downloads_region'
+class Users(CRM):
+    """ Table crm_usage """
+    __tablename__ = 'crm_usage'
 
     index = Column(Integer, primary_key=True, index=True)
     date = Column(Date, nullable=False)
-    region = Column(String, nullable=False)
+    zone_type = Column(String, nullable=False)
+    zone_name = Column(String, nullable=False)
     unique_user = Column(Integer, nullable=False)
-    cumsum = Column(Integer, nullable=False)
