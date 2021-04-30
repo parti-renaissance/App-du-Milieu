@@ -70,5 +70,5 @@ def get_downloads(
         # fill cumulative to previous value (minus first value)
         df['cumsum'] = df['cumsum'].fillna(method='ffill').astype(int)
         df['cumsum'] = df['cumsum'] - sum_ori
-        df['date'] = df['date'].dt.strftime('%Y-%m-%d')
+        df['date'] = df['date'].dt.strftime('%d/%m')
     return df
