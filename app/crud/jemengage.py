@@ -66,9 +66,9 @@ def get_downloads(
         df['date'] = pd.to_datetime(df['date'], format='%Y-%m-%d')
         df = df.set_index('date').reindex(s_date).rename_axis('date').reset_index()
         # fill unique user to 0
-        df['unique_user'] = df['unique_user'].fillna(0)
+        df['unique_user'] = df['unique_user'].fillna(0).astype(int)
         # fill cumulative to previous value (minus first value)
-        df['cumsum'] = df['cumsum'].fillna(method='ffill')
-        df['cumsum'] = df['cumsum'].astype(int) - int(sum_ori)
+        df['cumsum'] = df['cumsum'].fillna(method='ffill').astype(int)
+        df['cumsum'] = df['cumsum'] - sum_ori
         df['date'] = df['date'].dt.strftime('%Y-%m-%d')
     return df
