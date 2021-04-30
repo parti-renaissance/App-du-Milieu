@@ -73,7 +73,8 @@ def read_contacts(
 
 @app.get('/adherents')
 def get_adherents(
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    X_User_UUID: Optional[str] = Header(None)
     ):
     if not X_User_UUID:
         return HTTPException(status_code=401, detail='You are not authenticated.')
@@ -84,6 +85,7 @@ def get_adherents(
         return HTTPException(status_code=403, detail='You are not allowed to access these datas.')
 
     return {'nombre d\'adhérents': contact.get_number_of_contacts(db, me)}
+
 
 
 @app.get('/jemengage/downloads')
@@ -107,9 +109,30 @@ def jemengage_downloads(
     return {'downloads': json.loads(res)}
 
 
+@app.get('/jemengage/users')
+def jemengage_users(
+    db: Session = Depends(get_db),
+    X_User_UUID: Optional[str] = Header(None)
+    ):
+    if not X_User_UUID:
+        return HTTPException(status_code=401, detail='You are not authenticated.')
+
+    try:
+        me = contact.me(db, X_User_UUID)
+    except:
+        return HTTPException(status_code=403, detail='You are not allowed to access these datas.')
+
+    res = jemengage.get_users(db, me)
+    if res.empty:
+        return HTTPException(status_code=204, detail='No content')
+
+    res = res.to_json(orient='records')
+    return {'downloads': json.loads(res)}
+
+
 if __name__ == "__main__":
     uvicorn.run(
         app,
-    	host="0.0.0.0",
+        host="0.0.0.0",
         port=int(environ.get("PORT", 8080))
     	)
