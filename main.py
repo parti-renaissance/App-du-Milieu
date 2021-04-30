@@ -96,7 +96,7 @@ def jemengage_downloads(
         return HTTPException(status_code=204, detail='No content')
 
     res = res.to_json(orient='records')
-    return json.loads(res)
+    return {'downloads': json.loads(res)}
 
 
 if __name__ == "__main__":
