@@ -3,7 +3,6 @@ Endpoints de notre api
 """
 from sqlalchemy.orm import Session
 
-from typing import Optional
 from app.models.models_enmarche import Adherents, CandidateManagedArea, GeoZone
 
 
