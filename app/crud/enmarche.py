@@ -32,7 +32,3 @@ def get_candidate_zone(db: Session, adherent: Adherents):
     if geoZone is None:
         raise Exception('Geo_zone not found')
     return geoZone
-
-
-def total_adherents(db: Session):
-    return {'total_adherents': db.query(Adherents).count()}
