@@ -29,3 +29,10 @@ def get_contacts(db: Session, adherent: Adherents):
         **gender,
         'contacts': [*contacts]
         }
+
+
+def get_number_of_contacts(db: Session, adherent: Adherents):
+    zone = get_candidate_zone(db, adherent)
+    filter_zone = {zone.type: zone.name}
+
+    return db.query(Contact).filter_by(**filter_zone).count()
