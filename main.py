@@ -60,7 +60,7 @@ def read_contacts(
         return HTTPException(status_code=401, detail='You are not authenticated.')
 
     try:
-        me = contact.me(db, X_User_UUID)
+        me = enmarche.me(db, X_User_UUID)
     except:
         return HTTPException(status_code=403, detail='You are not allowed to access these datas.')
 
@@ -80,7 +80,7 @@ def get_adherents(
         return HTTPException(status_code=401, detail='You are not authenticated.')
 
     try:
-        me = contact.me(db, X_User_UUID)
+        me = enmarche.me(db, X_User_UUID)
     except:
         return HTTPException(status_code=403, detail='You are not allowed to access these datas.')
 
@@ -97,7 +97,7 @@ def jemengage_downloads(
         return HTTPException(status_code=401, detail='You are not authenticated.')
 
     try:
-        me = contact.me(db, X_User_UUID)
+        me = enmarche.me(db, X_User_UUID)
     except:
         return HTTPException(status_code=403, detail='You are not allowed to access these datas.')
 
@@ -118,7 +118,7 @@ def jemengage_users(
         return HTTPException(status_code=401, detail='You are not authenticated.')
 
     try:
-        me = contact.me(db, X_User_UUID)
+        me = enmarche.me(db, X_User_UUID)
     except:
         return HTTPException(status_code=403, detail='You are not allowed to access these datas.')
 
