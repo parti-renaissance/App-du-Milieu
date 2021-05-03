@@ -3,11 +3,10 @@ Endpoints de notre api
 """
 from sqlalchemy.orm import Session
 
-from typing import Optional
 from app.models.models_crm import Contact
 from app.models.models_enmarche import Adherents
 from app.schemas import schemas
-from app.crud.enmarche import me, get_candidate_zone
+from app.crud.enmarche import get_candidate_zone
 import numpy as np
 
 
@@ -20,11 +19,11 @@ def get_contacts(db: Session, adherent: Adherents):
             db.query(Contact).filter_by(**filter_zone).all()])
 
     """ metadata list of choices """
-    interests = {'interests_choices': schemas.Interests_choices.list()}
-    gender = {'gender_choices': schemas.Gender.list()}
+    interests = {'interestsChoices': schemas.Interests_choices.list()}
+    gender = {'genderChoices': schemas.Gender.list()}
 
     return {
-        'total_items': len(contacts),
+        'totalItems': len(contacts),
         **interests,
         **gender,
         'contacts': [*contacts]
@@ -36,6 +35,6 @@ def get_number_of_contacts(db: Session, adherent: Adherents):
     filter_zone = {zone.type: zone.name}
 
     return {
-        'Nombre d\'adhérents': db.query(Contact).filter_by(**filter_zone).count(),
-        'Zone': zone.name
+        'adherentCount': db.query(Contact).filter_by(**filter_zone).count(),
+        'zoneName': zone.name
     }

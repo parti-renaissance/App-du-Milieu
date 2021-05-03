@@ -127,7 +127,7 @@ def jemengage_users(
         return HTTPException(status_code=204, detail='No content')
 
     res = res.to_json(orient='records')
-    return {'downloads': json.loads(res)}
+    return {'users': json.loads(res)}
 
 
 if __name__ == "__main__":

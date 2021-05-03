@@ -3,7 +3,6 @@ Endpoints de notre api
 """
 from sqlalchemy.orm import Session
 
-from typing import Optional
 from app.models.models_enmarche import Adherents, CandidateManagedArea, GeoZone
 
 
@@ -32,7 +31,3 @@ def get_candidate_zone(db: Session, adherent: Adherents):
     if geoZone is None:
         raise Exception('Geo_zone not found')
     return geoZone
-
-
-def total_adherents(db: Session):
-    return {'total_adherents': db.query(Adherents).count()}
