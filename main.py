@@ -7,6 +7,7 @@ from typing import List, Optional
 
 from fastapi import FastAPI, Depends, Header, HTTPException
 from fastapi.middleware.gzip import GZipMiddleware
+from fastapi.responses import ORJSONResponse
 from starlette.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
@@ -44,15 +45,15 @@ def get_db():
 
 
 @app.get("/")
-def home():
+async def home():
     """ Message d'accueil """
     return {
         'message': 'Welcome to building RESTful APIs with FastAPI'
     }
 
 
-@app.get("/contacts")
-def read_contacts(
+@app.get("/contacts", response_class=ORJSONResponse)
+async def read_contacts(
     db: Session = Depends(get_db),
     X_User_UUID: Optional[str] = Header(None)
     ):
@@ -71,8 +72,8 @@ def read_contacts(
     return contacts
 
 
-@app.get('/adherents')
-def get_adherents(
+@app.get('/adherents', response_class=ORJSONResponse)
+async def get_adherents(
     db: Session = Depends(get_db),
     X_User_UUID: Optional[str] = Header(None)
     ):
@@ -88,8 +89,8 @@ def get_adherents(
 
 
 
-@app.get('/jemengage/downloads')
-def jemengage_downloads(
+@app.get('/jemengage/downloads', response_class=ORJSONResponse)
+async def jemengage_downloads(
     db: Session = Depends(get_db),
     X_User_UUID: Optional[str] = Header(None)
     ):
@@ -109,8 +110,8 @@ def jemengage_downloads(
     return {'downloads': json.loads(res)}
 
 
-@app.get('/jemengage/users')
-def jemengage_users(
+@app.get('/jemengage/users', response_class=ORJSONResponse)
+async def jemengage_users(
     db: Session = Depends(get_db),
     X_User_UUID: Optional[str] = Header(None)
     ):
