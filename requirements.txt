@@ -7,3 +7,4 @@ gunicorn
 pymysql
 numpy
 pandas
+orjson
