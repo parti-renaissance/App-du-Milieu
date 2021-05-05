@@ -9,6 +9,7 @@ from typing import Optional
 from app.models.models_enmarche import Adherents
 from app.models.models_crm import Downloads, Users
 from app.crud.enmarche import me, get_candidate_zone
+from app.database.database_crm import engine_crm
 
 import pandas as pd
 
