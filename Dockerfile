@@ -11,7 +11,7 @@ ENV PYTHONUNBUFFERED True
 ENV APP_HOME /app
 WORKDIR $APP_HOME
 COPY . ./
-RUN apk update
+RUN sudo sh -c "apt-get -y update;apt-get -y dist-upgrade;apt-get -y autoremove;apt-get -y autoclean"
 #RUN apk add make automake gcc g++ subversion python3-dev
 RUN pip install -r requirements.txt
 
