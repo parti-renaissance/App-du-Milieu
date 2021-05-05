@@ -1,7 +1,8 @@
 # Use the official lightweight Python image.
 # https://hub.docker.com/_/python
 
-FROM python:3.9-alpine
+FROM python:3.9
+#-alpine
 
 # Allow statements and log messages to immediately appear in the Knative logs
 ENV PYTHONUNBUFFERED True
@@ -11,7 +12,7 @@ ENV APP_HOME /app
 WORKDIR $APP_HOME
 COPY . ./
 RUN apk update
-RUN apk add make automake gcc g++ subversion python3-dev
+#RUN apk add make automake gcc g++ subversion python3-dev
 RUN pip install -r requirements.txt
 
 # Run the web service on container startup. Here we use the gunicorn
