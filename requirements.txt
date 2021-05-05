@@ -6,3 +6,4 @@ requests
 gunicorn
 pymysql
 pandas
+orjson
