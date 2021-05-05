@@ -14,7 +14,7 @@ class Contact(CRM):
     genre = Column(String, nullable=True)
     prenom = Column(String, nullable=True)
     nom = Column(String, nullable=True)
-    sub_email = Column(Boolean, nullable=True)
+    sub_email = Column(String, nullable=True)
     sub_tel = Column(Boolean, nullable=True)
     code_postal = Column(String, nullable=True)
     code_commune = Column(String, nullable=True)
@@ -38,7 +38,7 @@ class Contact(CRM):
             'Prénom': self.prenom,
             'Nom': self.nom,
             'Abonné_email': True if self.sub_email is not None else False,
-            'Abonné_tel': True if self.sub_tel else False,
+            'Abonné_tel': self.sub_tel,
             'Code_postal': self.code_postal,
             'Code_commune': self.code_commune,
             'Commune': self.commune,
