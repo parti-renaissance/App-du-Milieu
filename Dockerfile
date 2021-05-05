@@ -1,8 +1,5 @@
 # Use the official lightweight Python image.
 # https://hub.docker.com/_/python
-
-ARG DEBIAN_FRONTEND=noninteractive
-
 FROM python:3.9
 #-alpine
 
@@ -15,7 +12,7 @@ WORKDIR $APP_HOME
 COPY . ./
 
 # Install apt-utils
-RUN apt-get -yq install apt-utils
+RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends apt-utils
 # Upgrade Linux packages
 RUN apt-get -y update && apt-get -y dist-upgrade && apt-get -y autoremove && apt-get -y autoclean
 # Upgrade pip itself
