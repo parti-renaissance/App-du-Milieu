@@ -10,7 +10,8 @@ ENV PYTHONUNBUFFERED True
 ENV APP_HOME /app
 WORKDIR $APP_HOME
 COPY . ./
-
+RUN apk update
+RUN apk add make automake gcc g++ subversion python3-dev
 RUN pip install -r requirements.txt
 
 # Run the web service on container startup. Here we use the gunicorn
