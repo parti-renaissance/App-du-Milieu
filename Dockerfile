@@ -13,7 +13,7 @@ WORKDIR $APP_HOME
 COPY . ./
 
 # Upgrade Linux packages
-RUN apt-get update && apt-get dist-upgrade && apt-get autoremove && apt-get autoclean
+RUN apt-get -y update && apt-get -y dist-upgrade && apt-get -y autoremove && apt-get -y autoclean
 # Upgrade pip itself
 RUN pip install --upgrade pip
 # Upgrade to latests python packages
