@@ -1,12 +1,9 @@
 """
 SQLAlchemy de notre base de données CRM
 """
-from sqlalchemy import Column, Integer, String, Date, DateTime
+from sqlalchemy import Column, Integer, String, Boolean, Date, DateTime
 
 from app.database import CRM
-
-# import datetime
-# 'tim': int ((self.tim - datetime.datetime (1970, 1, 1)).total_seconds ()),
 
 
 class Contact(CRM):
@@ -17,9 +14,8 @@ class Contact(CRM):
     genre = Column(String, nullable=True)
     prenom = Column(String, nullable=True)
     nom = Column(String, nullable=True)
-    sub_email = Column(String, nullable=True)
-    sub_tel = Column(String, nullable=True)
-    centres_interet = Column(String, nullable=True)
+    sub_email = Column(Boolean, nullable=True)
+    sub_tel = Column(Boolean, nullable=True)
     code_postal = Column(String, nullable=True)
     code_commune = Column(String, nullable=True)
     commune = Column(String, nullable=True)
@@ -27,7 +23,12 @@ class Contact(CRM):
     departement = Column(String, nullable=True)
     code_region = Column(String, nullable=True)
     region = Column(String, nullable=True)
-
+    centres_interet = Column(String, nullable=True)
+    adherent_id = Column(Integer, nullable=True)
+    email = Column(String, nullable=False, unique=True)
+    email_subscriptions = Column(String, nullable=True)
+    telephones = Column(String, nullable=True)
+    typeforms = Column(String, nullable=True)
 
     def serialize(self):
         """ Print pour le call /contacts/ """
@@ -48,12 +49,6 @@ class Contact(CRM):
             'Centres_d\'intérêt': [] if self.centres_interet is None else self.centres_interet.split(',')
         }
 
-
-class ContactFull(Contact):
-    adherent_id = Column(Integer, nullable=True)
-    email = Column(String, nullable=False, unique=True)
-    telephones = Column(String, nullable=True)
-    typeforms = Column(String, nullable=True)
 
 
 class Downloads(CRM):

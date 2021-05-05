@@ -8,7 +8,6 @@ from datetime import date, timedelta
 from typing import Optional
 from app.models.models_enmarche import Adherents
 from app.models.models_crm import Downloads, Users
-from app.database.database_crm import engine_crm
 from app.crud.enmarche import me, get_candidate_zone
 
 import pandas as pd

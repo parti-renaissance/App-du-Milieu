@@ -8,6 +8,9 @@ from typing import List, Optional
 from fastapi import FastAPI, Depends, Header, HTTPException
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import ORJSONResponse
+# profiling
+#from fastapi_profiler.profiler_middleware import PyInstrumentProfilerMiddleware
+
 from starlette.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
@@ -18,6 +21,7 @@ from app.database import SessionLocal
 import uvicorn
 import json
 
+
 app = FastAPI(
     title="API pour le CRM de LaREM",
     description="GET uniquements pour récupérer les données des contacts de notre base",
@@ -25,15 +29,15 @@ app = FastAPI(
 )
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
-origins = ["*"]
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+#app.add_middleware(PyInstrumentProfilerMiddleware)
 
 # Dependency
 def get_db():

@@ -7,12 +7,10 @@ from app.models.models_enmarche import Adherents, CandidateManagedArea, GeoZone
 
 
 def me(db: Session, uuid: str) -> Adherents:
-    adherent = db.query(Adherents) \
-                 .filter(Adherents.uuid == uuid) \
-                 .first()
-    if adherent is None:
-        raise Exception('Adherent not found')
-    return adherent
+    if adherent := db.query(Adherents) \
+                         .filter(Adherents.uuid == uuid) \
+                         .first():
+        return adherent
 
 
 def get_candidate_zone(db: Session, adherent: Adherents):
