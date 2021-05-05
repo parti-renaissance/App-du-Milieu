@@ -12,7 +12,7 @@ WORKDIR $APP_HOME
 COPY . ./
 
 # Install apt-utils
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends apt-utils
+#RUN DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends apt-utils
 # Upgrade Linux packages
 RUN apt-get -y update && apt-get -y dist-upgrade && apt-get -y autoremove && apt-get -y autoclean
 # Upgrade pip itself
