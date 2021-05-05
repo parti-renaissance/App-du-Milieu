@@ -5,6 +5,8 @@ uvicorn[standard]
 requests
 gunicorn
 pymysql
-numpy
+numexpr
+bottleneck
+numba
 pandas
 orjson
