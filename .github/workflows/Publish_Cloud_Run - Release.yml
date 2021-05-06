@@ -1,5 +1,4 @@
-name: Release to Cloud Run
-
+name: Prod - Deploy to Cloud Run
 on:
   release:
     types:
@@ -19,9 +18,9 @@ env:
   DB_PASS: ${{ secrets.DB_PASS_PROD }}
 
   # Image Env
-  IMAGE: middleware-api
-  IMAGE_NAME: middleware-api
-  TAG: staging
+  IMAGE: app-du-milieu
+  TAG: build
+  C_RUN_NAME: app-du-milieu
 
 jobs:
   Deploy:
@@ -38,12 +37,12 @@ jobs:
 
     - name : Deploy Cloud Run
       run : |-
-        gcloud run deploy $IMAGE_NAME \
+        gcloud run deploy $C_RUN_NAME \
         --image eu.gcr.io/$GCP_PROJECT_ID/$IMAGE:$TAG \
         --platform managed \
         --region $GCP_ZONE \
         --allow-unauthenticated \
         --ingress internal-and-cloud-load-balancing \
-        --memory 2048Mi \
+        --memory 1024Mi \
         --set-cloudsql-instances $SQL_INST \
         --set-env-vars=DB_USER=$DB_USER,DB_PASS=$DB_PASS,DB_NAME=$DB_NAME,DB_READ=$DB_READ,CLOUDSQL_CONN=$GCP_PROJECT_ID:$GCP_ZONE:$SQL_INST

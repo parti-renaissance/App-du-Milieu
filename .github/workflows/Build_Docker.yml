@@ -13,8 +13,8 @@ env:
   GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
 
   # Image Env
-  IMAGE: middleware-api
-  TAG: staging
+  IMAGE: app-du-milieu
+  TAG: build
 
 jobs:
   Build:
