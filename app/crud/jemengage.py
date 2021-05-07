@@ -96,7 +96,7 @@ def get_survey(
     if (zone := get_candidate_zone(db, adherent)) is None:
         return None
     
-    if zone.type == 'departement':
+    if zone.type == 'department':
         return db.query(JecouteSurvey) \
             .filter(JecouteSurvey.postal_code != '') \
             .join(GeoCity, GeoCity.postal_code == JecouteSurvey.postal_code) \
