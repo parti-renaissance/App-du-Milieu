@@ -77,6 +77,7 @@ class ContactOut(BaseModel):
 
 
 class JecouteSurvey(BaseModel):
+    id: int
     author_id: Optional[str]
     survey_id: str
     posted_at: datetime
