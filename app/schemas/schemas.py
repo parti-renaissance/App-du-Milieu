@@ -77,14 +77,14 @@ class ContactOut(BaseModel):
 
 
 class JecouteSurvey(BaseModel):
-    author_id: str
+    author_id: Optional[str]
     survey_id: str
     posted_at: datetime
-    postal_code: str
-    age_range: str
-    gender: str
-    latitude: float
-    longitude: float
+    postal_code: Optional[str]
+    age_range: Optional[str]
+    gender: Optional[str]
+    latitude: Optional[float]
+    longitude: Optional[float]
 
     class Config:
         orm_mode = True
