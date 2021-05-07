@@ -6,7 +6,8 @@ from sqlalchemy import func, desc, Date
 from datetime import date, timedelta
 
 from typing import Optional
-from app.models.models_enmarche import Adherents
+from app.models.models_enmarche import GeoCity, GeoDepartment, GeoRegion
+from app.models.models_enmarche import Adherents, JecouteSurvey
 from app.models.models_crm import Downloads, Users
 from app.crud.enmarche import me, get_candidate_zone
 from app.database.database_crm import engine_crm
@@ -20,8 +21,7 @@ def get_downloads(
     before: Date = date.today(),
     range: int = 28
     ):
-    zone = get_candidate_zone(db, adherent)
-    if zone is None:
+    if (zone := get_candidate_zone(db, adherent)) is None:
         return None
 
     # We first add filter by geo_zone
@@ -58,8 +58,7 @@ def get_users(
     before: Date = date.today(),
     range: int = 28
     ):
-    zone = get_candidate_zone(db, adherent)
-    if zone is None:
+    if (zone := get_candidate_zone(db, adherent)) is None:
         return None
 
     # We first add filter by geo_zone
@@ -89,3 +88,31 @@ def get_users(
         df = df[df.date >= pd.to_datetime(after)]
         df['date'] = df['date'].dt.strftime('%d/%m')
     return df
+
+def get_survey(
+    db: Session,
+    adherent: Adherents
+    ):
+    if (zone := get_candidate_zone(db, adherent)) is None:
+        return None
+    
+    if zone.type == 'departement':
+        return db.query(JecouteSurvey) \
+            .filter(JecouteSurvey.postal_code != '') \
+            .join(GeoCity, GeoCity.postal_code == JecouteSurvey.postal_code) \
+            .join(GeoDepartment) \
+            .filter(GeoDepartment.code == zone.code) \
+            .filter(JecouteSurvey.latitude != '') \
+            .filter(JecouteSurvey.longitude != '') \
+            .all()
+
+    if zone.type == 'region':
+        return db.query(JecouteSurvey) \
+                .filter(JecouteSurvey.postal_code != '') \
+                .join(GeoCity, GeoCity.postal_code == JecouteSurvey.postal_code) \
+                .join(GeoDepartment) \
+                .join(GeoRegion) \
+                .filter(GeoRegion.code == zone.code) \
+                .filter(JecouteSurvey.latitude != '') \
+                .filter(JecouteSurvey.longitude != '') \
+                .all()

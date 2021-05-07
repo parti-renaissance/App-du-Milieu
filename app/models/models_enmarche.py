@@ -1,7 +1,8 @@
 """
 SQLAlchemy de notre base de données Globale
 """
-from sqlalchemy import Column, Integer, String, DateTime, Date, UniqueConstraint
+from sqlalchemy import Column, Integer, Float, String, DateTime, Date, UniqueConstraint, ForeignKey
+from sqlalchemy.orm import relationship
 
 from app.database import Base
 
@@ -50,6 +51,34 @@ class GeoZone(Base):
         return self.type
 
 
+class GeoCity(Base):
+    """ Table geo_city """
+    __tablename__ = 'geo_city'
+
+    id = Column(Integer, primary_key=True, index=True)
+    postal_code = Column(String, nullable=False)
+    department_id = Column(Integer, ForeignKey('geo_department.id'))
+    geo_department = relationship('GeoDepartment')
+
+
+class GeoDepartment(Base):
+    """ Table geo_department """
+    __tablename__ = 'geo_department'
+
+    id = Column(Integer, primary_key=True, index=True)
+    code = Column(String, nullable=False)
+    region_id = Column(Integer, ForeignKey('geo_region.id'))
+    geo_region = relationship('GeoRegion')
+
+
+class GeoRegion(Base):
+    """ Table geo_region """
+    __tablename__ = 'geo_region'
+
+    id = Column(Integer, primary_key=True, index=True)
+    code = Column(String, nullable=False)
+
+
 class OauthAccessTokens(Base):
     """ Table oauth_access_tokens """
     __tablename__ = 'oauth_access_tokens'
@@ -58,3 +87,18 @@ class OauthAccessTokens(Base):
     client_id = Column(Integer, nullable=False, index=True)
     user_id = Column(Integer, index=True)
     created_at = Column(DateTime, nullable=False, index=True)
+
+
+class JecouteSurvey(Base):
+    """ Table jecoute_data_survey """
+    __tablename__ = 'jecoute_data_survey'
+
+    id = Column(Integer, primary_key=True, index=True)
+    author_id = Column(Integer, nullable=True)
+    survey_id = Column(Integer, nullable=False)
+    posted_at = Column(DateTime, nullable=False)
+    postal_code = Column(String, nullable=True)
+    age_range = Column(String, nullable=True)
+    gender = Column(String, nullable=True)
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)

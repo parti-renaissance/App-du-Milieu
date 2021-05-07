@@ -135,6 +135,22 @@ async def jemengage_users(
     return {'users': json.loads(res)}
 
 
+@app.get('/jemengage/survey', response_model=List[schemas.JecouteSurvey], response_class=ORJSONResponse)
+async def jemengage_survey(
+    db: Session = Depends(get_db),
+    X_User_UUID: Optional[str] = Header(None)
+    ):
+    if not X_User_UUID:
+        return HTTPException(status_code=401, detail='You are not authenticated.')
+
+    try:
+        me = enmarche.me(db, X_User_UUID)
+    except:
+        return HTTPException(status_code=403, detail='You are not allowed to access these datas.')
+
+    return jemengage.get_survey(db, adherent=me)
+
+
 if __name__ == "__main__":
     uvicorn.run(
         app,

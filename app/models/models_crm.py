@@ -33,7 +33,6 @@ class Contact(CRM):
     def serialize(self):
         """ Print pour le call /contacts/ """
         return {
-            'id': self.id,
             'Genre': self.genre,
             'Prénom': self.prenom,
             'Nom': self.nom,

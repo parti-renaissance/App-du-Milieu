@@ -17,7 +17,7 @@ def get_contacts(db: Session, adherent: Adherents):
             db.query(Contact).filter_by(**filter_zone).all()]
 
     """ metadata list of choices """
-    interests = {'interestsChoices': schemas.Interests_choices.list()}
+    interests = {'interestsChoices': schemas.InterestsChoices.list()}
     gender = {'genderChoices': schemas.Gender.list()}
 
     return {
