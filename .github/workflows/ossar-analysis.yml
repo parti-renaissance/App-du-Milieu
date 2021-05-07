@@ -4,9 +4,19 @@
 name: OSSAR
 
 on:
-  pull_request:
+  push:
+    branches: [ master ]
     paths:
       - '**.py'
+      - 'Dockerfile'
+      - 'requirements.txt'
+
+  pull_request:
+    branches: [ master ]
+    paths:
+      - '**.py'
+      - 'Dockerfile'
+      - 'requirements.txt'
 
 jobs:
   OSSAR-Scan:
