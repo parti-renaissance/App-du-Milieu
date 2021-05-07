@@ -109,7 +109,7 @@ def get_survey(
     if zone.type == 'region':
         return db.query(JecouteSurvey) \
                 .filter(JecouteSurvey.postal_code != '') \
-                .join(GeoCity, GeoCity.postal_code == JecouteSurvey.postal_code) \
+                .join(GeoCity, GeoCity.postal_code.like('%' + JecouteSurvey.postal_code + '%')) \
                 .join(GeoDepartment) \
                 .join(GeoRegion) \
                 .filter(GeoRegion.code == zone.code) \
