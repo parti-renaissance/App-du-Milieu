@@ -3,8 +3,11 @@ name: Build and Publish Docker Image
 # If Push on master
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
+    paths:
+      - '**.py'
+      - 'Dockerfile'
+      - 'requirements.txt'
 
 # General Environments variables
 env:
