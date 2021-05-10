@@ -17,11 +17,11 @@ import pandas as pd
 
 def get_downloads(
     db: Session,
-    adherent: Adherents,
+    uuid: str,
     before: Date = date.today(),
     range: int = 28
     ):
-    if (zone := get_candidate_zone(db, adherent)) is None:
+    if (zone := get_candidate_zone(db, uuid)) is None:
         return None
 
     # We first add filter by geo_zone
@@ -54,11 +54,11 @@ def get_downloads(
 
 def get_users(
     db: Session,
-    adherent: Adherents,
+    uuid: str,
     before: Date = date.today(),
     range: int = 28
     ):
-    if (zone := get_candidate_zone(db, adherent)) is None:
+    if (zone := get_candidate_zone(db, uuid)) is None:
         return None
 
     # We first add filter by geo_zone
@@ -91,9 +91,9 @@ def get_users(
 
 def get_survey(
     db: Session,
-    adherent: Adherents
+    uuid: str
     ):
-    if (zone := get_candidate_zone(db, adherent)) is None:
+    if (zone := get_candidate_zone(db, uuid)) is None:
         return None
     
     if zone.type == 'department':
