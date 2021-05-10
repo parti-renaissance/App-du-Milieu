@@ -10,7 +10,8 @@ from app.crud.enmarche import get_candidate_zone
 
 
 def get_contacts(db: Session, uuid: str):
-    zone = get_candidate_zone(db, uuid)
+    if (zone := get_candidate_zone(db, uuid)) is None:
+        return None
     filter_zone = {'departement': zone.name} if zone.type == 'department' else {zone.type: zone.name}
 
     contacts = [contact.serialize() for contact in
@@ -29,10 +30,9 @@ def get_contacts(db: Session, uuid: str):
 
 
 def get_number_of_contacts(db: Session, uuid: str):
-    if zone := get_candidate_zone(db, uuid) is None:
+    if (zone := get_candidate_zone(db, uuid)) is None:
         return None
-
-    filter_zone = {zone.type: zone.name}
+    filter_zone = {'departement': zone.name} if zone.type == 'department' else {zone.type: zone.name}
 
     return {
         'adherentCount': db.query(Contact).filter_by(**filter_zone).count(),

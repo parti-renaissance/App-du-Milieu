@@ -1,7 +1,7 @@
 """
 Endpoints de notre api
 """
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func, desc, Date
 from datetime import date, timedelta
 
@@ -97,15 +97,6 @@ def get_survey(
         return None
     
     if zone.type == 'department':
-        print(db.query(JecouteDataSurvey, JecouteSurvey) \
-            .filter(JecouteDataSurvey.postal_code is not None) \
-            .join(GeoCity, func.instr(GeoCity.postal_code, JecouteDataSurvey.postal_code)) \
-            .join(GeoDepartment) \
-            .join(JecouteSurvey) \
-            .filter(GeoDepartment.code == zone.code) \
-            .filter(JecouteDataSurvey.latitude != '') \
-            .filter(JecouteDataSurvey.longitude != '') \
-            .statement)
         return db.query(JecouteDataSurvey, JecouteSurvey) \
             .filter(JecouteDataSurvey.postal_code is not None) \
             .join(GeoCity, func.instr(GeoCity.postal_code, JecouteDataSurvey.postal_code)) \
@@ -117,23 +108,13 @@ def get_survey(
             .all()
 
     if zone.type == 'region':
-        print(db.query(JecouteDataSurvey, JecouteSurvey) \
-                .filter(JecouteDataSurvey.postal_code != '') \
-                .join(GeoCity, GeoCity.postal_code.like('%' + JecouteDataSurvey.postal_code + '%')) \
-                .join(GeoDepartment) \
-                .join(GeoRegion) \
-                .join(JecouteSurvey) \
-                .filter(GeoRegion.code == zone.code) \
-                .filter(JecouteDataSurvey.latitude != '') \
-                .filter(JecouteDataSurvey.longitude != '') \
-                .statement)
-        return db.query(JecouteDataSurvey, JecouteSurvey) \
-                .filter(JecouteDataSurvey.postal_code != '') \
-                .join(GeoCity, GeoCity.postal_code.like('%' + JecouteDataSurvey.postal_code + '%')) \
-                .join(GeoDepartment) \
-                .join(GeoRegion) \
-                .join(JecouteSurvey) \
-                .filter(GeoRegion.code == zone.code) \
-                .filter(JecouteDataSurvey.latitude != '') \
-                .filter(JecouteDataSurvey.longitude != '') \
-                .all()
+        return db.query(JecouteDataSurvey) \
+            .options(joinedload(JecouteDataSurvey.jecoute_survey)) \
+            .filter(JecouteDataSurvey.postal_code != '') \
+            .join(GeoCity, GeoCity.postal_code.like('%' + JecouteDataSurvey.postal_code + '%')) \
+            .join(GeoDepartment) \
+            .join(GeoRegion) \
+            .filter(GeoRegion.code == zone.code) \
+            .filter(JecouteDataSurvey.latitude != '') \
+            .filter(JecouteDataSurvey.longitude != '') \
+            .all()

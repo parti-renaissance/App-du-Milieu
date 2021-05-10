@@ -79,10 +79,7 @@ async def get_adherents(
     if not X_User_UUID:
         return HTTPException(status_code=401, detail='You are not authenticated.')
 
-    if nb_contacts := contact.get_number_of_contacts(db, X_User_UUID) is None:
-        return HTTPException(status_code=403, detail='You are not allowed to access these datas.')
-
-    return nb_contacts
+    return contact.get_number_of_contacts(db, X_User_UUID)
 
 
 
@@ -118,7 +115,7 @@ async def jemengage_users(
     return {'users': json.loads(res)}
 
 
-#@app.get('/jemengage/survey', response_model=List[schemas.JecouteDataSurvey], response_class=ORJSONResponse)
+#@app.get('/jemengage/survey', response_model=List[schemas.DataSurvey], response_class=ORJSONResponse)
 @app.get('/jemengage/survey', response_class=ORJSONResponse)
 async def jemengage_survey(
     db: Session = Depends(get_db),
@@ -127,11 +124,7 @@ async def jemengage_survey(
     if not X_User_UUID:
         return HTTPException(status_code=401, detail='You are not authenticated.')
 
-
-    if res := jemengage.get_survey(db, X_User_UUID) is None:
-        return HTTPException(status_code=204, detail='No content')
-
-    return res
+    return jemengage.get_survey(db, X_User_UUID)
 
 
 if __name__ == "__main__":

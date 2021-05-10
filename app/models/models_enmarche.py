@@ -101,7 +101,7 @@ class JecouteDataSurvey(Base):
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
     survey_id = Column(Integer, ForeignKey('jecoute_survey.id'))
-    jecoute_survey = relationship('JecouteSurvey')
+    jecoute_survey = relationship('JecouteSurvey', lazy='joined')
 
 
 class JecouteSurvey(Base):
