@@ -13,18 +13,9 @@ def me(db: Session, uuid: str) -> Adherents:
         return adherent
 
 
-def get_candidate_zone(db: Session, adherent: Adherents):
-    if adherent is None:
-        raise Exception('Adherent not found')
-
-    if (managedArea := db.query(CandidateManagedArea) \
-                    .filter(CandidateManagedArea.id == adherent.get_candidate_managed_area()) \
-                    .first()) is None:
-        raise Exception('No managed area found')
-
-    if (geoZone := db.query(GeoZone) \
-                .filter(GeoZone.id == managedArea.get_zone_id()) \
-                .first()) is None:
-        raise Exception('Geo_zone not found')
-
-    return geoZone
+def get_candidate_zone(db: Session, uuid: str):
+    return db.query(GeoZone) \
+             .join(CandidateManagedArea) \
+             .join(Adherents) \
+             .filter(Adherents.uuid == uuid) \
+             .first()

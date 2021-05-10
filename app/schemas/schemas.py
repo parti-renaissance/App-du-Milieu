@@ -76,16 +76,28 @@ class ContactOut(BaseModel):
 """
 
 
-class JecouteSurvey(BaseModel):
+
+class Survey(BaseModel):
     id: int
     author_id: Optional[str]
-    survey_id: str
+    name: str
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class DataSurvey(BaseModel):
+    id: int
+    author_id: Optional[str]
     posted_at: datetime
     postal_code: Optional[str]
     age_range: Optional[str]
     gender: Optional[str]
     latitude: Optional[float]
     longitude: Optional[float]
+    survey: Survey
 
     class Config:
         orm_mode = True

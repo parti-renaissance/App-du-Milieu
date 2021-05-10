@@ -16,10 +16,8 @@ class Adherents(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     uuid = Column(String(36), unique=True, nullable=False, index=True)
-    candidate_managed_area_id = Column(Integer)
-
-    def get_candidate_managed_area(self):
-        return self.candidate_managed_area_id
+    candidate_managed_area_id = Column(Integer, ForeignKey('candidate_managed_area.id'))
+    candidate_managed_area = relationship('CandidateManagedArea')
 
 
 class CandidateManagedArea(Base):
@@ -27,7 +25,8 @@ class CandidateManagedArea(Base):
     __tablename__ = 'candidate_managed_area'
 
     id = Column(Integer, primary_key=True, index=True)
-    zone_id = Column(Integer, nullable=False)
+    zone_id = Column(Integer, ForeignKey('geo_zone.id'))
+    candidate_managed_zone = relationship('GeoZone')
 
     def get_zone_id(self):
         return self.zone_id
@@ -89,16 +88,31 @@ class OauthAccessTokens(Base):
     created_at = Column(DateTime, nullable=False, index=True)
 
 
-class JecouteSurvey(Base):
+class JecouteDataSurvey(Base):
     """ Table jecoute_data_survey """
     __tablename__ = 'jecoute_data_survey'
 
     id = Column(Integer, primary_key=True, index=True)
     author_id = Column(Integer, nullable=True)
-    survey_id = Column(Integer, nullable=False)
     posted_at = Column(DateTime, nullable=False)
     postal_code = Column(String, nullable=True)
     age_range = Column(String, nullable=True)
     gender = Column(String, nullable=True)
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
+    survey_id = Column(Integer, ForeignKey('jecoute_survey.id'))
+    jecoute_survey = relationship('JecouteSurvey', lazy='joined')
+
+
+class JecouteSurvey(Base):
+    """ Table jecoute_data_survey """
+    __tablename__ = 'jecoute_survey'
+
+    id = Column(Integer, primary_key=True, index=True)
+    author_id = Column(Integer, nullable=True)
+    name = Column(String, nullable=False)
+    created_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=False)
+    type = Column(String, nullable=False)
+    zone_id = Column(Integer, ForeignKey('geo_zone.id'))
+    geo_zone = relationship('GeoZone')

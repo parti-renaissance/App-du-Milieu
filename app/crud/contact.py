@@ -9,9 +9,10 @@ from app.schemas import schemas
 from app.crud.enmarche import get_candidate_zone
 
 
-def get_contacts(db: Session, adherent: Adherents):
-    zone = get_candidate_zone(db, adherent)
-    filter_zone = {zone.type: zone.name}
+def get_contacts(db: Session, uuid: str):
+    if (zone := get_candidate_zone(db, uuid)) is None:
+        return None
+    filter_zone = {'departement': zone.name} if zone.type == 'department' else {zone.type: zone.name}
 
     contacts = [contact.serialize() for contact in
             db.query(Contact).filter_by(**filter_zone).all()]
@@ -28,9 +29,10 @@ def get_contacts(db: Session, adherent: Adherents):
         }
 
 
-def get_number_of_contacts(db: Session, adherent: Adherents):
-    zone = get_candidate_zone(db, adherent)
-    filter_zone = {zone.type: zone.name}
+def get_number_of_contacts(db: Session, uuid: str):
+    if (zone := get_candidate_zone(db, uuid)) is None:
+        return None
+    filter_zone = {'departement': zone.name} if zone.type == 'department' else {zone.type: zone.name}
 
     return {
         'adherentCount': db.query(Contact).filter_by(**filter_zone).count(),
