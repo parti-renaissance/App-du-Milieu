@@ -89,16 +89,31 @@ class OauthAccessTokens(Base):
     created_at = Column(DateTime, nullable=False, index=True)
 
 
-class JecouteSurvey(Base):
+class JecouteDataSurvey(Base):
     """ Table jecoute_data_survey """
     __tablename__ = 'jecoute_data_survey'
 
     id = Column(Integer, primary_key=True, index=True)
     author_id = Column(Integer, nullable=True)
-    survey_id = Column(Integer, nullable=False)
     posted_at = Column(DateTime, nullable=False)
     postal_code = Column(String, nullable=True)
     age_range = Column(String, nullable=True)
     gender = Column(String, nullable=True)
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
+    survey_id = Column(Integer, ForeignKey('jecoute_survey.id'))
+    jecoute_survey = relationship('JecouteSurvey')
+
+
+class JecouteSurvey(Base):
+    """ Table jecoute_data_survey """
+    __tablename__ = 'jecoute_survey'
+
+    id = Column(Integer, primary_key=True, index=True)
+    author_id = Column(Integer, nullable=True)
+    name = Column(String, nullable=False)
+    created_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=False)
+    type = Column(String, nullable=False)
+    zone_id = Column(Integer, ForeignKey('geo_zone.id'))
+    geo_zone = relationship('GeoZone')

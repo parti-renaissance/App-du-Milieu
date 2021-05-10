@@ -77,8 +77,20 @@ class ContactOut(BaseModel):
 
 
 class JecouteSurvey(BaseModel):
+    id: int
     author_id: Optional[str]
-    survey_id: str
+    name: str
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        orm_mode = True
+
+
+class JecouteDataSurvey(BaseModel):
+    id: int
+    author_id: Optional[str]
+    survey: JecouteSurvey
     posted_at: datetime
     postal_code: Optional[str]
     age_range: Optional[str]
