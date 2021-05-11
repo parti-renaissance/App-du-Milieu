@@ -77,18 +77,19 @@ class ContactOut(BaseModel):
 
 
 
-class Survey(BaseModel):
-    id: int
-    author_id: Optional[str]
+class JecouteSurvey(BaseModel):
+    survey_id: int = Field(alias="id")
+    survey_author_id: Optional[str]
     name: str
     created_at: datetime
     updated_at: datetime
 
     class Config:
+        json_encoders = {datetime: lambda v: v.date().strftime("%d/%m/%y")}
         orm_mode = True
 
 
-class DataSurvey(BaseModel):
+class JecouteDataSurvey(BaseModel):
     id: int
     author_id: Optional[str]
     posted_at: datetime
@@ -97,7 +98,8 @@ class DataSurvey(BaseModel):
     gender: Optional[str]
     latitude: Optional[float]
     longitude: Optional[float]
-    survey: Survey
+    survey: JecouteSurvey = Field(alias="jecoute_survey")
 
     class Config:
+        json_encoders = {datetime: lambda v: v.date().strftime("%d/%m/%y")}
         orm_mode = True
