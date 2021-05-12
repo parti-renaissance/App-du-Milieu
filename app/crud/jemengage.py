@@ -97,11 +97,12 @@ def get_survey(
         return None
     
     if zone.type == 'department':
-        return db.query(JecouteDataSurvey, JecouteSurvey) \
-            .filter(JecouteDataSurvey.postal_code is not None) \
+        return db.query(JecouteDataSurvey) \
+            .options(joinedload(JecouteDataSurvey.author)) \
+            .options(joinedload(JecouteDataSurvey.survey)) \
+            .filter(JecouteDataSurvey.postal_code != '') \
             .join(GeoCity, func.instr(GeoCity.postal_code, JecouteDataSurvey.postal_code)) \
             .join(GeoDepartment) \
-            .join(JecouteSurvey) \
             .filter(GeoDepartment.code == zone.code) \
             .filter(JecouteDataSurvey.latitude != '') \
             .filter(JecouteDataSurvey.longitude != '') \
@@ -109,7 +110,8 @@ def get_survey(
 
     if zone.type == 'region':
         return db.query(JecouteDataSurvey) \
-            .options(joinedload(JecouteDataSurvey.jecoute_survey)) \
+            .options(joinedload(JecouteDataSurvey.author)) \
+            .options(joinedload(JecouteDataSurvey.survey)) \
             .filter(JecouteDataSurvey.postal_code != '') \
             .join(GeoCity, GeoCity.postal_code.like('%' + JecouteDataSurvey.postal_code + '%')) \
             .join(GeoDepartment) \

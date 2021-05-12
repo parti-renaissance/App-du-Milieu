@@ -2,7 +2,7 @@
 Schemas
 """
 from enum import Enum
-from typing import List, Set, Optional
+from typing import List, Set, Union, Optional
 from pydantic import BaseModel, Field
 from datetime import datetime
 
@@ -76,10 +76,18 @@ class ContactOut(BaseModel):
 """
 
 
+class AdherentName(BaseModel):
+    adherent_id: int = Field(alias="id")
+    first_name: str
+    last_name: str
+
+    class Config:
+        orm_mode = True
+
 
 class JecouteSurvey(BaseModel):
-    survey_id: int = Field(alias="id")
-    survey_author_id: Optional[str]
+    id: int
+    survey_author: Optional[AdherentName]
     name: str
     created_at: datetime
     updated_at: datetime
@@ -91,14 +99,14 @@ class JecouteSurvey(BaseModel):
 
 class JecouteDataSurvey(BaseModel):
     id: int
-    author_id: Optional[str]
+    author: Optional[AdherentName]
     posted_at: datetime
     postal_code: Optional[str]
     age_range: Optional[str]
     gender: Optional[str]
     latitude: Optional[float]
     longitude: Optional[float]
-    survey: JecouteSurvey = Field(alias="jecoute_survey")
+    survey: JecouteSurvey
 
     class Config:
         json_encoders = {datetime: lambda v: v.date().strftime("%d/%m/%y")}

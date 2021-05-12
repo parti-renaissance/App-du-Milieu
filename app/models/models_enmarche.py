@@ -15,6 +15,8 @@ class Adherents(Base):
     __tablename__ = 'adherents'
 
     id = Column(Integer, primary_key=True, index=True)
+    first_name = Column(String, nullable=False)
+    last_name = Column(String, nullable=False)
     uuid = Column(String(36), unique=True, nullable=False, index=True)
     candidate_managed_area_id = Column(Integer, ForeignKey('candidate_managed_area.id'))
     candidate_managed_area = relationship('CandidateManagedArea')
@@ -93,7 +95,8 @@ class JecouteDataSurvey(Base):
     __tablename__ = 'jecoute_data_survey'
 
     id = Column(Integer, primary_key=True, index=True)
-    author_id = Column(Integer, nullable=True)
+    author_id = Column(Integer, ForeignKey('adherents.id'), nullable=True)
+    author = relationship('Adherents', lazy='joined')
     posted_at = Column(DateTime, nullable=False)
     postal_code = Column(String, nullable=True)
     age_range = Column(String, nullable=True)
@@ -101,7 +104,7 @@ class JecouteDataSurvey(Base):
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
     survey_id = Column(Integer, ForeignKey('jecoute_survey.id'))
-    jecoute_survey = relationship('JecouteSurvey', lazy='joined')
+    survey = relationship('JecouteSurvey', lazy='joined')
 
 
 class JecouteSurvey(Base):
@@ -109,10 +112,11 @@ class JecouteSurvey(Base):
     __tablename__ = 'jecoute_survey'
 
     id = Column(Integer, primary_key=True, index=True)
-    author_id = Column(Integer, nullable=True)
+    author_id = Column(Integer, ForeignKey('adherents.id'), nullable=True)
+    author = relationship('Adherents', lazy='joined')
     name = Column(String, nullable=False)
     created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=False)
     type = Column(String, nullable=False)
     zone_id = Column(Integer, ForeignKey('geo_zone.id'))
-    geo_zone = relationship('GeoZone')
+    geo_zone_relation = relationship('GeoZone')
