@@ -87,7 +87,7 @@ class AdherentName(BaseModel):
 
 class JecouteSurvey(BaseModel):
     id: int
-    survey_author: Optional[AdherentName]
+    survey_author: Optional[AdherentName] = Field(alias="author")
     name: str
     created_at: datetime
     updated_at: datetime
@@ -99,14 +99,14 @@ class JecouteSurvey(BaseModel):
 
 class JecouteDataSurvey(BaseModel):
     id: int
-    author: Optional[AdherentName]
+    author: Optional[AdherentName] = Field(alias="author")
     posted_at: datetime
     postal_code: Optional[str]
     age_range: Optional[str]
     gender: Optional[str]
     latitude: Optional[float]
     longitude: Optional[float]
-    survey: JecouteSurvey
+    survey: JecouteSurvey = Field(alias="survey")
 
     class Config:
         json_encoders = {datetime: lambda v: v.date().strftime("%d/%m/%y")}
