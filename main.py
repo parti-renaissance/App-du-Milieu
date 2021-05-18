@@ -82,7 +82,6 @@ async def get_adherents(
     return contact.get_number_of_contacts(db, X_User_UUID)
 
 
-
 @app.get('/jemengage/downloads', response_class=ORJSONResponse)
 async def jemengage_downloads(
     db: Session = Depends(get_db),
@@ -92,6 +91,22 @@ async def jemengage_downloads(
         return HTTPException(status_code=401, detail='You are not authenticated.')
 
     res = jemengage.get_downloads(db, X_User_UUID)
+    if res.empty:
+        return HTTPException(status_code=204, detail='No content')
+
+    res = res.to_json(orient='records')
+    return {'downloads': json.loads(res)}
+
+
+@app.get('/jemengage/downloadsRatios', response_class=ORJSONResponse)
+async def jemengage_downloads_ratio(
+    db: Session = Depends(get_db),
+    X_User_UUID: Optional[str] = Header(None)
+    ):
+    if not X_User_UUID:
+        return HTTPException(status_code=401, detail='You are not authenticated.')
+
+    res = jemengage.downloads_ratio(db, X_User_UUID)
     if res.empty:
         return HTTPException(status_code=204, detail='No content')
 
