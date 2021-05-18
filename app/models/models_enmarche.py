@@ -68,6 +68,8 @@ class GeoDepartment(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     code = Column(String, nullable=False)
+    latitude = Column(Float, nullable=False)
+    longitude = Column(Float, nullable=False)
     region_id = Column(Integer, ForeignKey('geo_region.id'))
     geo_region = relationship('GeoRegion')
 
@@ -78,6 +80,8 @@ class GeoRegion(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     code = Column(String, nullable=False)
+    latitude = Column(Float, nullable=False)
+    longitude = Column(Float, nullable=False)
 
 
 class OauthAccessTokens(Base):

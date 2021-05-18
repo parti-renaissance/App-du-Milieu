@@ -90,8 +90,8 @@ def downloads_ratio(
         df['date'] = pd.to_datetime(df['date'], format='%Y-%m-%d')
         df = df.set_index('date').reindex(s_date).rename_axis('date')
         # fill unique user to 0
-        df['downloadsPer1000'] = df['downloadsPer1000'].fillna(method='ffill')
-        df_nat['nationalPer1000'] = df_nat['nationalPer1000'].fillna(method='ffill')
+        df['downloadsPer1000'] = df['downloadsPer1000'].fillna(method='ffill').round(3)
+        df_nat['nationalPer1000'] = df_nat['nationalPer1000'].fillna(method='ffill').round(3)
 
         df.reset_index(inplace=True)
         df = df.merge(df_nat)
@@ -145,7 +145,14 @@ def get_survey(
         return None
     
     if zone.type == 'department':
-        return db.query(JecouteDataSurvey) \
+        geo_dpt =  db.query(GeoDepartment) \
+            .filter(GeoDepartment.code == zone.code) \
+            .first()
+        return {
+            "zone_name": zone.name,
+            "latitude": geo_dpt.latitude,
+            "longitude": geo_dpt.longitude,
+            "survey_datas": db.query(JecouteDataSurvey) \
             .options(joinedload(JecouteDataSurvey.author)) \
             .options(joinedload(JecouteDataSurvey.survey)) \
             .filter(JecouteDataSurvey.postal_code != '') \
@@ -155,16 +162,25 @@ def get_survey(
             .filter(JecouteDataSurvey.latitude != '') \
             .filter(JecouteDataSurvey.longitude != '') \
             .all()
+        }
 
     if zone.type == 'region':
-        return db.query(JecouteDataSurvey) \
-            .options(joinedload(JecouteDataSurvey.author)) \
-            .options(joinedload(JecouteDataSurvey.survey)) \
-            .filter(JecouteDataSurvey.postal_code != '') \
-            .join(GeoCity, GeoCity.postal_code.like('%' + JecouteDataSurvey.postal_code + '%')) \
-            .join(GeoDepartment) \
-            .join(GeoRegion) \
+        geo_reg =  db.query(GeoRegion) \
             .filter(GeoRegion.code == zone.code) \
-            .filter(JecouteDataSurvey.latitude != '') \
-            .filter(JecouteDataSurvey.longitude != '') \
-            .all()
+            .first()
+        return {
+            "zone_name": zone.name,
+            "latitude": geo_reg.latitude,
+            "longitude": geo_reg.longitude,
+            "survey_datas": db.query(JecouteDataSurvey) \
+                .options(joinedload(JecouteDataSurvey.author)) \
+                .options(joinedload(JecouteDataSurvey.survey)) \
+                .filter(JecouteDataSurvey.postal_code != '') \
+                .join(GeoCity, GeoCity.postal_code.like('%' + JecouteDataSurvey.postal_code + '%')) \
+                .join(GeoDepartment) \
+                .join(GeoRegion) \
+                .filter(GeoRegion.code == zone.code) \
+                .filter(JecouteDataSurvey.latitude != '') \
+                .filter(JecouteDataSurvey.longitude != '') \
+                .all()
+        }

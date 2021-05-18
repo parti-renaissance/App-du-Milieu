@@ -111,3 +111,9 @@ class JecouteDataSurvey(BaseModel):
     class Config:
         json_encoders = {datetime: lambda v: v.date().strftime("%d/%m/%y")}
         orm_mode = True
+
+class JecouteDataSurveyOut(BaseModel):
+    zone_name: str
+    latitude: float
+    longitude: float
+    survey_datas: List[JecouteDataSurvey]

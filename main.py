@@ -130,7 +130,7 @@ async def jemengage_users(
     return {'users': json.loads(res)}
 
 
-@app.get('/jemengage/survey', response_model=List[schemas.JecouteDataSurvey], response_class=ORJSONResponse)
+@app.get('/jemengage/survey', response_model=schemas.JecouteDataSurveyOut, response_class=ORJSONResponse)
 async def jemengage_survey(
     db: Session = Depends(get_db),
     X_User_UUID: Optional[str] = Header(None)
