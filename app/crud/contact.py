@@ -28,7 +28,6 @@ def get_contacts(db: Session, uuid: str):
         'contacts': contacts
         }
 
-
 def get_number_of_contacts(db: Session, uuid: str):
     if (zone := get_candidate_zone(db, uuid)) is None:
         return None
