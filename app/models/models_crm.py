@@ -1,7 +1,7 @@
 """
 SQLAlchemy de notre base de données CRM
 """
-from sqlalchemy import Column, Integer, String, Boolean, Date, DateTime
+from sqlalchemy import Column, Integer, Float, String, Boolean, Date, DateTime
 
 from app.database import CRM
 
@@ -33,7 +33,6 @@ class Contact(CRM):
     def serialize(self):
         """ Print pour le call /contacts/ """
         return {
-            'id': self.id,
             'Genre': self.genre,
             'Prénom': self.prenom,
             'Nom': self.nom,
@@ -60,6 +59,7 @@ class Downloads(CRM):
     zone_type = Column(String, nullable=False)
     zone_name = Column(String, nullable=False)
     unique_user = Column(Integer, nullable=False)
+    downloadsPer1000 = Column(Float, nullable=False)
 
 
 class Users(CRM):
