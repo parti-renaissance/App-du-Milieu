@@ -129,7 +129,7 @@ def get_users(
         # fill unique user to 0
         df['unique_user'] = df['unique_user'].fillna(0).astype(int)
         # fill cumulative to previous value
-        df['7days_users'] = df.rolling(7).sum().fillna(0).astype(int)
+        df['rolling_seven_users'] = df.rolling(7).sum().fillna(0).astype(int)
         
         df.reset_index(inplace=True)
         df = df[df.date >= pd.to_datetime(after)]
