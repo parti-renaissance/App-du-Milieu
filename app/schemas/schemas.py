@@ -93,7 +93,6 @@ class JecouteSurvey(BaseModel):
     updated_at: datetime
 
     class Config:
-        json_encoders = {datetime: lambda v: v.date().strftime("%d/%m/%y")}
         orm_mode = True
 
 
@@ -109,7 +108,6 @@ class JecouteDataSurvey(BaseModel):
     survey: JecouteSurvey = Field(alias="survey")
 
     class Config:
-        json_encoders = {datetime: lambda v: v.date().strftime("%d/%m/%y")}
         orm_mode = True
 
 class JecouteDataSurveyOut(BaseModel):
@@ -117,3 +115,7 @@ class JecouteDataSurveyOut(BaseModel):
     latitude: float
     longitude: float
     survey_datas: List[JecouteDataSurvey]
+
+    class Config:
+        json_encoders = {datetime: lambda v: v.strftime("%d/%m/%y %H:%M")}
+        orm_mode = True
