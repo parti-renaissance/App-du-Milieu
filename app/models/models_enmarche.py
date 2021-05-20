@@ -1,7 +1,8 @@
 """
 SQLAlchemy de notre base de données Globale
 """
-from sqlalchemy import Column, Integer, Float, String, DateTime, Date, UniqueConstraint, ForeignKey
+from sqlalchemy import Column, Integer, Float, Boolean, String, DateTime
+from sqlalchemy import UniqueConstraint, ForeignKey, PrimaryKeyConstraint
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -18,8 +19,22 @@ class Adherents(Base):
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
     uuid = Column(String(36), unique=True, nullable=False, index=True)
-    candidate_managed_area_id = Column(Integer, ForeignKey('candidate_managed_area.id'))
+    candidate_managed_area_id = Column(Integer, ForeignKey('candidate_managed_area.id'), nullable=True)
     candidate_managed_area = relationship('CandidateManagedArea')
+
+
+class AdherentMessages(Base):
+    """ Table adherent_messages """
+    __tablename__ = 'adherent_messages'
+
+    id = Column(Integer, primary_key=True, index=True)
+    author_id = Column(Integer, ForeignKey('adherents.id'), nullable=True)
+    author = relationship('Adherents', lazy='joined')
+    label = Column(String, nullable=False)
+    subject = Column(String, nullable=False)
+    status = Column(String, nullable=False)
+    type = Column(String, nullable=False)
+    sent_at = Column(DateTime, nullable=True)
 
 
 class CandidateManagedArea(Base):
@@ -50,6 +65,17 @@ class GeoZone(Base):
 
     def get_type(self):
         return self.type
+
+
+class GeoCanton(Base):
+    """ Table geo_canton """
+    __tablename__ = 'geo_canton'
+
+    id = Column(Integer, primary_key=True, index=True)
+    code = Column(String, nullable=False)
+    department_id = Column(Integer, ForeignKey('geo_department.id'))
+    geo_department = relationship('GeoDepartment')
+    active = Column(Boolean, nullable=False)
 
 
 class GeoCity(Base):
@@ -84,16 +110,6 @@ class GeoRegion(Base):
     longitude = Column(Float, nullable=False)
 
 
-class OauthAccessTokens(Base):
-    """ Table oauth_access_tokens """
-    __tablename__ = 'oauth_access_tokens'
-
-    id = Column(Integer, primary_key=True, index=True)
-    client_id = Column(Integer, nullable=False, index=True)
-    user_id = Column(Integer, index=True)
-    created_at = Column(DateTime, nullable=False, index=True)
-
-
 class JecouteDataSurvey(Base):
     """ Table jecoute_data_survey """
     __tablename__ = 'jecoute_data_survey'
@@ -124,3 +140,77 @@ class JecouteSurvey(Base):
     type = Column(String, nullable=False)
     zone_id = Column(Integer, ForeignKey('geo_zone.id'))
     geo_zone_relation = relationship('GeoZone')
+
+
+class MailChimpCampaign(Base):
+    """ Table mailchimp_campaign """
+    __tablename__ = 'mailchimp_campaign'
+
+    id = Column(Integer, primary_key=True, index=True)
+    message_id = Column(Integer, ForeignKey('adherent_messages.id'), nullable=True)
+    message = relationship('AdherentMessages', lazy='joined')
+    recipient_count = Column(Integer, nullable=True)
+    status = Column(String, nullable=False)
+    report_id = Column(Integer, ForeignKey('mailchimp_campaign_report.id'), nullable=True)
+    report = relationship('MailChimpCampaignReport', back_populates='mailchimp_campaign')
+
+
+class MailChimpCampaignReport(Base):
+    """ Table mailchimp_campaign_report """
+    __tablename__ = 'mailchimp_campaign_report'
+
+    id = Column(Integer, primary_key=True, index=True)
+    open_total = Column(Integer, nullable=False)
+    open_unique = Column(Integer, nullable=False)
+    click_total = Column(Integer, nullable=False)
+    click_unique = Column(Integer, nullable=False)
+    email_sent = Column(Integer, nullable=False)
+    unsubscribed = Column(Integer, nullable=False)
+    mailchimp_campaign = relationship("MailChimpCampaign", back_populates="report")
+    #TODO define method to calculate rates ?
+
+
+class Referent(Base):
+    """ Table referent """
+    __tablename__ = 'referent'
+
+    id = Column(Integer, primary_key=True, index=True)
+    email_address = Column(String, nullable=True)
+    area_label = Column(String, nullable=False)
+    status = Column(String, nullable=False)
+    first_name = Column(String, nullable=False)
+    last_name = Column(String, nullable=False)
+
+
+class ReferentArea(Base):
+    """ Table referent_area """
+    __tablename__ = 'referent_area'
+
+    id = Column(Integer, primary_key=True, index=True)
+    area_code = Column(String, nullable=False)
+    area_type = Column(String, nullable=False)
+
+
+class ReferentAreas(Base):
+    """ Table referent_areas """
+    __tablename__ = 'referent_areas'
+
+    referent_id = Column(Integer, ForeignKey('referent.id'), nullable=True)
+    referent = relationship('Referent', lazy='joined')
+    area_id = Column(Integer, ForeignKey('referent_area.id'), nullable=True)
+    area = relationship('ReferentArea', lazy='joined')
+
+    __table_args__ = (
+        PrimaryKeyConstraint('referent_id', 'area_id'),
+        {},
+    )
+
+
+class OauthAccessTokens(Base):
+    """ Table oauth_access_tokens """
+    __tablename__ = 'oauth_access_tokens'
+
+    id = Column(Integer, primary_key=True, index=True)
+    client_id = Column(Integer, nullable=False, index=True)
+    user_id = Column(Integer, index=True)
+    created_at = Column(DateTime, nullable=False, index=True)
