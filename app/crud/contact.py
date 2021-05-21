@@ -15,12 +15,12 @@ def get_contacts(db: Session, uuid: str):
         return None
     filter_zone = {'departement': zone.name} if zone.type == 'department' else {zone.type: zone.name}
 
-    query = db.query(Contact).filter_by(**filter_zone).limit(10).statement
+    query = db.query(Contact).filter_by(**filter_zone).statement
     columns = [column.name for column in inspect(Contact).c]
 
     with engine_crm.connect() as conn:
         cursor = conn.execute(query)
-        contacts = [dict(zip(columns.pop(0), record.pop(0))).pop(0) for record in cursor]
+        contacts = [dict(zip(columns, record)) for record in cursor]
 
     """ metadata list of choices """
     interests = {'interestsChoices': schemas.InterestsChoices.list()}
