@@ -50,8 +50,8 @@ def get_db():
 
 
 async def get_uuid_zone(
-    db: Session = Depends(get_db),
-    X_User_UUID: str = Header(None)) -> GeoZone:
+    X_User_UUID: str = Header(None),
+    db: Session = Depends(get_db)) -> GeoZone:
     if X_User_UUID is None:
         raise HTTPException(status_code=401, detail='You are not authenticated.')
     
@@ -76,8 +76,8 @@ async def home():
 
 @app.get("/contacts", response_class=ORJSONResponse)
 async def read_contacts(
-    db: Session = Depends(get_db),
-    filter_zone: dict = Depends(get_filter_zone)
+    filter_zone: dict = Depends(get_filter_zone),
+    db: Session = Depends(get_db)
     ):
     try:
         contacts = contact.get_contacts(db, filter_zone)
@@ -88,16 +88,16 @@ async def read_contacts(
 
 @app.get('/adherents', response_class=ORJSONResponse)
 async def get_adherents(
-    db: Session = Depends(get_db),
-    filter_zone: dict = Depends(get_filter_zone)
+    filter_zone: dict = Depends(get_filter_zone),
+    db: Session = Depends(get_db)
     ):
     return contact.get_number_of_contacts(db, filter_zone)
 
 
 @app.get('/jemengage/downloads', response_class=ORJSONResponse)
 async def jemengage_downloads(
-    db: Session = Depends(get_db),
-    zone: dict = Depends(get_uuid_zone)
+    zone: dict = Depends(get_uuid_zone),
+    db: Session = Depends(get_db)
     ):
     res = jemengage.get_downloads(db, zone)
     if res.empty:
@@ -109,8 +109,8 @@ async def jemengage_downloads(
 
 @app.get('/jemengage/downloadsRatios', response_class=ORJSONResponse)
 async def jemengage_downloads_ratio(
-    db: Session = Depends(get_db),
-    zone: dict = Depends(get_uuid_zone)
+    zone: dict = Depends(get_uuid_zone),
+    db: Session = Depends(get_db)
     ):
     res = jemengage.downloads_ratio(db, zone)
     if res.empty:
@@ -122,8 +122,8 @@ async def jemengage_downloads_ratio(
 
 @app.get('/jemengage/users', response_class=ORJSONResponse)
 async def jemengage_users(
-    db: Session = Depends(get_db),
-    zone: dict = Depends(get_uuid_zone)
+    zone: dict = Depends(get_uuid_zone),
+    db: Session = Depends(get_db)
     ):
     res = jemengage.get_users(db, zone)
     if res.empty:
@@ -135,8 +135,8 @@ async def jemengage_users(
 
 @app.get('/jemengage/survey', response_model=schemas.JecouteDataSurveyOut, response_class=ORJSONResponse)
 async def jemengage_survey(
-    db: Session = Depends(get_db),
-    zone: dict = Depends(get_uuid_zone)
+    zone: dict = Depends(get_uuid_zone),
+    db: Session = Depends(get_db)
     ):
     return jemengage.get_survey(db, zone)
 
