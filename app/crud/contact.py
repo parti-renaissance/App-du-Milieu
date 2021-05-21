@@ -2,9 +2,10 @@
 Endpoints de notre api
 """
 from sqlalchemy.orm import Session
+from sqlalchemy.inspection import inspect
+from app.database.database_crm import engine_crm
 
 from app.models.models_crm import Contact
-from app.models.models_enmarche import Adherents
 from app.schemas import schemas
 from app.crud.enmarche import get_candidate_zone
 
@@ -14,8 +15,12 @@ def get_contacts(db: Session, uuid: str):
         return None
     filter_zone = {'departement': zone.name} if zone.type == 'department' else {zone.type: zone.name}
 
-    contacts = [contact.serialize() for contact in
-            db.query(Contact).filter_by(**filter_zone).all()]
+    query = db.query(Contact).filter_by(**filter_zone).statement
+    columns = [column.name for column in inspect(Contact).c]
+
+    with engine_crm.connect() as conn:
+        cursor = conn.execute(query)
+        contacts = [dict(zip(columns, record)) for record in cursor]
 
     """ metadata list of choices """
     interests = {'interestsChoices': schemas.InterestsChoices.list()}
