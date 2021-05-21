@@ -5,11 +5,9 @@ from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func, Date
 from datetime import date, timedelta
 
-from typing import Optional
-from app.models.models_enmarche import GeoCity, GeoDepartment, GeoRegion
+from app.models.models_enmarche import GeoZone, GeoCity, GeoDepartment, GeoRegion
 from app.models.models_enmarche import JecouteDataSurvey
 from app.models.models_crm import Downloads, Users
-from app.crud.enmarche import me, get_candidate_zone
 from app.database.database_crm import engine_crm
 
 import pandas as pd
@@ -17,21 +15,15 @@ import pandas as pd
 
 def get_downloads(
     db: Session,
-    uuid: str,
+    zone: GeoZone,
     before: Date = date.today(),
     range: int = 28
     ):
-    if (zone := get_candidate_zone(db, uuid)) is None:
-        return None
-
-    # We first add filter by geo_zone
-    filter_zone = {'zone_type': zone.type, 'zone_name': zone.name}
-
     after = before - timedelta(days=range)
 
-    filter_zone = {'zone_type': zone.type, 'zone_name': zone.name}
     query = db.query(Downloads.date, Downloads.unique_user) \
-            .filter_by(**filter_zone) \
+            .filter(Downloads.zone_type == zone.type) \
+            .filter(Downloads.zone_name == zone.name) \
             .filter(Downloads.date < before) \
             .filter(Downloads.date >= after) \
             .statement
@@ -55,25 +47,22 @@ def get_downloads(
 
 def downloads_ratio(
     db: Session,
-    uuid: str,
+    zone: GeoZone,
     before: Date = date.today(),
     range: int = 28
     ):
-    if (zone := get_candidate_zone(db, uuid)) is None:
-        return None
-
     after = before - timedelta(days=range)
 
-    filter_zone = {'zone_type': zone.type, 'zone_name': zone.name}
     query = db.query(Downloads.date, Downloads.downloadsPer1000) \
-            .filter_by(**filter_zone) \
+            .filter(Downloads.zone_type == zone.type) \
+            .filter(Downloads.zone_name == zone.name) \
             .filter(Downloads.date < before) \
             .filter(Downloads.date >= after) \
             .statement
 
-    filter_zone = {'zone_type': 'pays', 'zone_name': 'France'}
+    filter_nat = {'zone_type': 'pays', 'zone_name': 'France'}
     query_nat = db.query(Downloads.date, Downloads.downloadsPer1000) \
-            .filter_by(**filter_zone) \
+            .filter_by(**filter_nat) \
             .filter(Downloads.date < before) \
             .filter(Downloads.date >= after) \
             .statement
@@ -101,20 +90,15 @@ def downloads_ratio(
 
 def get_users(
     db: Session,
-    uuid: str,
+    zone: GeoZone,
     before: Date = date.today(),
     range: int = 28
     ):
-    if (zone := get_candidate_zone(db, uuid)) is None:
-        return None
-
-    # We first add filter by geo_zone
-    filter_zone = {'zone_type': zone.type, 'zone_name': zone.name}
-
     after = before - timedelta(days=range)
 
     query = db.query(Users.date, Users.unique_user) \
-            .filter_by(**filter_zone) \
+            .filter(Users.zone_type == zone.type) \
+            .filter(Users.zone_name == zone.name) \
             .filter(Users.date < before) \
             .filter(Users.date >= after - timedelta(7)) \
             .statement
@@ -139,13 +123,10 @@ def get_users(
 
 def get_survey(
     db: Session,
-    uuid: str
-    ):
-    if (zone := get_candidate_zone(db, uuid)) is None:
-        return None
-    
+    zone: GeoZone
+    ):    
     if zone.type == 'department':
-        geo_dpt =  db.query(GeoDepartment) \
+        geo_dpt = db.query(GeoDepartment) \
             .filter(GeoDepartment.code == zone.code) \
             .first()
         return {

@@ -3,7 +3,7 @@
 A sample flask application on Cloud Run. Version 1
 """
 from os import environ
-from typing import List, Optional
+from typing import List
 
 from fastapi import FastAPI, Depends, Header, HTTPException
 from fastapi.middleware.gzip import GZipMiddleware
@@ -15,6 +15,7 @@ from starlette.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from app.crud import contact, enmarche, jemengage
+from app.models.models_enmarche import GeoZone
 from app.schemas import schemas
 from app.database import SessionLocal
 
@@ -48,6 +49,23 @@ def get_db():
         db.close()
 
 
+async def get_uuid_zone(
+    db: Session = Depends(get_db),
+    X_User_UUID: str = Header(None)) -> GeoZone:
+    if X_User_UUID is None:
+        raise HTTPException(status_code=401, detail='You are not authenticated.')
+    
+    if (zone := enmarche.get_candidate_zone(db, X_User_UUID)) is None:
+        raise HTTPException(status_code=203, detail='You have no candidate area affected.')
+
+    return zone
+
+
+async def get_filter_zone(zone: GeoZone = Depends(get_uuid_zone)):
+    filter_zone = {'departement': zone.name} if zone.type == 'department' else {zone.type: zone.name}
+    return filter_zone
+
+
 @app.get("/")
 async def home():
     """ Message d'accueil """
@@ -59,13 +77,10 @@ async def home():
 @app.get("/contacts", response_class=ORJSONResponse)
 async def read_contacts(
     db: Session = Depends(get_db),
-    X_User_UUID: Optional[str] = Header(None)
+    filter_zone: dict = Depends(get_filter_zone)
     ):
-    if not X_User_UUID:
-        return HTTPException(status_code=401, detail='You are not authenticated.')
-
     try:
-        contacts = contact.get_contacts(db, X_User_UUID)
+        contacts = contact.get_contacts(db, filter_zone)
     except:
         return HTTPException(status_code=204, detail='No contact found')
     return contacts
@@ -74,23 +89,17 @@ async def read_contacts(
 @app.get('/adherents', response_class=ORJSONResponse)
 async def get_adherents(
     db: Session = Depends(get_db),
-    X_User_UUID: Optional[str] = Header(None)
+    filter_zone: dict = Depends(get_filter_zone)
     ):
-    if not X_User_UUID:
-        return HTTPException(status_code=401, detail='You are not authenticated.')
-
-    return contact.get_number_of_contacts(db, X_User_UUID)
+    return contact.get_number_of_contacts(db, filter_zone)
 
 
 @app.get('/jemengage/downloads', response_class=ORJSONResponse)
 async def jemengage_downloads(
     db: Session = Depends(get_db),
-    X_User_UUID: Optional[str] = Header(None)
+    zone: dict = Depends(get_uuid_zone)
     ):
-    if not X_User_UUID:
-        return HTTPException(status_code=401, detail='You are not authenticated.')
-
-    res = jemengage.get_downloads(db, X_User_UUID)
+    res = jemengage.get_downloads(db, zone)
     if res.empty:
         return HTTPException(status_code=204, detail='No content')
 
@@ -101,12 +110,9 @@ async def jemengage_downloads(
 @app.get('/jemengage/downloadsRatios', response_class=ORJSONResponse)
 async def jemengage_downloads_ratio(
     db: Session = Depends(get_db),
-    X_User_UUID: Optional[str] = Header(None)
+    zone: dict = Depends(get_uuid_zone)
     ):
-    if not X_User_UUID:
-        return HTTPException(status_code=401, detail='You are not authenticated.')
-
-    res = jemengage.downloads_ratio(db, X_User_UUID)
+    res = jemengage.downloads_ratio(db, zone)
     if res.empty:
         return HTTPException(status_code=204, detail='No content')
 
@@ -117,12 +123,9 @@ async def jemengage_downloads_ratio(
 @app.get('/jemengage/users', response_class=ORJSONResponse)
 async def jemengage_users(
     db: Session = Depends(get_db),
-    X_User_UUID: Optional[str] = Header(None)
+    zone: dict = Depends(get_uuid_zone)
     ):
-    if not X_User_UUID:
-        return HTTPException(status_code=401, detail='You are not authenticated.')
-
-    res = jemengage.get_users(db, X_User_UUID)
+    res = jemengage.get_users(db, zone)
     if res.empty:
         return HTTPException(status_code=204, detail='No content')
 
@@ -133,12 +136,9 @@ async def jemengage_users(
 @app.get('/jemengage/survey', response_model=schemas.JecouteDataSurveyOut, response_class=ORJSONResponse)
 async def jemengage_survey(
     db: Session = Depends(get_db),
-    X_User_UUID: Optional[str] = Header(None)
+    zone: dict = Depends(get_uuid_zone)
     ):
-    if not X_User_UUID:
-        return HTTPException(status_code=401, detail='You are not authenticated.')
-
-    return jemengage.get_survey(db, X_User_UUID)
+    return jemengage.get_survey(db, zone)
 
 
 if __name__ == "__main__":
