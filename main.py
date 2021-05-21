@@ -143,7 +143,7 @@ async def jemengage_survey(
 
 
 @app.get('/mailCampaign/reports', response_class=ORJSONResponse)
-async def jemengage_survey(
+async def campaign_reports(
     db: Session = Depends(get_db),
     X_User_UUID: Optional[str] = Header(None)
     ):

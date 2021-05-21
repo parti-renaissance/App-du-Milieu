@@ -29,7 +29,7 @@ class AdherentMessages(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     author_id = Column(Integer, ForeignKey('adherents.id'), nullable=True)
-    author = relationship('Adherents', lazy='joined')
+    author = relationship('Adherents')
     label = Column(String, nullable=False)
     subject = Column(String, nullable=False)
     status = Column(String, nullable=False)
@@ -148,7 +148,7 @@ class MailChimpCampaign(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     message_id = Column(Integer, ForeignKey('adherent_messages.id'), nullable=True)
-    message = relationship('AdherentMessages', lazy='joined')
+    message = relationship('AdherentMessages', lazy="joined")
     recipient_count = Column(Integer, nullable=True)
     status = Column(String, nullable=False)
     report_id = Column(Integer, ForeignKey('mailchimp_campaign_report.id'), nullable=True)

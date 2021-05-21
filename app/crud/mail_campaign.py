@@ -2,7 +2,7 @@
 Endpoints de notre api
 """
 from datetime import datetime
-from sqlalchemy.orm import Session, contains_eager, joinedload
+from sqlalchemy.orm import Session, contains_eager, joinedload, subqueryload
 from sqlalchemy import func, DateTime
 from app.models.models_enmarche import AdherentMessages, Adherents, CandidateManagedArea
 from app.models.models_enmarche import MailChimpCampaign, MailChimpCampaignReport
@@ -41,15 +41,32 @@ async def get_candidate_reports(
     print('zone.id:', zone.id)
     print('since:', since)
 
-
-    return db.query(MailChimpCampaign) \
+    query = db.query(MailChimpCampaign) \
         .join(MailChimpCampaign.message) \
+        .options(subqueryload(MailChimpCampaign.message)) \
         .filter(AdherentMessages.status == 'sent') \
         .filter(AdherentMessages.type.in_(['candidate', 'candidate_jecoute'])) \
         .filter(AdherentMessages.sent_at >= since) \
         .join(MailChimpCampaign.report) \
-        .options(contains_eager(MailChimpCampaign.message)) \
-        .options(contains_eager(MailChimpCampaign.report)) \
+        .options(subqueryload(MailChimpCampaign.report)) \
+        .join(AdherentMessages.author) \
+        .join(Adherents.candidate_managed_area.and_(CandidateManagedArea.zone_id == zone.id)) \
+        .statement
+    print('\nQUERY\n\n', query)
+
+    return db.query(MailChimpCampaign) \
+             .join(MailChimpCampaign.message) \
+             .all()
+"""
+    return db.query(MailChimpCampaign) \
+        .join(MailChimpCampaign.message) \
+        .options(joinedload(MailChimpCampaign.message)) \
+        .filter(AdherentMessages.status == 'sent') \
+        .filter(AdherentMessages.type.in_(['candidate', 'candidate_jecoute'])) \
+        .filter(AdherentMessages.sent_at >= since) \
+        .join(MailChimpCampaign.report) \
+        .options(joinedload(MailChimpCampaign.report)) \
         .join(AdherentMessages.author) \
         .join(Adherents.candidate_managed_area.and_(CandidateManagedArea.zone_id == zone.id)) \
         .all()
+"""
