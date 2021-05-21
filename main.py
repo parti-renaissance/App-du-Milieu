@@ -14,7 +14,7 @@ from fastapi.responses import ORJSONResponse
 from starlette.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
-from app.crud import contact, jemengage, mail_campaign
+from app.crud import contact, enmarche, jemengage
 from app.schemas import schemas
 from app.database import SessionLocal
 
@@ -138,20 +138,7 @@ async def jemengage_survey(
     if not X_User_UUID:
         return HTTPException(status_code=401, detail='You are not authenticated.')
 
-    result = jemengage.get_survey(db, X_User_UUID)
-    return result
-
-
-@app.get('/mailCampaign/reports', response_class=ORJSONResponse)
-async def campaign_reports(
-    db: Session = Depends(get_db),
-    X_User_UUID: Optional[str] = Header(None)
-    ):
-    if not X_User_UUID:
-        return HTTPException(status_code=401, detail='You are not authenticated.')
-
-    result = await mail_campaign.get_campaign_reports(db, X_User_UUID)
-    return result
+    return jemengage.get_survey(db, X_User_UUID)
 
 
 if __name__ == "__main__":

@@ -117,5 +117,5 @@ class JecouteDataSurveyOut(BaseModel):
     survey_datas: List[JecouteDataSurvey]
 
     class Config:
-        json_encoders = {datetime: lambda v: v.strftime("%d/%m/%y à %H:%M")}
+        json_encoders = {datetime: lambda v: v.strftime("%d/%m/%y %H:%M")}
         orm_mode = True

@@ -156,7 +156,7 @@ def get_survey(
             .options(joinedload(JecouteDataSurvey.author)) \
             .options(joinedload(JecouteDataSurvey.survey)) \
             .filter(JecouteDataSurvey.postal_code != '') \
-            .join(GeoCity, GeoCity.postal_code.like('%' + JecouteDataSurvey.postal_code + '%')) \
+            .join(GeoCity, func.instr(GeoCity.postal_code, JecouteDataSurvey.postal_code)) \
             .join(GeoDepartment) \
             .filter(GeoDepartment.code == zone.code) \
             .filter(JecouteDataSurvey.latitude != '') \
