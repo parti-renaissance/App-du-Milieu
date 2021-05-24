@@ -16,9 +16,12 @@ env:
   # Cloud SQL Env
   SQL_INST: ${{ secrets.SQL_INST_STAGING }}
   DB_READ: ${{ secrets.DB_READ_STAGING }}
-  DB_NAME: ${{ secrets.DB_NAME_STAGING }}
   DB_USER: ${{ secrets.DB_USER_STAGING }}
   DB_PASS: ${{ secrets.DB_PASS_STAGING }}
+  SQL_INST_PG: ${{ secrets.SQL_INST_STAGING }}
+  DB_NAME_PG: ${{ secrets.DB_NAME_PG_STAGING }}
+  DB_USER_PG: ${{ secrets.DB_USER_PG_STAGING }}
+  DB_PASS_PG: ${{ secrets.DB_PASS_PG_STAGING }}
 
   # Image Env
   IMAGE: app-du-milieu
@@ -51,4 +54,4 @@ jobs:
         --memory 512Mi \
         --cpu 1 \
         --set-cloudsql-instances $SQL_INST \
-        --set-env-vars=DB_USER=$DB_USER,DB_PASS=$DB_PASS,DB_NAME=$DB_NAME,DB_READ=$DB_READ,CLOUDSQL_CONN=$GCP_PROJECT_ID:$GCP_ZONE:$SQL_INST
+        --set-env-vars=DB_USER=$DB_USER,DB_PASS=$DB_PASS,DB_READ=$DB_READ,CLOUDSQL_CONN=$GCP_PROJECT_ID:$GCP_ZONE:$SQL_INST,DB_USER_PG=$DB_USER_PG,DB_PASS_PG=$DB_PASS_PG,DB_NAME_PG=$DB_NAME_PG,CLOUDSQL_CONN_PG=$GCP_PROJECT_ID:$GCP_ZONE:$SQL_INST_PG
