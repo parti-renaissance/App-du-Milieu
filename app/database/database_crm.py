@@ -8,19 +8,19 @@ from sqlalchemy.ext.declarative import as_declarative
 
 
 # GCP
-CLOUDSQL_USER_PG = environ["DB_USER_PG"]
-CLOUDSQL_PASS_PG = environ["DB_PASS_PG"]
-CLOUDSQL_NAME_PG = environ["DB_NAME_PG"]
-CLOUDSQL_CONN_PG = environ["CLOUDSQL_CONN_PG"]
+CLOUDSQL_USER = environ["DB_USER"]
+CLOUDSQL_PASS = environ["DB_PASS"]
+CLOUDSQL_NAME = environ["DB_NAME"]
+CLOUDSQL_CONN = environ["CLOUDSQL_CONN"]
 
 engine_crm = create_engine(
     URL(
-        drivername="postgresql+psycopg2",
-        username=CLOUDSQL_USER_PG,
-        password=CLOUDSQL_PASS_PG,
-        database=CLOUDSQL_NAME_PG,
+        drivername="mysql+pymysql",
+        username=CLOUDSQL_USER,
+        password=CLOUDSQL_PASS,
+        database=CLOUDSQL_NAME,
         query={
-            "unix_socket": "/cloudsql/{}".format(CLOUDSQL_CONN_PG)
+            "unix_socket": "/cloudsql/{}".format(CLOUDSQL_CONN)
         }
     ),
     pool_size=5,
