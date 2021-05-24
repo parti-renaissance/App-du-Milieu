@@ -8,10 +8,10 @@ from sqlalchemy.ext.declarative import as_declarative
 
 
 # GCP
-CLOUDSQL_USER_PG = environ["DB_USER"]
-CLOUDSQL_PASS_PG = environ["DB_PASS"]
-CLOUDSQL_NAME_PG = environ["DB_NAME"]
-CLOUDSQL_CONN_PG = environ["CLOUDSQL_CONN"]
+CLOUDSQL_USER_PG = environ["DB_USER_PG"]
+CLOUDSQL_PASS_PG = environ["DB_PASS_PG"]
+CLOUDSQL_NAME_PG = environ["DB_NAME_PG"]
+CLOUDSQL_CONN_PG = environ["CLOUDSQL_CONN_PG"]
 
 engine_crm = create_engine(
     URL(
