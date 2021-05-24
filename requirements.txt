@@ -1,3 +1,4 @@
+psycopg2-binary
 fastapi[all]
 sqlalchemy
 pydantic
@@ -5,6 +6,5 @@ uvicorn[standard]
 requests
 gunicorn
 pymysql
-psycopg2
 pandas
 orjson
