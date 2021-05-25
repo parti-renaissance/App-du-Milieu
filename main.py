@@ -18,6 +18,7 @@ from app.crud import contact, enmarche, jemengage
 from app.models.models_enmarche import GeoZone
 from app.schemas import schemas
 from app.database import SessionLocal
+from app.database.database_crm import PG_URL
 
 import uvicorn
 import json
@@ -82,7 +83,7 @@ async def read_contacts(
     try:
         contacts = contact.get_contacts(db, filter_zone)
     except:
-        return HTTPException(status_code=204, detail='No contact found')
+        return HTTPException(status_code=204, detail='No contact found: {}'.format(PG_URL))
     return contacts
 
 
