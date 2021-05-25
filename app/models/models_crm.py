@@ -14,7 +14,7 @@ class Contact(CRM):
     genre = Column(String, nullable=True)
     prenom = Column(String, nullable=True)
     nom = Column(String, nullable=True)
-    sub_email = Column(String, nullable=True)
+    sub_email = Column(Boolean, nullable=True)
     sub_tel = Column(Boolean, nullable=True)
     code_postal = Column(String, nullable=True)
     code_commune = Column(String, nullable=True)
@@ -36,7 +36,7 @@ class Contact(CRM):
             'Genre': self.genre,
             'Prénom': self.prenom,
             'Nom': self.nom,
-            'Abonné_email': True if self.sub_email is not None else False,
+            'Abonné_email': self.sub_email,
             'Abonné_tel': self.sub_tel,
             'Code_postal': self.code_postal,
             'Code_commune': self.code_commune,
@@ -45,9 +45,8 @@ class Contact(CRM):
             'Département': self.departement,
             'Code_région': self.code_region,
             'Région': self.region,
-            'Centres_d\'intérêt': [] if self.centres_interet is None else self.centres_interet.split(',')
+            'Centres_d\'intérêt': self.centres_interet
         }
-
 
 
 class Downloads(CRM):
