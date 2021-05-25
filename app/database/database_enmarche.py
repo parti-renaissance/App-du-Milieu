@@ -14,7 +14,7 @@ CLOUDSQL_READ = environ["DB_READ"]
 CLOUDSQL_CONN = environ["CLOUDSQL_CONN"]
 
 engine_read_only = create_engine(
-    URL(
+    URL.create(
         drivername="mysql+pymysql",
         username=CLOUDSQL_USER,
         password=CLOUDSQL_PASS,
