@@ -21,14 +21,13 @@ engine_crm = create_engine(
         password=CLOUDSQL_PASS,
         database=CLOUDSQL_NAME,
         query={
-            "host": "/cloudsql/{}/.s.PGSQL.5432".format(CLOUDSQL_CONN)
+            "host": "/cloudsql/{}".format(CLOUDSQL_CONN)
         }
     ),
     pool_size=5,
     pool_timeout=30,
     pool_recycle=1800,
-    max_overflow=2,
-    echo=True
+    max_overflow=2
 )
 
 @as_declarative()
