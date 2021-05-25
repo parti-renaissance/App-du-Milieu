@@ -83,7 +83,7 @@ async def read_contacts(
     try:
         contacts = contact.get_contacts(db, filter_zone)
     except:
-        return HTTPException(status_code=204, detail='No contact found: {}'.format(PG_URL))
+        return HTTPException(status_code=204, detail='No contact found')
     return contacts
 
 

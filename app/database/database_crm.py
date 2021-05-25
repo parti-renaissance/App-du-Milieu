@@ -14,16 +14,6 @@ CLOUDSQL_PASS = environ["DB_PASS_PG"]
 CLOUDSQL_NAME = environ["DB_NAME_PG"]
 CLOUDSQL_CONN = environ["CLOUDSQL_CONN_PG"]
 
-PG_URL = URL.create(
-        drivername="postgresql+psycopg2",
-        username=CLOUDSQL_USER,
-        password=CLOUDSQL_PASS,
-        database=CLOUDSQL_NAME,
-        query={
-            "host": "/cloudsql/{}/.s.PGSQL.5432".format(CLOUDSQL_CONN)
-        }
-)
-
 engine_crm = create_engine(
     URL.create(
         drivername="postgresql+psycopg2",
