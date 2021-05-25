@@ -20,7 +20,7 @@ engine_crm = create_engine(
         password=CLOUDSQL_PASS,
         database=CLOUDSQL_NAME,
         query={
-            "host": "/cloudsql/{}".format(CLOUDSQL_CONN)
+            "unix_socket": "/cloudsql/{}".format(CLOUDSQL_CONN)
         }
     ),
     pool_size=5,
