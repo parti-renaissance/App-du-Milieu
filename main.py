@@ -18,7 +18,6 @@ from app.crud import contact, enmarche, jemengage
 from app.models.models_enmarche import GeoZone
 from app.schemas import schemas
 from app.database import SessionLocal
-from app.database.database_crm import PG_URL
 
 import uvicorn
 import json
