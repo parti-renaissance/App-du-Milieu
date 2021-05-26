@@ -110,6 +110,7 @@ class JecouteDataSurvey(BaseModel):
     class Config:
         orm_mode = True
 
+
 class JecouteDataSurveyOut(BaseModel):
     zone_name: str
     latitude: float
@@ -117,5 +118,39 @@ class JecouteDataSurveyOut(BaseModel):
     survey_datas: List[JecouteDataSurvey]
 
     class Config:
-        json_encoders = {datetime: lambda v: v.strftime("%d/%m/%y %H:%M")}
+        json_encoders = {datetime: lambda v: v.strftime("%d/%m/%y à %H:%M")}
+        orm_mode = True
+
+
+class MailReport(BaseModel):
+    date: datetime
+    auteur: str
+    titre: str
+    nb_emails_envoyés: int
+    nb_ouvertures:int
+    taux_ouverture: float
+    nb_cliques:int
+    taux_clique: float
+    nb_désabonnements: int
+    taux_désabonnement: float
+
+
+class MailReportOut(BaseModel):
+    zone: str
+    since: datetime
+    campagnes: List[MailReport]
+
+    class Config:
+        json_encoders = {datetime: lambda v: v.strftime("%d/%m/%y")}
+        orm_mode = True
+
+
+class MailRatiosOut(BaseModel):
+    zone: str
+    since: datetime
+    local: dict
+    national: dict
+
+    class Config:
+        json_encoders = {datetime: lambda v: v.strftime("%d/%m/%y")}
         orm_mode = True
