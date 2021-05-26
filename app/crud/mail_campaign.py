@@ -17,19 +17,19 @@ async def get_candidate_reports(
 
     return {
         'zone': zone.name,
-        'since': since,
+        'depuis': since,
         'campagnes': db.query(
             MailChimpCampaign.id.label('id'), \
             AdherentMessages.sent_at.label('date'), \
             (Adherents.first_name + ' ' + Adherents.last_name).label('auteur'), \
             AdherentMessages.subject.label('titre'), \
-            MailChimpCampaignReport.email_sent.label('nb_emails_envoyés'), \
+            MailChimpCampaignReport.email_sent.label('nb_emails'), \
             MailChimpCampaignReport.open_unique.label('nb_ouvertures'), \
-            (MailChimpCampaignReport.open_unique / MailChimpCampaignReport.email_sent).label('taux_ouverture'), \
+            (MailChimpCampaignReport.open_unique / MailChimpCampaignReport.email_sent).label('tx_ouverture'), \
             MailChimpCampaignReport.click_unique.label('nb_cliques'), \
-            (MailChimpCampaignReport.click_unique / MailChimpCampaignReport.email_sent).label('taux_clique'), \
-            MailChimpCampaignReport.unsubscribed.label('nb_désabonnements'), \
-            (MailChimpCampaignReport.unsubscribed / MailChimpCampaignReport.email_sent).label('taux_désabonnement')) \
+            (MailChimpCampaignReport.click_unique / MailChimpCampaignReport.email_sent).label('tx_clique'), \
+            MailChimpCampaignReport.unsubscribed.label('nb_desabonnements'), \
+            (MailChimpCampaignReport.unsubscribed / MailChimpCampaignReport.email_sent).label('tx_desabonnement')) \
         .join(MailChimpCampaign.message) \
         .filter(AdherentMessages.status == 'sent') \
         .filter(AdherentMessages.type.in_(['candidate', 'candidate_jecoute'])) \
@@ -48,9 +48,9 @@ async def get_mail_ratios(
     since: datetime):
 
     res = db.query(func.count(MailChimpCampaign.id).label('nb_campagnes'), \
-            (func.sum(MailChimpCampaignReport.open_unique) / func.sum(MailChimpCampaignReport.email_sent)).label('taux_ouverture'), \
-            (func.sum(MailChimpCampaignReport.click_unique) / func.sum(MailChimpCampaignReport.email_sent)).label('taux_clique'), \
-            (func.sum(MailChimpCampaignReport.unsubscribed) / func.sum(MailChimpCampaignReport.email_sent)).label('taux_désabonnement')) \
+            (func.sum(MailChimpCampaignReport.open_unique) / func.sum(MailChimpCampaignReport.email_sent)).label('tx_ouverture'), \
+            (func.sum(MailChimpCampaignReport.click_unique) / func.sum(MailChimpCampaignReport.email_sent)).label('tx_clique'), \
+            (func.sum(MailChimpCampaignReport.unsubscribed) / func.sum(MailChimpCampaignReport.email_sent)).label('tx_desabonnement')) \
         .select_from(MailChimpCampaignReport) \
         .join(MailChimpCampaignReport.mailchimp_campaign) \
         .join(MailChimpCampaign.message.and_( \
@@ -61,9 +61,9 @@ async def get_mail_ratios(
         .first()
 
     nat = db.query(
-            (func.sum(MailChimpCampaignReport.open_unique) / func.sum(MailChimpCampaignReport.email_sent)).label('taux_ouverture_nat'), \
-            (func.sum(MailChimpCampaignReport.click_unique) / func.sum(MailChimpCampaignReport.email_sent)).label('taux_clique_nat'), \
-            (func.sum(MailChimpCampaignReport.unsubscribed) / func.sum(MailChimpCampaignReport.email_sent)).label('taux_désabonnement_nat')) \
+            (func.sum(MailChimpCampaignReport.open_unique) / func.sum(MailChimpCampaignReport.email_sent)).label('tx_ouverture'), \
+            (func.sum(MailChimpCampaignReport.click_unique) / func.sum(MailChimpCampaignReport.email_sent)).label('tx_clique'), \
+            (func.sum(MailChimpCampaignReport.unsubscribed) / func.sum(MailChimpCampaignReport.email_sent)).label('tx_desabonnement')) \
         .select_from(MailChimpCampaignReport) \
         .join(MailChimpCampaignReport.mailchimp_campaign) \
         .join(MailChimpCampaign.message.and_( \

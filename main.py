@@ -160,7 +160,7 @@ async def mail_ratios(
     since: datetime = datetime(2021, 1, 1)
     ):
     result = await mail_campaign.get_mail_ratios(db, zone, since)
-    return {'zone': zone.name, 'since': since, **result}
+    return {'zone': zone.name, 'depuis': since, **result}
 
 
 if __name__ == "__main__":
