@@ -1,4 +1,5 @@
 from os import environ
+from settings import DATABASE_HOST, DATABASE_NAME, DATABASE_PASSWORD, DATABASE_USER
 from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
 from sqlalchemy.ext.declarative import as_declarative
@@ -8,20 +9,21 @@ from sqlalchemy.ext.declarative import as_declarative
 
 
 # GCP
-CLOUDSQL_USER = environ["DB_USER"]
-CLOUDSQL_PASS = environ["DB_PASS"]
-CLOUDSQL_READ = environ["DB_READ"]
-CLOUDSQL_CONN = environ["CLOUDSQL_CONN"]
+# CLOUDSQL_USER = environ["DB_USER"]
+# CLOUDSQL_PASS = environ["DB_PASS"]
+# CLOUDSQL_READ = environ["DB_READ"]
+# CLOUDSQL_CONN = environ["CLOUDSQL_CONN"]
 
 engine_read_only = create_engine(
     URL(
         drivername="mysql+pymysql",
-        username=CLOUDSQL_USER,
-        password=CLOUDSQL_PASS,
-        database=CLOUDSQL_READ,
-        query={
-            "unix_socket": "/cloudsql/{}".format(CLOUDSQL_CONN)
-        }
+        username=DATABASE_USER,
+        password=DATABASE_PASSWORD,
+        database=DATABASE_NAME,
+        host=DATABASE_HOST
+        # query={
+        #     "unix_socket": "/cloudsql/{}".format(CLOUDSQL_CONN)
+        # }
     ),
     pool_size=5,
     pool_timeout=30,
