@@ -122,14 +122,34 @@ class JecouteDataSurveyOut(BaseModel):
         orm_mode = True
 
 
-class MailReportOut(BaseModel):
+class MailReport(BaseModel):
     date: datetime
     auteur: str
     titre: str
     nb_emails_envoyés: int
+    nb_ouvertures:int
     taux_ouverture: float
+    nb_cliques:int
+    taux_clique: float
     nb_désabonnements: int
     taux_désabonnement: float
+
+
+class MailReportOut(BaseModel):
+    zone: str
+    since: datetime
+    campagnes: List[MailReport]
+
+    class Config:
+        json_encoders = {datetime: lambda v: v.strftime("%d/%m/%y")}
+        orm_mode = True
+
+
+class MailRatiosOut(BaseModel):
+    zone: str
+    since: datetime
+    local: dict
+    national: dict
 
     class Config:
         json_encoders = {datetime: lambda v: v.strftime("%d/%m/%y")}

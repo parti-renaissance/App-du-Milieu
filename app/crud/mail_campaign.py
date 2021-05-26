@@ -2,8 +2,9 @@
 Endpoints de notre api
 """
 from datetime import datetime
-from sqlalchemy.orm import Session, joinedload, load_only
-from sqlalchemy import func, DateTime
+from sqlalchemy.orm import Session
+from sqlalchemy.sql import select
+from sqlalchemy import func
 from app.models.models_enmarche import AdherentMessages, Adherents, CandidateManagedArea
 from app.models.models_enmarche import MailChimpCampaign, MailChimpCampaignReport
 from app.models.models_enmarche import GeoZone
@@ -12,18 +13,24 @@ from app.models.models_enmarche import GeoZone
 async def get_candidate_reports(
     db: Session,
     zone: GeoZone,
-    since: DateTime = datetime(2021, 3, 1)):
+    since: datetime):
 
-    return db.query(
+    return {
+        'zone': zone.name,
+        'since': since,
+        'campagnes': db.query(
+            MailChimpCampaign.id.label('id'), \
             AdherentMessages.sent_at.label('date'), \
             (Adherents.first_name + ' ' + Adherents.last_name).label('auteur'), \
             AdherentMessages.subject.label('titre'), \
             MailChimpCampaignReport.email_sent.label('nb_emails_envoyés'), \
+            MailChimpCampaignReport.open_unique.label('nb_ouvertures'), \
             (MailChimpCampaignReport.open_unique / MailChimpCampaignReport.email_sent).label('taux_ouverture'), \
+            MailChimpCampaignReport.click_unique.label('nb_cliques'), \
+            (MailChimpCampaignReport.click_unique / MailChimpCampaignReport.email_sent).label('taux_clique'), \
             MailChimpCampaignReport.unsubscribed.label('nb_désabonnements'), \
             (MailChimpCampaignReport.unsubscribed / MailChimpCampaignReport.email_sent).label('taux_désabonnement')) \
         .join(MailChimpCampaign.message) \
-        .join(MailChimpCampaign.report) \
         .filter(AdherentMessages.status == 'sent') \
         .filter(AdherentMessages.type.in_(['candidate', 'candidate_jecoute'])) \
         .filter(AdherentMessages.sent_at >= since) \
@@ -32,15 +39,17 @@ async def get_candidate_reports(
         .join(Adherents.candidate_managed_area.and_(CandidateManagedArea.zone_id == zone.id)) \
         .order_by(AdherentMessages.sent_at.desc()) \
         .all()
+    }
 
 
 async def get_mail_ratios(
     db: Session,
     zone: GeoZone,
-    since: DateTime = datetime(2021, 3, 1)):
+    since: datetime):
 
     res = db.query(func.count(MailChimpCampaign.id).label('nb_campagnes'), \
             (func.sum(MailChimpCampaignReport.open_unique) / func.sum(MailChimpCampaignReport.email_sent)).label('taux_ouverture'), \
+            (func.sum(MailChimpCampaignReport.click_unique) / func.sum(MailChimpCampaignReport.email_sent)).label('taux_clique'), \
             (func.sum(MailChimpCampaignReport.unsubscribed) / func.sum(MailChimpCampaignReport.email_sent)).label('taux_désabonnement')) \
         .select_from(MailChimpCampaignReport) \
         .join(MailChimpCampaignReport.mailchimp_campaign) \
@@ -53,6 +62,7 @@ async def get_mail_ratios(
 
     nat = db.query(
             (func.sum(MailChimpCampaignReport.open_unique) / func.sum(MailChimpCampaignReport.email_sent)).label('taux_ouverture_nat'), \
+            (func.sum(MailChimpCampaignReport.click_unique) / func.sum(MailChimpCampaignReport.email_sent)).label('taux_clique_nat'), \
             (func.sum(MailChimpCampaignReport.unsubscribed) / func.sum(MailChimpCampaignReport.email_sent)).label('taux_désabonnement_nat')) \
         .select_from(MailChimpCampaignReport) \
         .join(MailChimpCampaignReport.mailchimp_campaign) \
@@ -60,4 +70,4 @@ async def get_mail_ratios(
             AdherentMessages.type.in_(['candidate', 'candidate_jecoute']))) \
         .first()
 
-    return (res, nat)
+    return {'local': res, 'national': nat}
