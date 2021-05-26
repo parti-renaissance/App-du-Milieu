@@ -142,11 +142,20 @@ async def jemengage_survey(
 
 
 @app.get('/mailCampaign/reports', response_class=ORJSONResponse)
-async def jemengage_survey(
+async def mail_reports(
     zone: dict = Depends(get_uuid_zone),
     db: Session = Depends(get_db)
     ):
     result = await mail_campaign.get_candidate_reports(db, zone)
+    return result
+
+
+@app.get('/mailCampaign/reportsRatios', response_class=ORJSONResponse)
+async def mail_ratios(
+    zone: dict = Depends(get_uuid_zone),
+    db: Session = Depends(get_db)
+    ):
+    result = await mail_campaign.get_mail_ratios(db, zone)
     return result
 
 
