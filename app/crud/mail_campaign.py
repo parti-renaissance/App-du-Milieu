@@ -61,9 +61,9 @@ async def get_mail_ratios(
         .first()
 
     nat = db.query(
-            (func.sum(MailChimpCampaignReport.open_unique) / func.sum(MailChimpCampaignReport.email_sent)).label('tx_ouverture_nat'), \
-            (func.sum(MailChimpCampaignReport.click_unique) / func.sum(MailChimpCampaignReport.email_sent)).label('tx_clique_nat'), \
-            (func.sum(MailChimpCampaignReport.unsubscribed) / func.sum(MailChimpCampaignReport.email_sent)).label('tx_desabonnement_nat')) \
+            (func.sum(MailChimpCampaignReport.open_unique) / func.sum(MailChimpCampaignReport.email_sent)).label('tx_ouverture'), \
+            (func.sum(MailChimpCampaignReport.click_unique) / func.sum(MailChimpCampaignReport.email_sent)).label('tx_clique'), \
+            (func.sum(MailChimpCampaignReport.unsubscribed) / func.sum(MailChimpCampaignReport.email_sent)).label('tx_desabonnement')) \
         .select_from(MailChimpCampaignReport) \
         .join(MailChimpCampaignReport.mailchimp_campaign) \
         .join(MailChimpCampaign.message.and_( \
