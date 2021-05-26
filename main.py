@@ -14,7 +14,7 @@ from fastapi.responses import ORJSONResponse
 from starlette.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
-from app.crud import contact, enmarche, jemengage
+from app.crud import contact, enmarche, jemengage, mail_campaign
 from app.models.models_enmarche import GeoZone
 from app.schemas import schemas
 from app.database import SessionLocal
@@ -139,6 +139,15 @@ async def jemengage_survey(
     db: Session = Depends(get_db)
     ):
     return jemengage.get_survey(db, zone)
+
+
+@app.get('/mailCampaign/reports', response_class=ORJSONResponse)
+async def jemengage_survey(
+    zone: dict = Depends(get_uuid_zone),
+    db: Session = Depends(get_db)
+    ):
+    result = await mail_campaign.get_candidate_reports(db, zone)
+    return result
 
 
 if __name__ == "__main__":

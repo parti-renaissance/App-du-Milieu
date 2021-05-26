@@ -22,6 +22,20 @@ class Adherents(Base):
     candidate_managed_area = relationship('CandidateManagedArea')
 
 
+class AdherentMessages(Base):
+    """ Table adherent_messages """
+    __tablename__ = 'adherent_messages'
+
+    id = Column(Integer, primary_key=True, index=True)
+    author_id = Column(Integer, ForeignKey('adherents.id'), nullable=True)
+    author = relationship('Adherents', lazy='joined')
+    label = Column(String, nullable=False)
+    subject = Column(String, nullable=False)
+    status = Column(String, nullable=False)
+    type = Column(String, nullable=False)
+    sent_at = Column(DateTime, nullable=True)
+
+
 class CandidateManagedArea(Base):
     """ Table candidate_managed_area pour retrouver la zone_id """
     __tablename__ = 'candidate_managed_area'
@@ -84,16 +98,6 @@ class GeoRegion(Base):
     longitude = Column(Float, nullable=False)
 
 
-class OauthAccessTokens(Base):
-    """ Table oauth_access_tokens """
-    __tablename__ = 'oauth_access_tokens'
-
-    id = Column(Integer, primary_key=True, index=True)
-    client_id = Column(Integer, nullable=False, index=True)
-    user_id = Column(Integer, index=True)
-    created_at = Column(DateTime, nullable=False, index=True)
-
-
 class JecouteDataSurvey(Base):
     """ Table jecoute_data_survey """
     __tablename__ = 'jecoute_data_survey'
@@ -124,3 +128,31 @@ class JecouteSurvey(Base):
     type = Column(String, nullable=False)
     zone_id = Column(Integer, ForeignKey('geo_zone.id'))
     geo_zone_relation = relationship('GeoZone')
+
+
+class MailChimpCampaign(Base):
+    """ Table mailchimp_campaign """
+    __tablename__ = 'mailchimp_campaign'
+
+    id = Column(Integer, primary_key=True, index=True)
+    message_id = Column(Integer, ForeignKey('adherent_messages.id'), nullable=True)
+    message = relationship('AdherentMessages', lazy='joined')
+    recipient_count = Column(Integer, nullable=True)
+    status = Column(String, nullable=False)
+    report_id = Column(Integer, ForeignKey('mailchimp_campaign_report.id'), nullable=True)
+    report = relationship('MailChimpCampaignReport', back_populates='mailchimp_campaign')
+
+
+class MailChimpCampaignReport(Base):
+    """ Table mailchimp_campaign_report """
+    __tablename__ = 'mailchimp_campaign_report'
+
+    id = Column(Integer, primary_key=True, index=True)
+    open_total = Column(Integer, nullable=False)
+    open_unique = Column(Integer, nullable=False)
+    click_total = Column(Integer, nullable=False)
+    click_unique = Column(Integer, nullable=False)
+    email_sent = Column(Integer, nullable=False)
+    unsubscribed = Column(Integer, nullable=False)
+    mailchimp_campaign = relationship("MailChimpCampaign", back_populates="report")
+    #TODO define method to calculate rates ?
