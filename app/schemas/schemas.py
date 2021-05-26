@@ -126,18 +126,18 @@ class MailReport(BaseModel):
     date: datetime
     auteur: str
     titre: str
-    nb_emails_envoyés: int
+    nb_emails: int
     nb_ouvertures:int
-    taux_ouverture: float
+    tx_ouverture: float
     nb_cliques:int
-    taux_clique: float
-    nb_désabonnements: int
-    taux_désabonnement: float
+    tx_clique: float
+    nb_desabonnements: int
+    tx_desabonnement: float
 
 
 class MailReportOut(BaseModel):
     zone: str
-    since: datetime
+    depuis: datetime
     campagnes: List[MailReport]
 
     class Config:
@@ -147,7 +147,7 @@ class MailReportOut(BaseModel):
 
 class MailRatiosOut(BaseModel):
     zone: str
-    since: datetime
+    depuis: datetime
     local: dict
     national: dict
 
