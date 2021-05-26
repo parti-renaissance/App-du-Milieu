@@ -14,18 +14,25 @@ async def get_candidate_reports(
     zone: GeoZone,
     since: DateTime = datetime(2021, 3, 1)):
 
-    return db.query(MailChimpCampaign) \
+    return db.query(
+            AdherentMessages.sent_at.label('date'), \
+            (Adherents.first_name + ' ' + Adherents.last_name).label('auteur'), \
+            AdherentMessages.subject.label('titre'), \
+            MailChimpCampaignReport.email_sent.label('nb_emails_envoyés'), \
+            (MailChimpCampaignReport.open_unique / MailChimpCampaignReport.email_sent).label('taux_ouverture'), \
+            MailChimpCampaignReport.unsubscribed.label('nb_désabonnements'), \
+            (MailChimpCampaignReport.unsubscribed / MailChimpCampaignReport.email_sent).label('taux_désabonnement')) \
         .join(MailChimpCampaign.message) \
+        .join(MailChimpCampaign.report) \
         .filter(AdherentMessages.status == 'sent') \
         .filter(AdherentMessages.type.in_(['candidate', 'candidate_jecoute'])) \
         .filter(AdherentMessages.sent_at >= since) \
         .join(MailChimpCampaign.report) \
-        .options(joinedload(MailChimpCampaign.message)) \
-        .options(joinedload(MailChimpCampaign.report)) \
         .join(AdherentMessages.author) \
         .join(Adherents.candidate_managed_area.and_(CandidateManagedArea.zone_id == zone.id)) \
         .order_by(AdherentMessages.sent_at.desc()) \
         .all()
+
 
 async def get_mail_ratios(
     db: Session,

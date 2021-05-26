@@ -141,7 +141,7 @@ async def jemengage_survey(
     return jemengage.get_survey(db, zone)
 
 
-@app.get('/mailCampaign/reports', response_class=ORJSONResponse)
+@app.get('/mailCampaign/reports', response_model=List[schemas.MailReportOut], response_class=ORJSONResponse)
 async def mail_reports(
     zone: dict = Depends(get_uuid_zone),
     db: Session = Depends(get_db)
