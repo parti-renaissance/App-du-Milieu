@@ -22,7 +22,7 @@ env:
   DB_NAME_PG: ${{ secrets.DB_NAME_PG_STAGING }}
   DB_USER_PG: ${{ secrets.DB_USER_PG_STAGING }}
   DB_PASS_PG: ${{ secrets.DB_PASS_PG_STAGING }}
-
+  
   # Image Env
   IMAGE: app-du-milieu
   TAG: build
