@@ -123,9 +123,9 @@ class JecouteDataSurveyOut(BaseModel):
 
 
 class RatioReport(BaseModel):
-    txOuverture: float
-    txClique: float
-    txDesabonnement: float
+    txOuverture: Optional[float]
+    txClique: Optional[float]
+    txDesabonnement: Optional[float]
 
 
 class LocalRatioReport(RatioReport):
