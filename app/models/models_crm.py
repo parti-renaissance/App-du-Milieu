@@ -1,7 +1,7 @@
 """
 SQLAlchemy de notre base de données CRM
 """
-from sqlalchemy import Column, Integer, Float, String, Boolean, Date, DateTime
+from sqlalchemy import Column, Integer, Float, String, Boolean, Date, ARRAY
 
 from app.database import CRM
 
@@ -23,30 +23,15 @@ class Contact(CRM):
     departement = Column(String, nullable=True)
     code_region = Column(String, nullable=True)
     region = Column(String, nullable=True)
-    centres_interet = Column(String, nullable=True)
+    centres_interet = Column(ARRAY(String), nullable=True)
+
+
+class ContactInDb(Contact):
     adherent_id = Column(Integer, nullable=True)
     email = Column(String, nullable=False, unique=True)
-    email_subscriptions = Column(String, nullable=True)
+    email_subscriptions = Column(ARRAY(String), nullable=True)
     telephones = Column(String, nullable=True)
-    typeforms = Column(String, nullable=True)
-
-    def serialize(self):
-        """ Print pour le call /contacts/ """
-        return {
-            'Genre': self.genre,
-            'Prénom': self.prenom,
-            'Nom': self.nom,
-            'Abonné_email': self.sub_email,
-            'Abonné_tel': self.sub_tel,
-            'Code_postal': self.code_postal,
-            'Code_commune': self.code_commune,
-            'Commune': self.commune,
-            'Code_département': self.code_departement,
-            'Département': self.departement,
-            'Code_région': self.code_region,
-            'Région': self.region,
-            'Centres_d\'intérêt': self.centres_interet
-        }
+    typeforms = Column(ARRAY(String), nullable=True)
 
 
 class Downloads(CRM):
