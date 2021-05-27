@@ -4,10 +4,10 @@ name: Build and Publish Docker Image
 on:
   push:
     branches: [ master ]
-#    paths:
-#      - '**.py'
-#      - 'Dockerfile'
-#      - 'requirements.txt'
+    paths:
+      - '**.py'
+      - 'Dockerfile'
+      - 'requirements.txt'
 
 # General Environments variables
 env:
