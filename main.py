@@ -3,7 +3,6 @@
 A sample flask application on Cloud Run. Version 1
 """
 from os import environ
-from typing import List
 
 from fastapi import FastAPI, Depends, Header, HTTPException
 from fastapi.middleware.gzip import GZipMiddleware
