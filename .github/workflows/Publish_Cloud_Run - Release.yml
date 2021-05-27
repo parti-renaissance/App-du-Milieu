@@ -10,12 +10,15 @@ env:
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   GCP_ZONE: ${{ secrets.GCP_ZONE }}
 
-  # Cloud SQL Env
+  # Cloud SQL Env  
   SQL_INST: ${{ secrets.SQL_INST_PROD }}
   DB_READ: ${{ secrets.DB_READ_PROD }}
-  DB_NAME: ${{ secrets.DB_NAME_PROD }}
   DB_USER: ${{ secrets.DB_USER_PROD }}
   DB_PASS: ${{ secrets.DB_PASS_PROD }}
+  SQL_INST_PG: ${{ secrets.SQL_INST_PG_PROD }}
+  DB_NAME_PG: ${{ secrets.DB_NAME_PG_PROD }}
+  DB_USER_PG: ${{ secrets.DB_USER_PG_PROD }}
+  DB_PASS_PG: ${{ secrets.DB_PASS_PG_PROD }}
 
   # Image Env
   IMAGE: app-du-milieu
@@ -45,5 +48,6 @@ jobs:
         --ingress internal-and-cloud-load-balancing \
         --memory 2Gi \
         --cpu 4 \
-        --set-cloudsql-instances $SQL_INST \
-        --set-env-vars=DB_USER=$DB_USER,DB_PASS=$DB_PASS,DB_NAME=$DB_NAME,DB_READ=$DB_READ,CLOUDSQL_CONN=$GCP_PROJECT_ID:$GCP_ZONE:$SQL_INST
+        --set-cloudsql-instances $SQL_INST,$SQL_INST_PG \
+        --set-env-vars=DB_USER=$DB_USER,DB_PASS=$DB_PASS,DB_READ=$DB_READ,CLOUDSQL_CONN=$GCP_PROJECT_ID:$GCP_ZONE:$SQL_INST,DB_USER_PG=$DB_USER_PG,DB_PASS_PG=$DB_PASS_PG,DB_NAME_PG=$DB_NAME_PG,CLOUDSQL_CONN_PG=$GCP_PROJECT_ID:$GCP_ZONE:$SQL_INST_PG
+
