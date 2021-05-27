@@ -2,7 +2,6 @@
 Endpoints de notre api
 """
 from sqlalchemy.orm import Session
-from sqlalchemy.dialects import postgresql
 
 from app.models.models_crm import Contact
 from app.schemas import schemas
@@ -33,7 +32,6 @@ def get_contacts(db: Session, filter_zone: dict):
     query = str(db.query(Contact).filter_by(**filter_zone) \
         .statement.compile(compile_kwargs={"literal_binds": True})) \
         .replace('contacts.id, ', '', 1)
-    print(query)
 
     copy_sql = "COPY ({query}) TO STDOUT WITH CSV {head}".format(query=query, head="HEADER")
     conn = engine_crm.raw_connection()
