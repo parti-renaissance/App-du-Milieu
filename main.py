@@ -167,12 +167,14 @@ async def mail_ratios(
 @app.get('/elections', response_class=ORJSONResponse, response_model_exclude_unset=True)
 async def get_elections(
     election: str,
-    tour: int = None,
+    tour: int = 1,
     zone: GeoZone = Depends(get_uuid_zone),
     db: Session = Depends(get_db)
     ):
     if election not in elections.available_elections:
-        return HTTPException(status_code=422, detail='The election is not available yet')
+        return HTTPException(status_code=422, detail="The election is not available yet")
+    if tour not in [1,2]:
+        return HTTPException(status_code=422, detail="parameter 'tour' must be 1 or 2")
 
     result = elections.get_elections(election, tour, zone, db)
     return result
