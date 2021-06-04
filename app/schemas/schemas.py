@@ -6,6 +6,8 @@ from typing import List, Set, Union, Optional
 from pydantic import BaseModel, Field
 from datetime import datetime
 
+from sqlalchemy.sql.expression import null
+
 
 class InterestsChoices(str, Enum):
     economie = 'economie'
@@ -164,3 +166,28 @@ class MailRatiosOut(BaseModel):
     class Config:
         json_encoders = {datetime: lambda v: v.strftime("%d/%m/%y")}
         orm_mode = True
+
+
+class ElectionOut(BaseModel):
+    election: str
+    departement: str
+    commune: str
+    commune_libelle: str
+    bureau: str
+    inscrits: int
+    votants: int
+    blancs: Optional[int] = None
+    exprimes: int
+    numero_panneau: Optional[int] = None
+    nom_liste: Optional[str] = None
+    voix: int
+    circonscription: Optional[int] = None
+    sexe: Optional[str] = None
+    nom: Optional[str] = None
+    prenom: Optional[str] = None
+    tour: Optional[int] = None
+    nuance: Optional[str] = None
+    num_dep_binome_candidat: Optional[int] = None
+    canton: Optional[str] = None
+    canton_libelle: Optional[str] = None
+    composition_binome: Optional[str] = None

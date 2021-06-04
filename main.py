@@ -15,10 +15,12 @@ from sqlalchemy.orm import Session
 
 from datetime import datetime
 
-from app.crud import contact, enmarche, jemengage, mail_campaign
+from app.crud import contact, enmarche, jemengage, mail_campaign, elections
 from app.models.models_enmarche import GeoZone
 from app.schemas import schemas
 from app.database import SessionLocal
+
+from typing import List
 
 import uvicorn
 import json
@@ -97,7 +99,7 @@ async def get_adherents(
 
 @app.get('/jemengage/downloads', response_class=ORJSONResponse)
 async def jemengage_downloads(
-    zone: dict = Depends(get_uuid_zone),
+    zone: GeoZone = Depends(get_uuid_zone),
     db: Session = Depends(get_db)
     ):
     res = jemengage.get_downloads(db, zone)
@@ -110,7 +112,7 @@ async def jemengage_downloads(
 
 @app.get('/jemengage/downloadsRatios', response_class=ORJSONResponse)
 async def jemengage_downloads_ratio(
-    zone: dict = Depends(get_uuid_zone),
+    zone: GeoZone = Depends(get_uuid_zone),
     db: Session = Depends(get_db)
     ):
     res = jemengage.downloads_ratio(db, zone)
@@ -123,7 +125,7 @@ async def jemengage_downloads_ratio(
 
 @app.get('/jemengage/users', response_class=ORJSONResponse)
 async def jemengage_users(
-    zone: dict = Depends(get_uuid_zone),
+    zone: GeoZone = Depends(get_uuid_zone),
     db: Session = Depends(get_db)
     ):
     res = jemengage.get_users(db, zone)
@@ -136,7 +138,7 @@ async def jemengage_users(
 
 @app.get('/jemengage/survey', response_model=schemas.JecouteDataSurveyOut, response_class=ORJSONResponse)
 async def jemengage_survey(
-    zone: dict = Depends(get_uuid_zone),
+    zone: GeoZone = Depends(get_uuid_zone),
     db: Session = Depends(get_db)
     ):
     return jemengage.get_survey(db, zone)
@@ -144,7 +146,7 @@ async def jemengage_survey(
 
 @app.get('/mailCampaign/reports', response_model=schemas.MailReportOut, response_class=ORJSONResponse)
 async def mail_reports(
-    zone: dict = Depends(get_uuid_zone),
+    zone: GeoZone = Depends(get_uuid_zone),
     db: Session = Depends(get_db),
     since: datetime = datetime(2021, 1, 1)
     ):
@@ -154,12 +156,31 @@ async def mail_reports(
 
 @app.get('/mailCampaign/reportsRatios', response_model=schemas.MailRatiosOut, response_class=ORJSONResponse)
 async def mail_ratios(
-    zone: dict = Depends(get_uuid_zone),
+    zone: GeoZone = Depends(get_uuid_zone),
     db: Session = Depends(get_db),
     since: datetime = datetime(2021, 1, 1)
     ):
     result = await mail_campaign.get_mail_ratios(db, zone, since)
     return {'zone': zone.name, 'depuis': since, **result}
+
+
+@app.get('/elections', response_class=ORJSONResponse, response_model_exclude_unset=True)
+async def get_elections(
+    election: str,
+    tour: int = None,
+    zone: GeoZone = Depends(get_uuid_zone),
+    db: Session = Depends(get_db)
+    ):
+    if election not in elections.available_elections:
+        return HTTPException(status_code=422, detail='The election is not available yet')
+
+    result = elections.get_elections(election, tour, zone, db)
+    return result
+
+
+@app.get('/availableElections')
+def get_available_elections():
+    return {'availableElections': elections.available_elections}
 
 
 if __name__ == "__main__":

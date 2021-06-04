@@ -1,7 +1,7 @@
 """
 SQLAlchemy de notre base de données Globale
 """
-from sqlalchemy import Column, Integer, Float, String, DateTime, Date, UniqueConstraint, ForeignKey
+from sqlalchemy import Column, Integer, Float, String, DateTime, UniqueConstraint, ForeignKey
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -49,7 +49,7 @@ class CandidateManagedArea(Base):
 
 
 class GeoZone(Base):
-    """ Table candidate_managed_area pour retrouver la zone_id """
+    """ Table geo_zone pour retrouver la zone_id """
     __tablename__ = 'geo_zone'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -64,6 +64,18 @@ class GeoZone(Base):
 
     def get_type(self):
         return self.type
+
+
+class GeoZoneParent(Base):
+    """ Table geo_zone_parent pour retrouver la zone_id """
+    __tablename__ = 'geo_zone_parent'
+
+    child_id = Column(Integer, ForeignKey('geo_zone.id'), index=True)
+    child = relationship('GeoZone', foreign_keys='GeoZoneParent.child_id')
+    parent_id = Column(Integer, ForeignKey('geo_zone.id'), index=True)
+    parent = relationship('GeoZone', foreign_keys='GeoZoneParent.parent_id')
+
+    __mapper_args__ = {'primary_key':[child_id, parent_id]}
 
 
 class GeoCity(Base):
