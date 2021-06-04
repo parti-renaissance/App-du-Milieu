@@ -1,11 +1,9 @@
 """
 SQLAlchemy de notre base de données CRM
 """
-from sqlalchemy import Column, SmallInteger, Integer, Float, String, Boolean, Date, ARRAY,ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, SmallInteger, Integer, Float, String, Boolean, Date, ARRAY
 
 from app.database import CRM
-from app.models.models_enmarche import GeoDepartment
 
 
 class Contact(CRM):
