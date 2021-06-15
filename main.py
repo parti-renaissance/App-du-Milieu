@@ -80,10 +80,12 @@ async def home():
 @app.get("/contacts", response_class=ORJSONResponse)
 async def read_contacts(
     filter_zone: dict = Depends(get_filter_zone),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    skip: int = 0,
+    limit: int = 100
     ):
     try:
-        contacts = contact.get_contacts(db, filter_zone)
+        contacts = contact.get_contacts(db, filter_zone, skip, limit)
     except:
         return HTTPException(status_code=204, detail='No contact found')
     return contacts

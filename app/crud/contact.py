@@ -12,7 +12,11 @@ import io
 import pandas as pd
 
 
-def get_contacts(db: Session, filter_zone: dict):
+def get_contacts(db: Session, filter_zone: dict, skip: int, limit: int):
+    limit = min(limit, 1000)
+    limit = max(limit, 100)
+    skip = max(skip, 0)
+
     columns = [
         'Genre',
         'Prénom',
@@ -29,7 +33,9 @@ def get_contacts(db: Session, filter_zone: dict):
         'Centres_d\'intérêt'
     ]
 
+    total_items = db.query(Contact).filter_by(**filter_zone).count()
     query = str(db.query(Contact).filter_by(**filter_zone) \
+        .offset(skip).limit(limit) \
         .statement.compile(compile_kwargs={"literal_binds": True})) \
         .replace('contacts.id, ', '', 1)
 
@@ -51,7 +57,7 @@ def get_contacts(db: Session, filter_zone: dict):
     gender = {'genderChoices': schemas.Gender.list()}
 
     return {
-        'totalItems': len(df.index),
+        'totalItems': total_items,
         **interests,
         **gender,
         'contacts': loads(df.to_json(orient='records', force_ascii=False))
