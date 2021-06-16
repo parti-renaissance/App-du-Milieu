@@ -123,6 +123,19 @@ async def jemengage_downloads_ratio(
     return {'downloads': json.loads(res)}
 
 
+@app.get('/jemengage/downloadsRank', response_class=ORJSONResponse)
+async def jemengage_downloads_rank(
+    zone: GeoZone = Depends(get_uuid_zone),
+    db: Session = Depends(get_db)
+    ):
+    res = jemengage.downloads_rank(db, zone)
+    if res.empty:
+        return HTTPException(status_code=204, detail='No content')
+
+    res = res.to_json(orient='records')
+    return json.loads(res)
+
+
 @app.get('/jemengage/users', response_class=ORJSONResponse)
 async def jemengage_users(
     zone: GeoZone = Depends(get_uuid_zone),

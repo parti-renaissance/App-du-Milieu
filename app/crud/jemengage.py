@@ -88,6 +88,26 @@ def downloads_ratio(
     return df
 
 
+def downloads_rank(
+    db: Session,
+    zone: GeoZone
+    ):
+
+    query = db.query(Downloads) \
+            .filter(Downloads.zone_type == zone.type) \
+            .statement
+    
+    df = pd.read_sql(query, engine_crm)
+    if not df.empty:
+        last_downloads = df[df.groupby(['zone_type', 'zone_name']) \
+            .date.transform('max') == df['date']][['zone_type', 'zone_name', 'downloadsPer1000']]
+        last_downloads['rank'] = last_downloads.loc[:,'downloadsPer1000'].rank(ascending=False, method='min').astype(int)
+        rank = int(last_downloads.loc[last_downloads.zone_name == zone.name]['rank'])
+        return last_downloads.loc[last_downloads['rank'].between(rank-2, rank+2)].sort_values('rank')
+    
+    return df
+
+
 def get_users(
     db: Session,
     zone: GeoZone,
