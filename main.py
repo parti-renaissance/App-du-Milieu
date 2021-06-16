@@ -4,7 +4,7 @@ A sample flask application on Cloud Run. Version 1
 """
 from os import environ
 
-from fastapi import FastAPI, Depends, Header, HTTPException
+from fastapi import FastAPI, Depends, Header, HTTPException, Query
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import ORJSONResponse
 # profiling
@@ -82,10 +82,11 @@ async def read_contacts(
     filter_zone: dict = Depends(get_filter_zone),
     db: Session = Depends(get_db),
     skip: int = 0,
-    limit: int = 100
+    limit: int = 100,
+    q: list = Query([])
     ):
     try:
-        contacts = contact.get_contacts(db, filter_zone, skip, limit)
+        contacts = contact.get_contacts(db, filter_zone, skip, limit, q)
     except:
         return HTTPException(status_code=204, detail='No contact found')
     return contacts

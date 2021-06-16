@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 
 from app.models.models_crm import Contact
 from app.schemas import schemas
+from app import filtering
 from app.database.database_crm import engine_crm
 
 from json import loads
@@ -12,7 +13,7 @@ import io
 import pandas as pd
 
 
-def get_contacts(db: Session, filter_zone: dict, skip: int, limit: int):
+def get_contacts(db: Session, filter_zone: dict, skip: int, limit: int, q: str):
     limit = min(limit, 1000)
     limit = max(limit, 100)
     skip = max(skip, 0)
@@ -33,9 +34,12 @@ def get_contacts(db: Session, filter_zone: dict, skip: int, limit: int):
         'Centres_d\'intérêt'
     ]
 
-    total_items = db.query(Contact).filter_by(**filter_zone).count()
-    query = str(db.query(Contact).filter_by(**filter_zone) \
-        .offset(skip).limit(limit) \
+    base_query = db.query(Contact).filter_by(**filter_zone)
+    base_query = filtering.add_filters(q, base_query, Contact)
+
+    total_items = base_query.count()
+
+    query = str(base_query.offset(skip).limit(limit) \
         .statement.compile(compile_kwargs={"literal_binds": True})) \
         .replace('contacts.id, ', '', 1)
 
