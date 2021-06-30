@@ -53,6 +53,7 @@ class GeoZone(Base):
     __tablename__ = 'geo_zone'
 
     id = Column(Integer, primary_key=True, index=True)
+    uuid = Column(String(36), nullable=False)
     type = Column(String(255), nullable=False)
     code = Column(String(255), nullable=False)
     name = Column(String(255), nullable=False)

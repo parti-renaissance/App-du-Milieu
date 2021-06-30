@@ -1,18 +1,20 @@
 """
 Endpoints de notre api
 """
+from json import loads
+import io
+
 from sqlalchemy.orm import Session
 
+from app.crud.enmarche import scope2dict
 from app.models.models_crm import Contact
 from app.schemas import schemas
 from app.database.database_crm import engine_crm
 
-from json import loads
-import io
 import pandas as pd
 
 
-def get_contacts(db: Session, filter_zone: dict):
+def get_contacts(db: Session, scope: dict):
     columns = [
         'Genre',
         'Prénom',
@@ -29,8 +31,13 @@ def get_contacts(db: Session, filter_zone: dict):
         'Centres_d\'intérêt'
     ]
 
-    query = str(db.query(Contact).filter_by(**filter_zone) \
-        .statement.compile(compile_kwargs={"literal_binds": True})) \
+    filter_zone = scope2dict(scope)
+    query = db.query(Contact)
+
+    for k, v in filter_zone.items():
+        query = query.filter(getattr(Contact, k).in_(v))
+
+    query = str(query.statement.compile(compile_kwargs={"literal_binds": True})) \
         .replace('contacts.id, ', '', 1)
 
     copy_sql = "COPY ({query}) TO STDOUT WITH CSV {head}".format(query=query, head="HEADER")

@@ -52,21 +52,23 @@ def get_db():
         db.close()
 
 
-async def get_uuid_zone(
-    X_User_UUID: str = Header(None),
-    db: Session = Depends(get_db)) -> GeoZone:
-    if X_User_UUID is None:
+async def get_scopes(
+    X_Scope: str = Header(None),
+    db: Session = Depends(get_db)) -> dict:
+    if X_Scope is None:
         raise HTTPException(status_code=401, detail='You are not authenticated.')
     
-    if (zone := enmarche.get_candidate_zone(db, X_User_UUID)) is None:
+    if (scopes := enmarche.decode_scopes(db, X_Scope)) is None:
         raise HTTPException(status_code=203, detail='You have no candidate area affected.')
 
-    return zone
+    return scopes
 
-
-async def get_filter_zone(zone: GeoZone = Depends(get_uuid_zone)):
-    filter_zone = {'departement': zone.name} if zone.type == 'department' else {zone.type: zone.name}
-    return filter_zone
+# TODO DELETE
+@app.get("/testScopes", response_class=ORJSONResponse, response_model=schemas.ScopesOut)
+def testScopes(
+    X_Scope: str = Header(None),
+    db: Session = Depends(get_db)) -> dict:
+    return enmarche.decode_scopes(db, X_Scope)
 
 
 @app.get("/")
@@ -79,30 +81,34 @@ async def home():
 
 @app.get("/contacts", response_class=ORJSONResponse)
 async def read_contacts(
-    filter_zone: dict = Depends(get_filter_zone),
+    scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
     ):
+    print(f'get /contacts: {scope}')
+    contacts = contact.get_contacts(db, scope)
+    '''
     try:
-        contacts = contact.get_contacts(db, filter_zone)
+        contacts = contact.get_contacts(db, scope)
     except:
         return HTTPException(status_code=204, detail='No contact found')
+    '''
     return contacts
 
 
 @app.get('/adherents', response_class=ORJSONResponse)
 async def get_adherents(
-    filter_zone: dict = Depends(get_filter_zone),
+    scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
     ):
-    return contact.get_number_of_contacts(db, filter_zone)
+    return contact.get_number_of_contacts(db, scope)
 
 
 @app.get('/jemengage/downloads', response_class=ORJSONResponse)
 async def jemengage_downloads(
-    zone: GeoZone = Depends(get_uuid_zone),
+    scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
     ):
-    res = jemengage.get_downloads(db, zone)
+    res = jemengage.get_downloads(db, scope)
     if res.empty:
         return HTTPException(status_code=204, detail='No content')
 
@@ -112,10 +118,10 @@ async def jemengage_downloads(
 
 @app.get('/jemengage/downloadsRatios', response_class=ORJSONResponse)
 async def jemengage_downloads_ratio(
-    zone: GeoZone = Depends(get_uuid_zone),
+    scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
     ):
-    res = jemengage.downloads_ratio(db, zone)
+    res = jemengage.downloads_ratio(db, scope)
     if res.empty:
         return HTTPException(status_code=204, detail='No content')
 
@@ -125,10 +131,10 @@ async def jemengage_downloads_ratio(
 
 @app.get('/jemengage/users', response_class=ORJSONResponse)
 async def jemengage_users(
-    zone: GeoZone = Depends(get_uuid_zone),
+    scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
     ):
-    res = jemengage.get_users(db, zone)
+    res = jemengage.get_users(db, scope)
     if res.empty:
         return HTTPException(status_code=204, detail='No content')
 
@@ -138,37 +144,37 @@ async def jemengage_users(
 
 @app.get('/jemengage/survey', response_model=schemas.JecouteDataSurveyOut, response_class=ORJSONResponse)
 async def jemengage_survey(
-    zone: GeoZone = Depends(get_uuid_zone),
+    scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
     ):
-    return jemengage.get_survey(db, zone)
+    return jemengage.get_survey(db, scope)
 
 
 @app.get('/mailCampaign/reports', response_model=schemas.MailReportOut, response_class=ORJSONResponse)
 async def mail_reports(
-    zone: GeoZone = Depends(get_uuid_zone),
+    scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db),
     since: datetime = datetime(2021, 1, 1)
     ):
-    result = await mail_campaign.get_candidate_reports(db, zone, since)
+    result = await mail_campaign.get_candidate_reports(db, scope, since)
     return result
 
 
 @app.get('/mailCampaign/reportsRatios', response_model=schemas.MailRatiosOut, response_class=ORJSONResponse)
 async def mail_ratios(
-    zone: GeoZone = Depends(get_uuid_zone),
+    scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db),
     since: datetime = datetime(2021, 1, 1)
     ):
-    result = await mail_campaign.get_mail_ratios(db, zone, since)
-    return {'zone': zone.name, 'depuis': since, **result}
+    result = await mail_campaign.get_mail_ratios(db, scope, since)
+    return {'zones': [zone.name for zone in scope['zones']], 'depuis': since, **result}
 
 
 @app.get('/elections', response_class=ORJSONResponse, response_model_exclude_unset=True)
 async def get_elections(
     election: str,
     tour: int = 1,
-    zone: GeoZone = Depends(get_uuid_zone),
+    scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
     ):
     if election not in elections.available_elections:
@@ -176,7 +182,7 @@ async def get_elections(
     if tour not in [1,2]:
         return HTTPException(status_code=422, detail="parameter 'tour' must be 1 or 2")
 
-    result = elections.get_elections(election, tour, zone, db)
+    result = elections.get_elections(election, tour, scope, db)
     return result
 
 
@@ -187,7 +193,9 @@ def get_available_elections():
 
 if __name__ == "__main__":
     uvicorn.run(
-        app,
-        host="0.0.0.0",
-        port=int(environ.get("PORT", 8080))
+        app='main:app',
+        reload=True,
+        port=8080
+        #host="0.0.0.0",
+        #port=int(environ.get("PORT", 8080))
     	)
