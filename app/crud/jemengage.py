@@ -149,8 +149,6 @@ def get_survey(
     for zone in scope['zones']:
         city_codes += [zone.code for zone in get_child(db, zone, 'city')]
 
-    city_codes = [code[0] for sub in city_codes for code in sub]
-
     # nested tuples
     postal_codes = db.query(GeoCity.postal_code) \
         .filter(GeoCity.code.in_(city_codes)) \
