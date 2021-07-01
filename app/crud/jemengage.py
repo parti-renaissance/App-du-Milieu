@@ -149,19 +149,12 @@ def get_survey(
     for zone in scope['zones']:
         city_codes += [zone.code for zone in get_child(db, zone, 'city')]
 
-    # nested tuples
-    postal_codes = db.query(GeoCity.postal_code) \
-        .filter(GeoCity.code.in_(city_codes)) \
-        .filter(GeoCity.active == 1) \
-        .all()
-    # unnested
-    postal_codes = [code for sub in postal_codes if sub[0] is not None for code in sub[0].split(',')]
-
     survey_datas = db.query(JecouteDataSurvey) \
         .options(joinedload(JecouteDataSurvey.author)) \
         .options(joinedload(JecouteDataSurvey.survey)) \
         .filter(JecouteDataSurvey.postal_code != '') \
-        .join(GeoCity, GeoCity.postal_code.in_(postal_codes)) \
+        .join(GeoCity, GeoCity.postal_code.like('%' + JecouteDataSurvey.postal_code + '%')) \
+        .filter(GeoCity.code.in_(city_codes)) \
         .filter(JecouteDataSurvey.latitude != '') \
         .filter(JecouteDataSurvey.longitude != '') \
         .all()
