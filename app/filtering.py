@@ -25,10 +25,10 @@ def is_valid(q: Query):
 
 def add_filters(qs: str, query, myclass):
     for q in qs:
-        for filter in q.split(','):
-            filter = filter.split('=')
-            value = filter[1]
-            [attribute, operator] = filter[0].split('.') if len(filter[0].split('.')) == 2 else [filter[0], 'eq']
+        for f in q.split(','):
+            f = f.split('=')
+            value = f[1]
+            [attribute, operator] = f[0].split('.') if len(f[0].split('.')) == 2 else [f[0], 'eq']
             query = add_unique_filter(attribute, operator, value, query, myclass)
     return query
 
