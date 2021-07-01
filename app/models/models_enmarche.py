@@ -1,7 +1,7 @@
 """
 SQLAlchemy de notre base de données Globale
 """
-from sqlalchemy import Column, Integer, Float, String, DateTime, UniqueConstraint, ForeignKey
+from sqlalchemy import Column, Integer, Float, Boolean, String, DateTime, UniqueConstraint, ForeignKey
 from sqlalchemy.orm import relationship
 
 from app.database import Base
@@ -18,8 +18,44 @@ class Adherents(Base):
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
     uuid = Column(String(36), unique=True, nullable=False, index=True)
+    managed_area_id = Column(Integer, ForeignKey('referent_managed_areas_tags.referent_managed_area_id'))
+    managed_area = relationship('ReferentManagedAreasTags')
     candidate_managed_area_id = Column(Integer, ForeignKey('candidate_managed_area.id'))
     candidate_managed_area = relationship('CandidateManagedArea')
+
+
+class ReferentManagedAreasTags(Base):
+    """ Table referent_managed_areas_tags """
+    __tablename__ = 'referent_managed_areas_tags'
+
+    referent_managed_area_id = Column(Integer, index=True)
+    referent_tag_id = Column(Integer, ForeignKey('referent_tags.id'), nullable=True)
+    referent_tag = relationship('ReferentTags', lazy='joined')
+    
+    __mapper_args__ = {'primary_key':[referent_managed_area_id, referent_tag_id]}
+
+
+class AdherentMessageFilters(Base):
+    """ Table adherent_message_filters """
+    __tablename__ = 'adherent_message_filters'
+
+    id = Column(Integer, primary_key=True, index=True)
+    referent_tag_id = Column(Integer, ForeignKey('referent_tags.id'), nullable=True)
+    referent_tag = relationship('ReferentTags', lazy='joined')
+    zone_id = Column(Integer, ForeignKey('geo_zone.id'), nullable=True)
+    zone = relationship('GeoZone', lazy='joined')
+
+
+class ReferentTags(Base):
+    """ Table referent_tags """
+    __tablename__ = 'referent_tags'
+    
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    code = Column(String, nullable=False)
+    type = Column(String, nullable=True)
+    zone_id = Column(Integer, ForeignKey('geo_zone.id'), nullable=True)
+    zone = relationship('GeoZone', lazy='joined')
 
 
 class AdherentMessages(Base):
@@ -29,6 +65,8 @@ class AdherentMessages(Base):
     id = Column(Integer, primary_key=True, index=True)
     author_id = Column(Integer, ForeignKey('adherents.id'), nullable=True)
     author = relationship('Adherents', lazy='joined')
+    filter_id = Column(Integer, ForeignKey('adherent_message_filters.id'), nullable=True)
+    filter = relationship('AdherentMessageFilters', lazy='joined')
     label = Column(String, nullable=False)
     subject = Column(String, nullable=False)
     status = Column(String, nullable=False)
@@ -60,12 +98,6 @@ class GeoZone(Base):
     
     UniqueConstraint('code', 'type', name='geo_zone_code_type_unique')
 
-    def get_code(self):
-        return self.code
-
-    def get_type(self):
-        return self.type
-
 
 class GeoZoneParent(Base):
     """ Table geo_zone_parent pour retrouver la zone_id """
@@ -84,7 +116,10 @@ class GeoCity(Base):
     __tablename__ = 'geo_city'
 
     id = Column(Integer, primary_key=True, index=True)
+    code = Column(String, nullable=False)
+    name = Column(String(255), nullable=False)
     postal_code = Column(String, nullable=False)
+    active = Column(Boolean, nullable=True)
     department_id = Column(Integer, ForeignKey('geo_department.id'))
     geo_department = relationship('GeoDepartment')
 
@@ -95,6 +130,7 @@ class GeoDepartment(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     code = Column(String, nullable=False)
+    name = Column(String(255), nullable=False)
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
     region_id = Column(Integer, ForeignKey('geo_region.id'))
@@ -107,6 +143,7 @@ class GeoRegion(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     code = Column(String, nullable=False)
+    name = Column(String(255), nullable=False)
     latitude = Column(Float, nullable=False)
     longitude = Column(Float, nullable=False)
 

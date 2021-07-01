@@ -15,8 +15,7 @@ from sqlalchemy.orm import Session
 
 from datetime import datetime
 
-from app.crud import contact, enmarche, jemengage, mail_campaign, elections
-from app.models.models_enmarche import GeoZone
+from app.crud import contact, enmarche, jemengage, mail_campaign
 from app.schemas import schemas
 from app.database import SessionLocal
 
@@ -63,13 +62,6 @@ async def get_scopes(
 
     return scopes
 
-# TODO DELETE
-@app.get("/testScopes", response_class=ORJSONResponse, response_model=schemas.ScopesOut)
-def testScopes(
-    X_Scope: str = Header(None),
-    db: Session = Depends(get_db)) -> dict:
-    return enmarche.decode_scopes(db, X_Scope)
-
 
 @app.get("/")
 async def home():
@@ -84,14 +76,10 @@ async def read_contacts(
     scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
     ):
-    print(f'get /contacts: {scope}')
-    contacts = contact.get_contacts(db, scope)
-    '''
     try:
         contacts = contact.get_contacts(db, scope)
     except:
         return HTTPException(status_code=204, detail='No contact found')
-    '''
     return contacts
 
 
@@ -116,6 +104,9 @@ async def jemengage_downloads(
     return {'downloads': json.loads(res)}
 
 
+'''
+    Deprecated
+
 @app.get('/jemengage/downloadsRatios', response_class=ORJSONResponse)
 async def jemengage_downloads_ratio(
     scope: dict = Depends(get_scopes),
@@ -127,6 +118,7 @@ async def jemengage_downloads_ratio(
 
     res = res.to_json(orient='records')
     return {'downloads': json.loads(res)}
+'''
 
 
 @app.get('/jemengage/users', response_class=ORJSONResponse)
@@ -150,17 +142,17 @@ async def jemengage_survey(
     return jemengage.get_survey(db, scope)
 
 
-@app.get('/mailCampaign/reports', response_model=schemas.MailReportOut, response_class=ORJSONResponse)
+@app.get('/mailCampaign/reports', response_class=ORJSONResponse)
 async def mail_reports(
     scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db),
     since: datetime = datetime(2021, 1, 1)
     ):
-    result = await mail_campaign.get_candidate_reports(db, scope, since)
+    result = [await mail_campaign.get_campaign_reports(db, zone, since, scope['code']) for zone in scope['zones']]
     return result
 
 
-@app.get('/mailCampaign/reportsRatios', response_model=schemas.MailRatiosOut, response_class=ORJSONResponse)
+@app.get('/mailCampaign/reportsRatios', response_class=ORJSONResponse)
 async def mail_ratios(
     scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db),
@@ -170,32 +162,9 @@ async def mail_ratios(
     return {'zones': [zone.name for zone in scope['zones']], 'depuis': since, **result}
 
 
-@app.get('/elections', response_class=ORJSONResponse, response_model_exclude_unset=True)
-async def get_elections(
-    election: str,
-    tour: int = 1,
-    scope: dict = Depends(get_scopes),
-    db: Session = Depends(get_db)
-    ):
-    if election not in elections.available_elections:
-        return HTTPException(status_code=422, detail="The election is not available yet")
-    if tour not in [1,2]:
-        return HTTPException(status_code=422, detail="parameter 'tour' must be 1 or 2")
-
-    result = elections.get_elections(election, tour, scope, db)
-    return result
-
-
-@app.get('/availableElections')
-def get_available_elections():
-    return {'availableElections': elections.available_elections}
-
-
 if __name__ == "__main__":
     uvicorn.run(
-        app='main:app',
-        reload=True,
-        port=8080
-        #host="0.0.0.0",
-        #port=int(environ.get("PORT", 8080))
+        app,
+        host="0.0.0.0",
+        port=int(environ.get("PORT", 8080))
     	)

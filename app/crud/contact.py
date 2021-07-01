@@ -65,8 +65,14 @@ def get_contacts(db: Session, scope: dict):
         }
 
 
-def get_number_of_contacts(db: Session, filter_zone: dict):
+def get_number_of_contacts(db: Session, scope: dict):    
+    filter_zone = scope2dict(scope)
+
+    query = db.query(Contact)
+    for k, v in filter_zone.items():
+        query = query.filter(getattr(Contact, k).in_(v))
+
     return {
-        'adherentCount': db.query(Contact).filter_by(**filter_zone).count(),
-        'zoneName': list(filter_zone.values())[0]
+        'adherentCount': query.count(),
+        **scope2dict(scope, name=True)
     }
