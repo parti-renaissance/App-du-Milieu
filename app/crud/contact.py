@@ -5,6 +5,7 @@ from json import loads
 import io
 
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 
 from app.crud.enmarche import scope2dict
 from app.models.models_crm import Contact
@@ -32,10 +33,7 @@ def get_contacts(db: Session, scope: dict):
     ]
 
     filter_zone = scope2dict(scope)
-    query = db.query(Contact)
-
-    for k, v in filter_zone.items():
-        query = query.filter(getattr(Contact, k).in_(v))
+    query = db.query(Contact).filter(or_(getattr(Contact, k).in_(v) for k, v in filter_zone.items()))
 
     query = str(query.statement.compile(compile_kwargs={"literal_binds": True})) \
         .replace('contacts.id, ', '', 1)
@@ -68,9 +66,7 @@ def get_contacts(db: Session, scope: dict):
 def get_number_of_contacts(db: Session, scope: dict):    
     filter_zone = scope2dict(scope)
 
-    query = db.query(Contact)
-    for k, v in filter_zone.items():
-        query = query.filter(getattr(Contact, k).in_(v))
+    query = db.query(Contact).filter(or_(getattr(Contact, k).in_(v) for k, v in filter_zone.items()))
 
     return {
         'adherentCount': query.count(),
