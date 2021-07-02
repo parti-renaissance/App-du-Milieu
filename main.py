@@ -52,12 +52,12 @@ def get_db():
 
 
 async def get_scopes(
-    X_Scope: str,
+    scope: str,
     db: Session = Depends(get_db)) -> dict:
-    if X_Scope is None:
+    if scope is None:
         raise HTTPException(status_code=401, detail='You are not authenticated.')
     
-    if (scopes := enmarche.decode_scopes(db, X_Scope)) is None:
+    if (scopes := enmarche.decode_scopes(db, scope)) is None:
         raise HTTPException(status_code=203, detail='You have no candidate area affected.')
 
     return scopes
