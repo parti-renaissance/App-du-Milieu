@@ -52,7 +52,7 @@ def get_db():
 
 
 async def get_scopes(
-    X_Scope: str = Header(None),
+    X_Scope: str,
     db: Session = Depends(get_db)) -> dict:
     if X_Scope is None:
         raise HTTPException(status_code=401, detail='You are not authenticated.')
@@ -134,7 +134,7 @@ async def jemengage_users(
     return {'users': json.loads(res)}
 
 
-@app.get('/jemengage/survey', response_model=schemas.JecouteDataSurveyOut, response_class=ORJSONResponse)
+@app.get('/jemengage/survey', response_class=ORJSONResponse)
 async def jemengage_survey(
     scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
