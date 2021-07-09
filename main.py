@@ -7,7 +7,6 @@ from os import environ
 from fastapi import FastAPI, Depends, Header, HTTPException
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import ORJSONResponse
-from fastapi import Request
 # profiling
 #from fastapi_profiler.profiler_middleware import PyInstrumentProfilerMiddleware
 
@@ -19,8 +18,6 @@ from datetime import datetime
 from app.crud import contact, enmarche, jemengage, mail_campaign
 from app.schemas import schemas
 from app.database import SessionLocal
-
-from typing import List
 
 import uvicorn
 import json
