@@ -170,11 +170,6 @@ async def mail_ratios(
     return {'zones': [zone.name for zone in selected_scope['zones']], 'depuis': since, **result}
 
 
-@app.get("/app")
-def read_main(request: Request):
-    return {"message": "Hello World", "root_path": request.scope.get("root_path")}
-
-
 if __name__ == "__main__":
     uvicorn.run(
         app,
