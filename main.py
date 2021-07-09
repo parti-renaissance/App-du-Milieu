@@ -7,6 +7,7 @@ from os import environ
 from fastapi import FastAPI, Depends, Header, HTTPException
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import ORJSONResponse
+from fastapi import Request
 # profiling
 #from fastapi_profiler.profiler_middleware import PyInstrumentProfilerMiddleware
 
@@ -167,6 +168,11 @@ async def mail_ratios(
     ):
     result = await mail_campaign.get_mail_ratios(db, scope, since)
     return {'zones': [zone.name for zone in scope['zones']], 'depuis': since, **result}
+
+
+@app.get("/app")
+def read_main(request: Request):
+    return {"message": "Hello World", "root_path": request.scope.get("root_path")}
 
 
 if __name__ == "__main__":
