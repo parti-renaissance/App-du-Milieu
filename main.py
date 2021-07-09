@@ -53,14 +53,21 @@ def get_db():
 
 async def get_scopes(
     scope: str,
+    X_Scope: str = Header(None),
     db: Session = Depends(get_db)) -> dict:
-    if scope is None:
-        raise HTTPException(status_code=401, detail='You are not authenticated.')
+    if (scope is None) or (X_Scope is None):
+        raise HTTPException(status_code=401, detail='Scope problem')
     
-    if (scopes := enmarche.decode_scopes(db, scope)) is None:
+    if (scopes := enmarche.decode_scopes(db, X_Scope)) is None:
         raise HTTPException(status_code=203, detail='You have no candidate area affected.')
 
-    return scopes
+    for iter_scope in scopes:
+        if 'code' not in iter_scope.keys():
+            continue
+        if iter_scope['code'] == scope:
+            return iter_scope
+    
+    raise HTTPException(status_code=203, detail=f'You have no role {scope}')
 
 
 @app.get("/")
@@ -79,7 +86,7 @@ async def read_contacts(
     try:
         contacts = contact.get_contacts(db, scope)
     except:
-        return HTTPException(status_code=204, detail='No contact found')
+        raise HTTPException(status_code=204, detail='No contact found')
     return contacts
 
 
@@ -98,7 +105,7 @@ async def jemengage_downloads(
     ):
     res = jemengage.get_downloads(db, scope)
     if res.empty:
-        return HTTPException(status_code=204, detail='No content')
+        raise HTTPException(status_code=204, detail='No content')
 
     res = res.to_json(orient='records')
     return {'downloads': json.loads(res)}
@@ -128,7 +135,7 @@ async def jemengage_users(
     ):
     res = jemengage.get_users(db, scope)
     if res.empty:
-        return HTTPException(status_code=204, detail='No content')
+        raise HTTPException(status_code=204, detail='No content')
 
     res = res.to_json(orient='records')
     return {'users': json.loads(res)}

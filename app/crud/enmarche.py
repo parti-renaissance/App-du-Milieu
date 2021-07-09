@@ -23,7 +23,7 @@ class GeoTypes(str, Enum):
     #consular_district = 'circonscription_consulaire'
     #country = 'pays'
     department = 'departement'
-    #district = 'circonscription'
+    district = 'circonscription'
     #foreign_district = 'circonscription_des_FDE'
     region = 'region'
 
@@ -61,15 +61,19 @@ def decode_scopes(db: Session, scope: str):
     base64_bytes = scope.encode("latin1")
     scope_bytes = base64.b64decode(base64_bytes)
     scope_string = scope_bytes.decode("latin1")  
-    scope_dict = json.loads(scope_string)
+    scope_dict_list = json.loads(scope_string)
 
-    res_zone = []
-    for zone in scope_dict['zones']:
-        res_zone = [*res_zone,
-            db.query(GeoZone) \
-              .filter(GeoZone.uuid == zone['uuid']) \
-              .first()]
-    return {'code':scope_dict['code'], 'zones':res_zone}
+    res = []
+    for iter_scope in scope_dict_list:
+        res_zone = []
+        for zone in iter_scope['zones']:
+            res_zone = [*res_zone,
+                db.query(GeoZone) \
+                .filter(GeoZone.uuid == zone['uuid']) \
+                .first()]
+        res = [*res, {'code':iter_scope['code'], 'zones':res_zone}]
+
+    return res
 
 
 def get_child(db: Session, parent: GeoZone, type: str = None):
