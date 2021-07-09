@@ -53,10 +53,10 @@ def get_db():
 
 
 async def get_scopes(
-    scope: str,
+    role: str,
     X_Scope: str = Header(None),
     db: Session = Depends(get_db)) -> dict:
-    if (scope is None) or (X_Scope is None):
+    if (role is None) or (X_Scope is None):
         raise HTTPException(status_code=401, detail='Scope problem')
     
     if (scopes := enmarche.decode_scopes(db, X_Scope)) is None:
@@ -65,10 +65,10 @@ async def get_scopes(
     for iter_scope in scopes:
         if 'code' not in iter_scope.keys():
             continue
-        if iter_scope['code'] == scope:
+        if iter_scope['code'] == role:
             return iter_scope
     
-    raise HTTPException(status_code=203, detail=f'You have no role {scope}')
+    raise HTTPException(status_code=203, detail=f'You have no role {role}')
 
 
 @app.get("/")
@@ -81,11 +81,11 @@ async def home():
 
 @app.get("/contacts", response_class=ORJSONResponse)
 async def read_contacts(
-    scope: dict = Depends(get_scopes),
+    selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
     ):
     try:
-        contacts = contact.get_contacts(db, scope)
+        contacts = contact.get_contacts(db, selected_scope)
     except:
         raise HTTPException(status_code=204, detail='No contact found')
     return contacts
@@ -93,18 +93,18 @@ async def read_contacts(
 
 @app.get('/adherents', response_class=ORJSONResponse)
 async def get_adherents(
-    scope: dict = Depends(get_scopes),
+    selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
     ):
-    return contact.get_number_of_contacts(db, scope)
+    return contact.get_number_of_contacts(db, selected_scope)
 
 
 @app.get('/jemengage/downloads', response_class=ORJSONResponse)
 async def jemengage_downloads(
-    scope: dict = Depends(get_scopes),
+    selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
     ):
-    res = jemengage.get_downloads(db, scope)
+    res = jemengage.get_downloads(db, selected_scope)
     if res.empty:
         raise HTTPException(status_code=204, detail='No content')
 
@@ -117,10 +117,10 @@ async def jemengage_downloads(
 
 @app.get('/jemengage/downloadsRatios', response_class=ORJSONResponse)
 async def jemengage_downloads_ratio(
-    scope: dict = Depends(get_scopes),
+    selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
     ):
-    res = jemengage.downloads_ratio(db, scope)
+    res = jemengage.downloads_ratio(db, selected_scope)
     if res.empty:
         return HTTPException(status_code=204, detail='No content')
 
@@ -131,10 +131,10 @@ async def jemengage_downloads_ratio(
 
 @app.get('/jemengage/users', response_class=ORJSONResponse)
 async def jemengage_users(
-    scope: dict = Depends(get_scopes),
+    selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
     ):
-    res = jemengage.get_users(db, scope)
+    res = jemengage.get_users(db, selected_scope)
     if res.empty:
         raise HTTPException(status_code=204, detail='No content')
 
@@ -144,30 +144,30 @@ async def jemengage_users(
 
 @app.get('/jemengage/survey', response_class=ORJSONResponse)
 async def jemengage_survey(
-    scope: dict = Depends(get_scopes),
+    selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
     ):
-    return jemengage.get_survey(db, scope)
+    return jemengage.get_survey(db, selected_scope)
 
 
 @app.get('/mailCampaign/reports', response_class=ORJSONResponse)
 async def mail_reports(
-    scope: dict = Depends(get_scopes),
+    selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db),
     since: datetime = datetime(2021, 1, 1)
     ):
-    result = [await mail_campaign.get_campaign_reports(db, zone, since, scope['code']) for zone in scope['zones']]
+    result = [await mail_campaign.get_campaign_reports(db, zone, since, selected_scope['code']) for zone in selected_scope['zones']]
     return result
 
 
 @app.get('/mailCampaign/reportsRatios', response_class=ORJSONResponse)
 async def mail_ratios(
-    scope: dict = Depends(get_scopes),
+    selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db),
     since: datetime = datetime(2021, 1, 1)
     ):
-    result = await mail_campaign.get_mail_ratios(db, scope, since)
-    return {'zones': [zone.name for zone in scope['zones']], 'depuis': since, **result}
+    result = await mail_campaign.get_mail_ratios(db, selected_scope, since)
+    return {'zones': [zone.name for zone in selected_scope['zones']], 'depuis': since, **result}
 
 
 @app.get("/app")
