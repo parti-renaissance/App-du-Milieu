@@ -14,7 +14,7 @@ class Contact(CRM):
     genre = Column(String, nullable=True)
     prenom = Column(String, nullable=True)
     nom = Column(String, nullable=True)
-    sub_email = Column(Boolean, nullable=True)
+    email_subscriptions = Column(ARRAY(String), nullable=True)
     sub_tel = Column(Boolean, nullable=True)
     code_postal = Column(String, nullable=True)
     code_commune = Column(String, nullable=True)
@@ -23,13 +23,14 @@ class Contact(CRM):
     departement = Column(String, nullable=True)
     code_region = Column(String, nullable=True)
     region = Column(String, nullable=True)
+    code_circonscription = Column(String, nullable=True)
+    circonscription = Column(String, nullable=True)
     centres_interet = Column(ARRAY(String), nullable=True)
 
 
 class ContactInDb(Contact):
     adherent_id = Column(Integer, nullable=True)
     email = Column(String, nullable=False, unique=True)
-    email_subscriptions = Column(ARRAY(String), nullable=True)
     telephones = Column(String, nullable=True)
     typeforms = Column(ARRAY(String), nullable=True)
 

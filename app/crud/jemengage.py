@@ -24,7 +24,10 @@ def get_downloads(
 
     # series of all date from min to max
     s_date = pd.date_range(after, before - timedelta(days=1))
-    df_list = []
+
+    empty = pd.DataFrame(s_date, columns=['date'])
+    empty['unique_user'] = 0
+    df_list = [empty]
 
     for k, v in scope2dict(scope, True).items():
         query = db.query(Downloads.date, Downloads.unique_user) \
@@ -43,11 +46,11 @@ def get_downloads(
             df['unique_user'] = df['unique_user'].fillna(0).astype(int)
 
             df.reset_index(inplace=True)
-            df['date'] = df['date'].dt.strftime('%d/%m')
             df_list = [*df_list, df]
-    
+
     big_df = pd.concat(df_list)
     big_df = big_df.groupby(['date']).sum().reset_index()
+    big_df['date'] = big_df['date'].dt.strftime('%d/%m')
 
     return big_df
 
@@ -109,7 +112,10 @@ def get_users(
 
     # series of all date from min to max
     s_date = pd.date_range(after - timedelta(7), before - timedelta(days=1))
-    df_list = []
+
+    empty = pd.DataFrame(s_date, columns=['date'])
+    empty['unique_user'] = 0
+    df_list = [empty]
 
     for k, v in scope2dict(scope, True).items():
         query = db.query(Users.date, Users.unique_user) \
@@ -131,11 +137,11 @@ def get_users(
             
             df.reset_index(inplace=True)
             df = df[df.date >= pd.to_datetime(after)]
-            df['date'] = df['date'].dt.strftime('%d/%m')
             df_list = [*df_list, df]
     
     big_df = pd.concat(df_list)
     big_df = big_df.groupby(['date']).sum().reset_index()
+    big_df['date'] = big_df['date'].dt.strftime('%d/%m')
 
     return big_df
 

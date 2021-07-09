@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import List
 from sqlalchemy.orm import Session, Query
 from sqlalchemy import func
+from sqlalchemy.sql.functions import coalesce
 from app.crud.enmarche import get_child
 from app.models.models_enmarche import AdherentMessages, Adherents, CandidateManagedArea
 from app.models.models_enmarche import AdherentMessageFilters, ReferentTags, ReferentManagedAreasTags
@@ -76,9 +77,9 @@ async def get_mail_ratios(
     since: datetime):
 
     query = db.query(func.count(MailChimpCampaign.id).label('nbCampagnes'), \
-            func.round(func.sum(MailChimpCampaignReport.open_unique) / func.sum(MailChimpCampaignReport.email_sent), 4).label('txOuverture'), \
-            func.round(func.sum(MailChimpCampaignReport.click_unique) / func.sum(MailChimpCampaignReport.email_sent), 4).label('txClique'), \
-            func.round(func.sum(MailChimpCampaignReport.unsubscribed) / func.sum(MailChimpCampaignReport.email_sent), 4).label('txDesabonnement')) \
+            coalesce(func.round(func.sum(MailChimpCampaignReport.open_unique) / func.sum(MailChimpCampaignReport.email_sent), 4), 0).label('txOuverture'), \
+            coalesce(func.round(func.sum(MailChimpCampaignReport.click_unique) / func.sum(MailChimpCampaignReport.email_sent), 4), 0).label('txClique'), \
+            coalesce(func.round(func.sum(MailChimpCampaignReport.unsubscribed) / func.sum(MailChimpCampaignReport.email_sent), 4), 0).label('txDesabonnement')) \
         .select_from(MailChimpCampaignReport) \
         .join(MailChimpCampaignReport.mailchimp_campaign) \
         .join(MailChimpCampaign.message.and_( \
