@@ -50,10 +50,10 @@ def get_db():
 
 
 async def get_scopes(
-    role: str,
+    scope: str,
     X_Scope: str = Header(None),
     db: Session = Depends(get_db)) -> dict:
-    if (role is None) or (X_Scope is None):
+    if (scope is None) or (X_Scope is None):
         raise HTTPException(status_code=401, detail='Scope problem')
     
     if (scopes := enmarche.decode_scopes(db, X_Scope)) is None:
@@ -62,10 +62,10 @@ async def get_scopes(
     for iter_scope in scopes:
         if 'code' not in iter_scope.keys():
             continue
-        if iter_scope['code'] == role:
+        if iter_scope['code'] == scope:
             return iter_scope
     
-    raise HTTPException(status_code=203, detail=f'You have no role {role}')
+    raise HTTPException(status_code=203, detail=f'You have no role {scope}')
 
 
 @app.get("/")
