@@ -53,7 +53,7 @@ def get_db():
 
 
 async def get_scopes(
-    scope: str,
+    testScope: str,
     X_Scope: str = Header(None),
     db: Session = Depends(get_db)) -> dict:
     if (scope is None) or (X_Scope is None):
