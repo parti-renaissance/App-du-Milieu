@@ -56,16 +56,10 @@ async def get_scopes(
     if (scope is None) or (X_Scope is None):
         raise HTTPException(status_code=401, detail='Scope problem')
     
-    if (scopes := enmarche.decode_scopes(db, X_Scope)) is None:
+    if (scope := enmarche.decode_scopes(db, X_Scope)) is None:
         raise HTTPException(status_code=203, detail='You have no candidate area affected.')
 
-    for iter_scope in scopes:
-        if 'code' not in iter_scope.keys():
-            continue
-        if iter_scope['code'] == scope:
-            return iter_scope
-    
-    raise HTTPException(status_code=203, detail=f'You have no role {scope}')
+    return scope
 
 
 @app.get("/")
