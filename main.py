@@ -26,8 +26,7 @@ import json
 app = FastAPI(
     title="API pour le CRM de LaREM",
     description="GET uniquements pour récupérer les données des contacts de notre base",
-    version="1.0.0"
-)
+    version="1.0.0")
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 app.add_middleware(
@@ -38,9 +37,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-#app.add_middleware(PyInstrumentProfilerMiddleware)
+# app.add_middleware(PyInstrumentProfilerMiddleware)
 
 # Dependency
+
+
 def get_db():
     db = SessionLocal()
     try:
@@ -50,14 +51,15 @@ def get_db():
 
 
 async def get_scopes(
-    scope: str,
-    X_Scope: str = Header(None),
-    db: Session = Depends(get_db)) -> dict:
+        scope: str,
+        X_Scope: str = Header(None),
+        db: Session = Depends(get_db)) -> dict:
     if (scope is None) or (X_Scope is None):
         raise HTTPException(status_code=401, detail='Scope problem')
-    
+
     if (scope := enmarche.decode_scopes(db, X_Scope)) is None:
-        raise HTTPException(status_code=203, detail='You have no candidate area affected.')
+        raise HTTPException(status_code=203,
+                            detail='You have no candidate area affected.')
 
     return scope
 
@@ -74,10 +76,10 @@ async def home():
 async def read_contacts(
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
-    ):
+):
     try:
         contacts = contact.get_contacts(db, selected_scope)
-    except:
+    except BaseException:
         raise HTTPException(status_code=204, detail='No contact found')
     return contacts
 
@@ -86,7 +88,7 @@ async def read_contacts(
 async def get_adherents(
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
-    ):
+):
     return contact.get_number_of_contacts(db, selected_scope)
 
 
@@ -94,7 +96,7 @@ async def get_adherents(
 async def jemengage_downloads(
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
-    ):
+):
     res = jemengage.get_downloads(db, selected_scope)
     if res.empty:
         raise HTTPException(status_code=204, detail='No content')
@@ -124,7 +126,7 @@ async def jemengage_downloads_ratio(
 async def jemengage_users(
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
-    ):
+):
     res = jemengage.get_users(db, selected_scope)
     if res.empty:
         raise HTTPException(status_code=204, detail='No content')
@@ -137,7 +139,7 @@ async def jemengage_users(
 async def jemengage_survey(
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
-    ):
+):
     return jemengage.get_survey(db, selected_scope)
 
 
@@ -146,7 +148,7 @@ async def mail_reports(
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db),
     since: datetime = datetime(2021, 1, 1)
-    ):
+):
     result = [await mail_campaign.get_campaign_reports(db, zone, since, selected_scope['code']) for zone in selected_scope['zones']]
     return result
 
@@ -156,9 +158,13 @@ async def mail_ratios(
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db),
     since: datetime = datetime(2021, 1, 1)
-    ):
+):
     result = await mail_campaign.get_mail_ratios(db, selected_scope, since)
-    return {'zones': [zone.name for zone in selected_scope['zones']], 'depuis': since, **result}
+    return {
+        'zones': [
+            zone.name for zone in selected_scope['zones']],
+        'depuis': since,
+        **result}
 
 
 if __name__ == "__main__":
@@ -166,4 +172,4 @@ if __name__ == "__main__":
         app,
         host="0.0.0.0",
         port=int(environ.get("PORT", 8080))
-    	)
+    )

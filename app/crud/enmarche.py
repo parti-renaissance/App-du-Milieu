@@ -49,7 +49,7 @@ def scope2dict(scope: dict, name: bool = False):
             if name:
                 res[type].append(sub.name)
             else:
-                res['code_'+type].append(sub.code)
+                res['code_' + type].append(sub.code)
 
     return res
 
@@ -60,17 +60,17 @@ def decode_scopes(db: Session, scope: str):
     '''
     base64_bytes = scope.encode("latin1")
     scope_bytes = base64.b64decode(base64_bytes)
-    scope_string = scope_bytes.decode("latin1")  
+    scope_string = scope_bytes.decode("latin1")
     scope_dict = json.loads(scope_string)
     print(f'scope_dict: {scope_dict}')
 
     res_zone = []
     for zone in scope_dict['zones']:
         res_zone = [*res_zone,
-            db.query(GeoZone) \
-              .filter(GeoZone.uuid == zone['uuid']) \
-              .first()]
-    return {'code':scope_dict['code'], 'zones':res_zone}
+                    db.query(GeoZone)
+                    .filter(GeoZone.uuid == zone['uuid'])
+                    .first()]
+    return {'code': scope_dict['code'], 'zones': res_zone}
 
 
 def get_child(db: Session, parent: GeoZone, type: str = None):
@@ -79,11 +79,10 @@ def get_child(db: Session, parent: GeoZone, type: str = None):
 
     query = db.query(GeoZone) \
         .join(GeoZoneParent, and_(
-            GeoZoneParent.child_id  == GeoZone.id,
+            GeoZoneParent.child_id == GeoZone.id,
             GeoZoneParent.parent_id == parent.id))
-    
+
     if type:
         query = query.filter(GeoZone.type == type)
-    
-    return query.all()
 
+    return query.all()
