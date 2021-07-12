@@ -80,6 +80,8 @@ def get_contacts(db: Session, scope: dict):
     df.email_subscriptions = df.email_subscriptions.transform(lambda x: getEmailSubscription(scope['code']))
     df.sub_tel.replace({'t': True, 'f': False}, inplace=True)
     df.columns = columns
+    # not implemented in front yet
+    df.drop(columns=['Code_circonscription', 'Circonscription'], inplace=True)
 
     """ metadata list of choices """
     interests = {'interestsChoices': schemas.InterestsChoices.list()}
