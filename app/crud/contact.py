@@ -37,7 +37,7 @@ def getEmailSubscription(s: str):
     '''
     for t in EmailSubscriptions:
         if t.name == s:
-            return t.value
+            return True
     return False
 
 
