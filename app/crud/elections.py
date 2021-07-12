@@ -26,10 +26,10 @@ available_elections = [
 
 
 def get_elections(
-    election: str,
-    tour: int,
-    zone: GeoZone,
-    db: Session):
+        election: str,
+        tour: int,
+        zone: GeoZone,
+        db: Session):
     columns = [
         'election',
         'departement',
@@ -56,16 +56,19 @@ def get_elections(
     ]
 
     election_filter = {'election': election}
-    election_filter = {'tour': tour, **election_filter} if tour else election_filter
+    election_filter = {
+        'tour': tour,
+        **election_filter} if tour else election_filter
 
     child_codes = list(chain(*get_child_code(db, zone, 'department')))
 
-    query = str(db.query(Elections) \
-        .filter_by(**election_filter) \
-        .filter(Elections.departement.in_(child_codes)) \
-        .statement.compile(compile_kwargs={"literal_binds": True}))
+    query = str(db.query(Elections)
+                .filter_by(**election_filter)
+                .filter(Elections.departement.in_(child_codes))
+                .statement.compile(compile_kwargs={"literal_binds": True}))
 
-    copy_sql = "COPY ({query}) TO STDOUT WITH CSV {head}".format(query=query, head="HEADER")
+    copy_sql = "COPY ({query}) TO STDOUT WITH CSV {head}".format(
+        query=query, head="HEADER")
     conn = engine_crm.raw_connection()
     cur = conn.cursor()
     store = io.StringIO()

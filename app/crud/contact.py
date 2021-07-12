@@ -29,11 +29,12 @@ def get_contacts(db: Session, filter_zone: dict):
         'Centres_d\'intérêt'
     ]
 
-    query = str(db.query(Contact).filter_by(**filter_zone) \
-        .statement.compile(compile_kwargs={"literal_binds": True})) \
+    query = str(db.query(Contact).filter_by(**filter_zone)
+                .statement.compile(compile_kwargs={"literal_binds": True})) \
         .replace('contacts.id, ', '', 1)
 
-    copy_sql = "COPY ({query}) TO STDOUT WITH CSV {head}".format(query=query, head="HEADER")
+    copy_sql = "COPY ({query}) TO STDOUT WITH CSV {head}".format(
+        query=query, head="HEADER")
     conn = engine_crm.raw_connection()
     cur = conn.cursor()
     store = io.StringIO()
@@ -41,7 +42,8 @@ def get_contacts(db: Session, filter_zone: dict):
     store.seek(0)
     df = pd.read_csv(store, encoding='utf-8')
     # reformat some datas
-    df.centres_interet = df.centres_interet.str.replace('[{}"]', '', regex=True).str.split(',')
+    df.centres_interet = df.centres_interet.str.replace(
+        '[{}"]', '', regex=True).str.split(',')
     df.sub_email.replace({'t': True, 'f': False}, inplace=True)
     df.sub_tel.replace({'t': True, 'f': False}, inplace=True)
     df.columns = columns
@@ -55,7 +57,7 @@ def get_contacts(db: Session, filter_zone: dict):
         **interests,
         **gender,
         'contacts': loads(df.to_json(orient='records', force_ascii=False))
-        }
+    }
 
 
 def get_number_of_contacts(db: Session, filter_zone: dict):
