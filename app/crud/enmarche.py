@@ -5,6 +5,7 @@ from collections import defaultdict
 from enum import Enum
 import base64
 import json
+import logging
 
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
@@ -62,11 +63,16 @@ def decode_scopes(db: Session, scope: str):
     scope_bytes = base64.b64decode(base64_bytes)
     scope_string = scope_bytes.decode("latin1")  
     scope_dict_list = json.loads(scope_string)
+    logging.warning(f'scope_dict_list:{scope_dict_list}')
     
     res = []
     for iter_scope in scope_dict_list:
+        logging.warning(f'iter_scope:{iter_scope}')
+        if 'zone' not in iter_scope.keys():
+            continue
         res_zone = []
         for zone in iter_scope['zones']:
+            logging.warning(f'zone:{zone}')
             res_zone = [*res_zone,
                 db.query(GeoZone) \
                 .filter(GeoZone.uuid == zone['uuid']) \
