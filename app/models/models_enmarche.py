@@ -18,7 +18,8 @@ class Adherents(Base):
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
     uuid = Column(String(36), unique=True, nullable=False, index=True)
-    candidate_managed_area_id = Column(Integer, ForeignKey('candidate_managed_area.id'))
+    candidate_managed_area_id = Column(
+        Integer, ForeignKey('candidate_managed_area.id'))
     candidate_managed_area = relationship('CandidateManagedArea')
 
 
@@ -56,7 +57,7 @@ class GeoZone(Base):
     type = Column(String(255), nullable=False)
     code = Column(String(255), nullable=False)
     name = Column(String(255), nullable=False)
-    
+
     UniqueConstraint('code', 'type', name='geo_zone_code_type_unique')
 
     def get_code(self):
@@ -75,7 +76,7 @@ class GeoZoneParent(Base):
     parent_id = Column(Integer, ForeignKey('geo_zone.id'), index=True)
     parent = relationship('GeoZone', foreign_keys='GeoZoneParent.parent_id')
 
-    __mapper_args__ = {'primary_key':[child_id, parent_id]}
+    __mapper_args__ = {'primary_key': [child_id, parent_id]}
 
 
 class GeoCity(Base):
@@ -147,12 +148,20 @@ class MailChimpCampaign(Base):
     __tablename__ = 'mailchimp_campaign'
 
     id = Column(Integer, primary_key=True, index=True)
-    message_id = Column(Integer, ForeignKey('adherent_messages.id'), nullable=True)
+    message_id = Column(
+        Integer,
+        ForeignKey('adherent_messages.id'),
+        nullable=True)
     message = relationship('AdherentMessages', lazy='joined')
     recipient_count = Column(Integer, nullable=True)
     status = Column(String, nullable=False)
-    report_id = Column(Integer, ForeignKey('mailchimp_campaign_report.id'), nullable=True)
-    report = relationship('MailChimpCampaignReport', back_populates='mailchimp_campaign')
+    report_id = Column(
+        Integer,
+        ForeignKey('mailchimp_campaign_report.id'),
+        nullable=True)
+    report = relationship(
+        'MailChimpCampaignReport',
+        back_populates='mailchimp_campaign')
 
 
 class MailChimpCampaignReport(Base):
@@ -166,5 +175,6 @@ class MailChimpCampaignReport(Base):
     click_unique = Column(Integer, nullable=False)
     email_sent = Column(Integer, nullable=False)
     unsubscribed = Column(Integer, nullable=False)
-    mailchimp_campaign = relationship("MailChimpCampaign", back_populates="report")
-    #TODO define method to calculate rates ?
+    mailchimp_campaign = relationship(
+        "MailChimpCampaign", back_populates="report")
+    # TODO define method to calculate rates ?

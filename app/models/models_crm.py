@@ -85,7 +85,7 @@ class Elections(CRM):
     composition_binome = Column(String, nullable=True)
 
     __mapper_args__ = {
-        'primary_key':[
+        'primary_key': [
             election,
             departement,
             commune,
