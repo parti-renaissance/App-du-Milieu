@@ -29,8 +29,7 @@ import json
 app = FastAPI(
     title="API pour le CRM de LaREM",
     description="GET uniquements pour récupérer les données des contacts de notre base",
-    version="1.0.0"
-)
+    version="1.0.0")
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 app.add_middleware(
@@ -41,9 +40,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-#app.add_middleware(PyInstrumentProfilerMiddleware)
+# app.add_middleware(PyInstrumentProfilerMiddleware)
 
 # Dependency
+
+
 def get_db():
     db = SessionLocal()
     try:
@@ -53,19 +54,24 @@ def get_db():
 
 
 async def get_uuid_zone(
-    X_User_UUID: str = Header(None),
-    db: Session = Depends(get_db)) -> GeoZone:
+        X_User_UUID: str = Header(None),
+        db: Session = Depends(get_db)) -> GeoZone:
     if X_User_UUID is None:
-        raise HTTPException(status_code=401, detail='You are not authenticated.')
-    
+        raise HTTPException(
+            status_code=401,
+            detail='You are not authenticated.')
+
     if (zone := enmarche.get_candidate_zone(db, X_User_UUID)) is None:
-        raise HTTPException(status_code=203, detail='You have no candidate area affected.')
+        raise HTTPException(status_code=203,
+                            detail='You have no candidate area affected.')
 
     return zone
 
 
 async def get_filter_zone(zone: GeoZone = Depends(get_uuid_zone)):
-    filter_zone = {'departement': zone.name} if zone.type == 'department' else {zone.type: zone.name}
+    filter_zone = {
+        'departement': zone.name} if zone.type == 'department' else {
+        zone.type: zone.name}
     return filter_zone
 
 
@@ -81,10 +87,10 @@ async def home():
 async def read_contacts(
     filter_zone: dict = Depends(get_filter_zone),
     db: Session = Depends(get_db)
-    ):
+):
     try:
         contacts = contact.get_contacts(db, filter_zone)
-    except:
+    except BaseException:
         return HTTPException(status_code=204, detail='No contact found')
     return contacts
 
@@ -93,7 +99,7 @@ async def read_contacts(
 async def get_adherents(
     filter_zone: dict = Depends(get_filter_zone),
     db: Session = Depends(get_db)
-    ):
+):
     return contact.get_number_of_contacts(db, filter_zone)
 
 
@@ -101,7 +107,7 @@ async def get_adherents(
 async def jemengage_downloads(
     zone: GeoZone = Depends(get_uuid_zone),
     db: Session = Depends(get_db)
-    ):
+):
     res = jemengage.get_downloads(db, zone)
     if res.empty:
         return HTTPException(status_code=204, detail='No content')
@@ -114,7 +120,7 @@ async def jemengage_downloads(
 async def jemengage_downloads_ratio(
     zone: GeoZone = Depends(get_uuid_zone),
     db: Session = Depends(get_db)
-    ):
+):
     res = jemengage.downloads_ratio(db, zone)
     if res.empty:
         return HTTPException(status_code=204, detail='No content')
@@ -127,7 +133,7 @@ async def jemengage_downloads_ratio(
 async def jemengage_users(
     zone: GeoZone = Depends(get_uuid_zone),
     db: Session = Depends(get_db)
-    ):
+):
     res = jemengage.get_users(db, zone)
     if res.empty:
         return HTTPException(status_code=204, detail='No content')
@@ -136,45 +142,54 @@ async def jemengage_users(
     return {'users': json.loads(res)}
 
 
-@app.get('/jemengage/survey', response_model=schemas.JecouteDataSurveyOut, response_class=ORJSONResponse)
+@app.get('/jemengage/survey',
+         response_model=schemas.JecouteDataSurveyOut,
+         response_class=ORJSONResponse)
 async def jemengage_survey(
     zone: GeoZone = Depends(get_uuid_zone),
     db: Session = Depends(get_db)
-    ):
+):
     return jemengage.get_survey(db, zone)
 
 
-@app.get('/mailCampaign/reports', response_model=schemas.MailReportOut, response_class=ORJSONResponse)
+@app.get('/mailCampaign/reports',
+         response_model=schemas.MailReportOut,
+         response_class=ORJSONResponse)
 async def mail_reports(
     zone: GeoZone = Depends(get_uuid_zone),
     db: Session = Depends(get_db),
     since: datetime = datetime(2021, 1, 1)
-    ):
+):
     result = await mail_campaign.get_candidate_reports(db, zone, since)
     return result
 
 
-@app.get('/mailCampaign/reportsRatios', response_model=schemas.MailRatiosOut, response_class=ORJSONResponse)
+@app.get('/mailCampaign/reportsRatios',
+         response_model=schemas.MailRatiosOut,
+         response_class=ORJSONResponse)
 async def mail_ratios(
     zone: GeoZone = Depends(get_uuid_zone),
     db: Session = Depends(get_db),
     since: datetime = datetime(2021, 1, 1)
-    ):
+):
     result = await mail_campaign.get_mail_ratios(db, zone, since)
     return {'zone': zone.name, 'depuis': since, **result}
 
 
-@app.get('/elections', response_class=ORJSONResponse, response_model_exclude_unset=True)
+@app.get('/elections', response_class=ORJSONResponse,
+         response_model_exclude_unset=True)
 async def get_elections(
     election: str,
     tour: int = 1,
     zone: GeoZone = Depends(get_uuid_zone),
     db: Session = Depends(get_db)
-    ):
+):
     if election not in elections.available_elections:
-        return HTTPException(status_code=422, detail="The election is not available yet")
-    if tour not in [1,2]:
-        return HTTPException(status_code=422, detail="parameter 'tour' must be 1 or 2")
+        return HTTPException(status_code=422,
+                             detail="The election is not available yet")
+    if tour not in [1, 2]:
+        return HTTPException(status_code=422,
+                             detail="parameter 'tour' must be 1 or 2")
 
     result = elections.get_elections(election, tour, zone, db)
     return result
@@ -190,4 +205,4 @@ if __name__ == "__main__":
         app,
         host="0.0.0.0",
         port=int(environ.get("PORT", 8080))
-    	)
+    )
