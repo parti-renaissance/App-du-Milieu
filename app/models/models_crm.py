@@ -19,6 +19,8 @@ class Contact(CRM):
     code_postal = Column(String, nullable=True)
     code_commune = Column(String, nullable=True)
     commune = Column(String, nullable=True)
+    code_arrondissement_commune = Column(String, nullable=True)
+    arrondissement_commune = Column(String, nullable=True)
     code_departement = Column(String, nullable=True)
     departement = Column(String, nullable=True)
     code_region = Column(String, nullable=True)

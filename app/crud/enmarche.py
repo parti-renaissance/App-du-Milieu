@@ -16,7 +16,7 @@ class GeoTypes(str, Enum):
     '''
         On ajoute ici les colonnes implementees dans la table contact pour pouvoir filtrer dessus
     '''
-    #borough = 'arrondissement'
+    borough = 'arrondissement_commune'
     #canton = 'canton'
     city = 'commune'
     #city_community = 'communaute_de_communes'

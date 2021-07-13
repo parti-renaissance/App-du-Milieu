@@ -51,6 +51,8 @@ def get_contacts(db: Session, scope: dict):
         'Code_postal',
         'Code_commune',
         'Commune',
+        'Code_arrondissement_commune',
+        'Arrondissement_commune',
         'Code_département',
         'Département',
         'Code_région',
@@ -82,6 +84,7 @@ def get_contacts(db: Session, scope: dict):
     df.columns = columns
     # not implemented in front yet
     df.drop(columns=['Code_circonscription', 'Circonscription'], inplace=True)
+    df.drop(columns=['Code_arrondissement_commune', 'Arrondissement_commune'], inplace=True)
 
     """ metadata list of choices """
     interests = {'interestsChoices': schemas.InterestsChoices.list()}
