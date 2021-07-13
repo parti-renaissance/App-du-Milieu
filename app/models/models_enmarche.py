@@ -124,6 +124,19 @@ class GeoCity(Base):
     geo_department = relationship('GeoDepartment')
 
 
+class GeoDistrict(Base):
+    """ Table geo_district """
+    __tablename__ = 'geo_district'
+
+    id = Column(Integer, primary_key=True, index=True)
+    code = Column(String, nullable=False)
+    name = Column(String(255), nullable=False)
+    latitude = Column(Float, nullable=False)
+    longitude = Column(Float, nullable=False)
+    department_id = Column(Integer, ForeignKey('geo_department.id'))
+    geo_department = relationship('GeoDepartment')
+
+
 class GeoDepartment(Base):
     """ Table geo_department """
     __tablename__ = 'geo_department'
