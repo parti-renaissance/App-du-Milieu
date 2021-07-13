@@ -183,7 +183,10 @@ def get_survey(
         res['latitude'] = geo_dpt.latitude
         res['longitude'] = geo_dpt.longitude
     else:
-        res['zone_name'] = next(iter(returned_zone.values()))
+        res['zone_name'] = next(iter(returned_zone.values()))[0]
+        # Chez Xavier
+        res['latitude'] = 48.835633
+        res['longitude'] =  2.323433
 
     res['survey_datas'] = survey_datas
     return res
