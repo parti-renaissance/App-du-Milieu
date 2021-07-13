@@ -7,7 +7,7 @@ from datetime import date, timedelta
 
 from app.crud.enmarche import scope2dict, get_child
 from app.database.database_crm import engine_crm
-from app.models.models_enmarche import GeoCity, GeoDistrict, GeoDepartment, GeoRegion
+from app.models.models_enmarche import GeoBorough, GeoCity, GeoDistrict, GeoDepartment, GeoRegion
 from app.models.models_enmarche import JecouteDataSurvey
 from app.models.models_crm import Downloads, Users
 
@@ -189,6 +189,13 @@ def get_survey(
         res['zone_name'] = geo_district.name
         res['latitude'] = geo_district.latitude
         res['longitude'] = geo_district.longitude
+    elif 'arrondissement_commune' in returned_zone.keys():
+        geo_borough =  db.query(GeoBorough) \
+            .filter(GeoBorough.name == returned_zone['arrondissement_commune'][0]) \
+            .first()
+        res['zone_name'] = geo_borough.name
+        res['latitude'] = geo_borough.latitude
+        res['longitude'] = geo_borough.longitude
     else:
         res['zone_name'] = next(iter(returned_zone.values()))[0]
         # Chez Xavier
