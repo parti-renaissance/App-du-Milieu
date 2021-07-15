@@ -20,6 +20,17 @@ def get_downloads(
     before: Date = date.today(),
     range: int = 28
     ):
+    """
+    Get all downloads for the specified scope from the database.
+
+    Args:
+        db: write your description
+        scope: write your description
+        before: write your description
+        date: write your description
+        today: write your description
+        range: write your description
+    """
     after = before - timedelta(days=range)
 
     # series of all date from min to max
@@ -108,6 +119,17 @@ def get_users(
     before: Date = date.today(),
     range: int = 28
     ):
+    """
+    Get all users in the database.
+
+    Args:
+        db: write your description
+        scope: write your description
+        before: write your description
+        date: write your description
+        today: write your description
+        range: write your description
+    """
     after = before - timedelta(days=range)
 
     # series of all date from min to max
@@ -150,6 +172,13 @@ def get_survey(
     db: Session,
     scope: dict
     ):
+    """
+    Get the survey datas for the scope.
+
+    Args:
+        db: write your description
+        scope: write your description
+    """
 
     city_codes = []
     for zone in scope['zones']:
