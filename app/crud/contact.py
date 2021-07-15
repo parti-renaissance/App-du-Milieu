@@ -42,13 +42,6 @@ def getEmailSubscription(s: str):
 
 
 def get_contacts(db: Session, scope: dict):
-    """
-    Get all contacts for the scope.
-
-    Args:
-        db: write your description
-        scope: write your description
-    """
     columns = [
         'Genre',
         'Prénom',
@@ -106,13 +99,6 @@ def get_contacts(db: Session, scope: dict):
 
 
 def get_number_of_contacts(db: Session, scope: dict): 
-    """
-    Get the number of contacts for the given scope.
-
-    Args:
-        db: write your description
-        scope: write your description
-    """
     filter_zone = scope2dict(scope)
 
     query = db.query(Contact).filter(or_(getattr(Contact, k).in_(v) for k, v in filter_zone.items()))

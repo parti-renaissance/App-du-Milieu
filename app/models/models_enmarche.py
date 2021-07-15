@@ -83,12 +83,6 @@ class CandidateManagedArea(Base):
     candidate_managed_zone = relationship('GeoZone')
 
     def get_zone_id(self):
-        """
-        Get the zone id for this zone.
-
-        Args:
-            self: write your description
-        """
         return self.zone_id
 
 

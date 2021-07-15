@@ -42,11 +42,5 @@ engine_crm = create_engine(
 @as_declarative()
 class CRM:
     def __init__(self):
-        """
-        Create the tables in the database.
-
-        Args:
-            self: write your description
-        """
         metadata.create_all(bind=engine_crm)
     pass

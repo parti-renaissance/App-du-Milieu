@@ -33,12 +33,6 @@ class InterestsChoices(str, Enum):
 
     @classmethod
     def list(cls):
-        """
-        List all the values in the enum
-
-        Args:
-            cls: write your description
-        """
         return list(map(lambda c: c.value, cls))[:-1]
 
 
@@ -50,12 +44,6 @@ class Gender(str, Enum):
     
     @classmethod
     def list(cls):
-        """
-        List all the values in the enum
-
-        Args:
-            cls: write your description
-        """
         return list(map(lambda c: c.value, cls))[:-1]
 
 
