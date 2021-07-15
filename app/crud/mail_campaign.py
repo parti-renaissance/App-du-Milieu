@@ -18,6 +18,15 @@ def filter_role(
     query: Query,
     zones: List[GeoZone],
     role: str):
+    """
+    Filters the query based on the role.
+
+    Args:
+        db: write your description
+        query: write your description
+        zones: write your description
+        role: write your description
+    """
     all_zones = [[zone.id] + [child.id for child in get_child(db, zone)] for zone in zones]
     all_zones = [item for sublist in all_zones for item in sublist]
     
@@ -42,6 +51,15 @@ async def get_campaign_reports(
     zone: GeoZone,
     since: datetime,
     role: str):
+      """
+      Get all the campaigns that have a particular role.
+
+      Args:
+          db: write your description
+          zone: write your description
+          since: write your description
+          role: write your description
+      """
 
     query = db.query(
             MailChimpCampaign.id.label('id'), \
@@ -75,6 +93,14 @@ async def get_mail_ratios(
     db: Session,
     scope: dict,
     since: datetime):
+      """
+      Get the mail ratios for the campaign.
+
+      Args:
+          db: write your description
+          scope: write your description
+          since: write your description
+      """
 
     query = db.query(func.count(MailChimpCampaign.id).label('nbCampagnes'), \
             coalesce(func.round(func.sum(MailChimpCampaignReport.open_unique) / func.sum(MailChimpCampaignReport.email_sent), 4), 0).label('txOuverture'), \
