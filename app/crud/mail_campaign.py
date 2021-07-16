@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session, Query
 from sqlalchemy import func
 from sqlalchemy.sql.functions import coalesce
 from app.crud.enmarche import get_child
-from app.models.models_enmarche import AdherentMessages, Adherents, CandidateManagedArea
+from app.models.models_enmarche import AdherentMessages, Adherents
 from app.models.models_enmarche import AdherentMessageFilters, ReferentTags, ReferentManagedAreasTags
 from app.models.models_enmarche import MailChimpCampaign, MailChimpCampaignReport
 from app.models.models_enmarche import GeoZone

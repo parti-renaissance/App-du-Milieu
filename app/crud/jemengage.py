@@ -2,7 +2,7 @@
 Endpoints de notre api
 """
 from sqlalchemy.orm import Session, joinedload
-from sqlalchemy import func, Date
+from sqlalchemy import Date
 from datetime import date, timedelta
 
 from app.crud.enmarche import scope2dict, get_child
@@ -188,14 +188,14 @@ def get_survey(
         res['latitude'] = geo_dpt.latitude
         res['longitude'] = geo_dpt.longitude
     elif 'circonscription' in returned_zone.keys():
-        geo_district =  db.query(GeoDistrict) \
+        geo_district = db.query(GeoDistrict) \
             .filter(GeoDistrict.name == returned_zone['circonscription'][0]) \
             .first()
         res['zone_name'] = geo_district.name
         res['latitude'] = geo_district.latitude
         res['longitude'] = geo_district.longitude
     elif 'arrondissement_commune' in returned_zone.keys():
-        geo_borough =  db.query(GeoBorough) \
+        geo_borough = db.query(GeoBorough) \
             .filter(GeoBorough.name == returned_zone['arrondissement_commune'][0]) \
             .first()
         res['zone_name'] = geo_borough.name
@@ -205,7 +205,7 @@ def get_survey(
         res['zone_name'] = next(iter(returned_zone.values()))[0]
         # Chez Xavier
         res['latitude'] = 48.835633
-        res['longitude'] =  2.323433
+        res['longitude'] = 2.323433
 
     res['survey_datas'] = survey_datas
     return res

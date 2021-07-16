@@ -12,7 +12,7 @@ from fastapi import FastAPI, Depends, Header, HTTPException
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import ORJSONResponse
 # profiling
-#from fastapi_profiler.profiler_middleware import PyInstrumentProfilerMiddleware
+# from fastapi_profiler.profiler_middleware import PyInstrumentProfilerMiddleware
 
 from starlette.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -100,11 +100,12 @@ async def jemengage_downloads(
     res = jemengage.get_downloads(db, selected_scope)
     if res.empty:
         raise HTTPException(status_code=204, detail='No content')
-    
+
     total = int(res.unique_user.sum())
 
     res = res.to_json(orient='records')
     return {'totalDownloads': total, 'downloads': json.loads(res)}
+
 
 @app.get('/jemengage/users', response_class=ORJSONResponse)
 async def jemengage_users(
