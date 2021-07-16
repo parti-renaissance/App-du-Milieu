@@ -17,14 +17,14 @@ class GeoTypes(str, Enum):
         On ajoute ici les colonnes implementees dans la table contact pour pouvoir filtrer dessus
     '''
     borough = 'arrondissement_commune'
-    #canton = 'canton'
+    # canton = 'canton'
     city = 'commune'
-    #city_community = 'communaute_de_communes'
-    #consular_district = 'circonscription_consulaire'
-    #country = 'pays'
+    # city_community = 'communaute_de_communes'
+    # consular_district = 'circonscription_consulaire'
+    # country = 'pays'
     department = 'departement'
     district = 'circonscription'
-    #foreign_district = 'circonscription_des_FDE'
+    # foreign_district = 'circonscription_des_FDE'
     region = 'region'
 
 
