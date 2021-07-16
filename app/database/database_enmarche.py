@@ -42,6 +42,4 @@ engine_read_only = create_engine(
 
 @as_declarative()
 class Base:
-    def __init__(self):
-        metadata.create_all(bind=engine_read_only)
     pass
