@@ -39,7 +39,7 @@ jobs:
             - uses: actions/upload-artifact@v2
               with:
                 name: Build-Artifact
-                path: ./Build-Artifact
+                #path: ./Build-Artifact
 
 
     Tests:
@@ -52,7 +52,7 @@ jobs:
             - uses: actions/download-artifact@v2
               with:
                 name: Build-Artifact
-                path: ./Build-Artifact
+                #path: ./Build-Artifact
 
             - name: Analysing the code with pylint
               run: |
