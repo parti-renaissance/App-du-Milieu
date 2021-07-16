@@ -45,7 +45,7 @@ def scope2dict(scope: dict, name: bool = False):
     '''
     res = defaultdict(list)
     for sub in scope['zones']:
-        if (geotype := getGeoType(sub.type)):
+        if geotype := getGeoType(sub.type):
             if name:
                 res[geotype].append(sub.name)
             else:

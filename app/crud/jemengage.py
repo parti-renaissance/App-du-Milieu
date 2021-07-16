@@ -1,17 +1,16 @@
 """
 Endpoints de notre api
 """
+from datetime import date, timedelta
+import pandas as pd
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import Date
-from datetime import date, timedelta
 
 from app.crud.enmarche import scope2dict, get_child
 from app.database.database_crm import engine_crm
 from app.models.models_enmarche import GeoBorough, GeoCity, GeoDistrict, GeoDepartment, GeoRegion
 from app.models.models_enmarche import JecouteDataSurvey
 from app.models.models_crm import Downloads, Users
-
-import pandas as pd
 
 
 def get_downloads(

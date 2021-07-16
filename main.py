@@ -53,9 +53,9 @@ async def get_scopes(
         scope: str,
         X_Scope: str = Header(None),
         db: Session = Depends(get_db)) -> dict:
-    if (scope is None):
+    if scope is None:
         raise HTTPException(status_code=400, detail='No scope parameter')
-    if (X_Scope is None):
+    if X_Scope is None:
         raise HTTPException(status_code=400, detail='No X-Scope in header')
     if (scope := enmarche.decode_scopes(db, X_Scope)) is None:
         raise HTTPException(status_code=203,
