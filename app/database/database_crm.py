@@ -39,6 +39,7 @@ engine_crm = create_engine(
     max_overflow=2
 )
 
+
 @as_declarative()
 class CRM:
     def __init__(self):

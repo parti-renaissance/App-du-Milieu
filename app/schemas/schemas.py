@@ -41,7 +41,7 @@ class Gender(str, Enum):
     femme = 'Femme'
     autre = 'Autre'
     vide = ''
-    
+
     @classmethod
     def list(cls):
         return list(map(lambda c: c.value, cls))[:-1]

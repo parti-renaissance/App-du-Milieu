@@ -39,6 +39,7 @@ engine_read_only = create_engine(
     max_overflow=2
 )
 
+
 @as_declarative()
 class Base:
     def __init__(self):

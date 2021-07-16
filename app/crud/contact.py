@@ -63,12 +63,19 @@ def get_contacts(db: Session, scope: dict):
     ]
 
     filter_zone = scope2dict(scope)
-    query = db.query(Contact).filter(or_(getattr(Contact, k).in_(v) for k, v in filter_zone.items()))
+    query = db.query(Contact).filter(or_(getattr(Contact, k).in_(v)
+                                         for k, v in filter_zone.items()))
 
-    query = str(query.statement.compile(compile_kwargs={"literal_binds": True})) \
-        .replace('contacts.id, ', '', 1)
+    query = str(
+        query.statement.compile(
+            compile_kwargs={
+                "literal_binds": True})) .replace(
+        'contacts.id, ',
+        '',
+        1)
 
-    copy_sql = "COPY ({query}) TO STDOUT WITH CSV {head}".format(query=query, head="HEADER")
+    copy_sql = "COPY ({query}) TO STDOUT WITH CSV {head}".format(
+        query=query, head="HEADER")
     conn = engine_crm.raw_connection()
     cur = conn.cursor()
     store = io.StringIO()
@@ -76,10 +83,13 @@ def get_contacts(db: Session, scope: dict):
     store.seek(0)
     df = pd.read_csv(store, encoding='utf-8')
     # reformat some datas
-    df.centres_interet = df.centres_interet.str.replace('[{}"]', '', regex=True).str.split(',')
+    df.centres_interet = df.centres_interet.str.replace(
+        '[{}"]', '', regex=True).str.split(',')
     df.email_subscriptions = df.email_subscriptions.fillna('')
-    df.email_subscriptions = df.email_subscriptions.str.replace('[{}"]', '', regex=True).str.split(',')
-    df.email_subscriptions = df.email_subscriptions.transform(lambda x: getEmailSubscription(scope['code']))
+    df.email_subscriptions = df.email_subscriptions.str.replace(
+        '[{}"]', '', regex=True).str.split(',')
+    df.email_subscriptions = df.email_subscriptions.transform(
+        lambda x: getEmailSubscription(scope['code']))
     df.sub_tel.replace({'t': True, 'f': False}, inplace=True)
     df.columns = columns
     # not implemented in front yet
@@ -95,13 +105,14 @@ def get_contacts(db: Session, scope: dict):
         **interests,
         **gender,
         'contacts': loads(df.to_json(orient='records', force_ascii=False))
-        }
+    }
 
 
-def get_number_of_contacts(db: Session, scope: dict): 
+def get_number_of_contacts(db: Session, scope: dict):
     filter_zone = scope2dict(scope)
 
-    query = db.query(Contact).filter(or_(getattr(Contact, k).in_(v) for k, v in filter_zone.items()))
+    query = db.query(Contact).filter(or_(getattr(Contact, k).in_(v)
+                                         for k, v in filter_zone.items()))
 
     zones = []
     for k, v in scope2dict(scope, name=True).items():
