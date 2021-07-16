@@ -38,7 +38,7 @@ jobs:
         run: |
           pip install pytest
           pip install pytest-cov
-          python -m pytest --cov=./ --cov-report=xml
+          python -m pytest --cov=./
 
         env:
           # Google Cloud Env
@@ -61,7 +61,7 @@ jobs:
         uses: codecov/codecov-action@v1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          directory: ./coverage/reports/
+          directory: ./
           flags: unittests
           env_vars: OS,PYTHON
           name: codecov-umbrella
