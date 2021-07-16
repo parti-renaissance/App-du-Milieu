@@ -45,11 +45,11 @@ def scope2dict(scope: dict, name: bool = False):
     '''
     res = defaultdict(list)
     for sub in scope['zones']:
-        if (type := getGeoType(sub.type)):
+        if (geotype := getGeoType(sub.type)):
             if name:
-                res[type].append(sub.name)
+                res[geotype].append(sub.name)
             else:
-                res['code_' + type].append(sub.code)
+                res['code_' + geotype].append(sub.code)
 
     return res
 
@@ -72,8 +72,8 @@ def decode_scopes(db: Session, scope: str):
     return {'code': scope_dict['code'], 'zones': res_zone}
 
 
-def get_child(db: Session, parent: GeoZone, type: str = None):
-    if parent.type == type:
+def get_child(db: Session, parent: GeoZone, geotype: str = None):
+    if parent.type == geotype:
         return parent
 
     query = db.query(GeoZone) \
@@ -81,7 +81,7 @@ def get_child(db: Session, parent: GeoZone, type: str = None):
             GeoZoneParent.child_id == GeoZone.id,
             GeoZoneParent.parent_id == parent.id))
 
-    if type:
-        query = query.filter(GeoZone.type == type)
+    if geotype:
+        query = query.filter(GeoZone.type == geotype)
 
     return query.all()
