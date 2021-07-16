@@ -73,6 +73,14 @@ def decode_scopes(db: Session, scope: str):
 
 
 def get_child(db: Session, parent: GeoZone, geotype: str = None):
+    """
+    Get a child GeoZone of the given parent.
+
+    Args:
+        db: write your description
+        parent: write your description
+        geotype: write your description
+    """
     if parent.type == geotype:
         return parent
 

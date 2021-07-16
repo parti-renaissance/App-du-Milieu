@@ -42,6 +42,11 @@ app.add_middleware(
 
 
 def get_db():
+    """
+    Get a context manager that opens a database.
+
+    Args:
+    """
     db = SessionLocal()
     try:
         yield db
@@ -53,6 +58,17 @@ async def get_scopes(
         scope: str,
         X_Scope: str = Header(None),
         db: Session = Depends(get_db)) -> dict:
+      """
+      Get the scopes for a scope.
+
+      Args:
+          scope: write your description
+          X_Scope: write your description
+          Header: write your description
+          db: write your description
+          Depends: write your description
+          get_db: write your description
+      """
     if scope is None:
         raise HTTPException(status_code=400, detail='No scope parameter')
     if X_Scope is None:
@@ -77,6 +93,17 @@ async def read_contacts(
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
 ):
+      """
+      Get the contacts for the selected scope.
+
+      Args:
+          selected_scope: write your description
+          Depends: write your description
+          get_scopes: write your description
+          db: write your description
+          Depends: write your description
+          get_db: write your description
+      """
     try:
         contacts = contact.get_contacts(db, selected_scope)
     except BaseException:
@@ -89,6 +116,17 @@ async def get_adherents(
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
 ):
+      """
+      Get the number of dependencies for the selected scope.
+
+      Args:
+          selected_scope: write your description
+          Depends: write your description
+          get_scopes: write your description
+          db: write your description
+          Depends: write your description
+          get_db: write your description
+      """
     return contact.get_number_of_contacts(db, selected_scope)
 
 
@@ -97,6 +135,17 @@ async def jemengage_downloads(
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
 ):
+      """
+      Get the number of downloads for the selected scope.
+
+      Args:
+          selected_scope: write your description
+          Depends: write your description
+          get_scopes: write your description
+          db: write your description
+          Depends: write your description
+          get_db: write your description
+      """
     res = jemengage.get_downloads(db, selected_scope)
     if res.empty:
         raise HTTPException(status_code=204, detail='No content')
@@ -112,6 +161,17 @@ async def jemengage_users(
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
 ):
+      """
+      Jemengage users.
+
+      Args:
+          selected_scope: write your description
+          Depends: write your description
+          get_scopes: write your description
+          db: write your description
+          Depends: write your description
+          get_db: write your description
+      """
     res = jemengage.get_users(db, selected_scope)
     if res.empty:
         raise HTTPException(status_code=204, detail='No content')
@@ -125,6 +185,17 @@ async def jemengage_survey(
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
 ):
+      """
+      Get a Survey object for the current user.
+
+      Args:
+          selected_scope: write your description
+          Depends: write your description
+          get_scopes: write your description
+          db: write your description
+          Depends: write your description
+          get_db: write your description
+      """
     return jemengage.get_survey(db, selected_scope)
 
 
@@ -134,6 +205,18 @@ async def mail_reports(
     db: Session = Depends(get_db),
     since: datetime = datetime(2021, 1, 1)
 ):
+      """
+      Get all the campaign reports for the selected scope.
+
+      Args:
+          selected_scope: write your description
+          Depends: write your description
+          get_scopes: write your description
+          db: write your description
+          Depends: write your description
+          get_db: write your description
+          since: write your description
+      """
     result = [await mail_campaign.get_campaign_reports(db, zone, since, selected_scope['code']) for zone in selected_scope['zones']]
     return result
 
@@ -144,6 +227,18 @@ async def mail_ratios(
     db: Session = Depends(get_db),
     since: datetime = datetime(2021, 1, 1)
 ):
+      """
+      Get the mail ratios for the current scope.
+
+      Args:
+          selected_scope: write your description
+          Depends: write your description
+          get_scopes: write your description
+          db: write your description
+          Depends: write your description
+          get_db: write your description
+          since: write your description
+      """
     result = await mail_campaign.get_mail_ratios(db, selected_scope, since)
     return {
         'zones': [
