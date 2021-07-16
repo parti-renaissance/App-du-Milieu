@@ -31,13 +31,16 @@ class EmailSubscriptions(str, Enum):
     senator = 'senator_email'
 
 
-def getEmailSubscription(s: str):
+def isSubscribed(role: str, subs: str):
     '''
         Retourne le subscription_type en fonction du role
     '''
+    if subs == None:
+        return False
+
     for t in EmailSubscriptions:
-        if t.name == s:
-            return True
+        if t.name == role:
+            return t.value in subs
     return False
 
 
@@ -65,8 +68,7 @@ def get_contacts(db: Session, scope: dict):
     filter_zone = scope2dict(scope)
     query = db.query(Contact).filter(or_(getattr(Contact, k).in_(v) for k, v in filter_zone.items()))
 
-    query = str(query.statement.compile(compile_kwargs={"literal_binds": True})) \
-        .replace('contacts.id, ', '', 1)
+    query = str(query.statement.compile(compile_kwargs={"literal_binds": True})).replace('contacts.id, ', '', 1)
 
     copy_sql = "COPY ({query}) TO STDOUT WITH CSV {head}".format(query=query, head="HEADER")
     conn = engine_crm.raw_connection()
@@ -79,7 +81,7 @@ def get_contacts(db: Session, scope: dict):
     df.centres_interet = df.centres_interet.str.replace('[{}"]', '', regex=True).str.split(',')
     df.email_subscriptions = df.email_subscriptions.fillna('')
     df.email_subscriptions = df.email_subscriptions.str.replace('[{}"]', '', regex=True).str.split(',')
-    df.email_subscriptions = df.email_subscriptions.transform(lambda x: getEmailSubscription(scope['code']))
+    df.email_subscriptions = df.email_subscriptions.transform(lambda x: isSubscribed(scope['code'], x))
     df.sub_tel.replace({'t': True, 'f': False}, inplace=True)
     df.columns = columns
     # not implemented in front yet
