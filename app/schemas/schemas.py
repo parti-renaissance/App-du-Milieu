@@ -6,7 +6,6 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 from datetime import datetime
 
-from sqlalchemy.sql.expression import null
 
 
 class InterestsChoices(str, Enum):
@@ -41,7 +40,7 @@ class Gender(str, Enum):
     femme = 'Femme'
     autre = 'Autre'
     vide = ''
-    
+
     @classmethod
     def list(cls):
         return list(map(lambda c: c.value, cls))[:-1]

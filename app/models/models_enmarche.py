@@ -18,9 +18,11 @@ class Adherents(Base):
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
     uuid = Column(String(36), unique=True, nullable=False, index=True)
-    managed_area_id = Column(Integer, ForeignKey('referent_managed_areas_tags.referent_managed_area_id'))
+    managed_area_id = Column(Integer, ForeignKey(
+        'referent_managed_areas_tags.referent_managed_area_id'))
     managed_area = relationship('ReferentManagedAreasTags')
-    candidate_managed_area_id = Column(Integer, ForeignKey('candidate_managed_area.id'))
+    candidate_managed_area_id = Column(
+        Integer, ForeignKey('candidate_managed_area.id'))
     candidate_managed_area = relationship('CandidateManagedArea')
 
 
@@ -29,10 +31,16 @@ class ReferentManagedAreasTags(Base):
     __tablename__ = 'referent_managed_areas_tags'
 
     referent_managed_area_id = Column(Integer, index=True)
-    referent_tag_id = Column(Integer, ForeignKey('referent_tags.id'), nullable=True)
+    referent_tag_id = Column(
+        Integer,
+        ForeignKey('referent_tags.id'),
+        nullable=True)
     referent_tag = relationship('ReferentTags', lazy='joined')
-    
-    __mapper_args__ = {'primary_key':[referent_managed_area_id, referent_tag_id]}
+
+    __mapper_args__ = {
+        'primary_key': [
+            referent_managed_area_id,
+            referent_tag_id]}
 
 
 class AdherentMessageFilters(Base):
@@ -40,7 +48,10 @@ class AdherentMessageFilters(Base):
     __tablename__ = 'adherent_message_filters'
 
     id = Column(Integer, primary_key=True, index=True)
-    referent_tag_id = Column(Integer, ForeignKey('referent_tags.id'), nullable=True)
+    referent_tag_id = Column(
+        Integer,
+        ForeignKey('referent_tags.id'),
+        nullable=True)
     referent_tag = relationship('ReferentTags', lazy='joined')
     zone_id = Column(Integer, ForeignKey('geo_zone.id'), nullable=True)
     zone = relationship('GeoZone', lazy='joined')
@@ -49,7 +60,7 @@ class AdherentMessageFilters(Base):
 class ReferentTags(Base):
     """ Table referent_tags """
     __tablename__ = 'referent_tags'
-    
+
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     code = Column(String, nullable=False)
@@ -65,7 +76,10 @@ class AdherentMessages(Base):
     id = Column(Integer, primary_key=True, index=True)
     author_id = Column(Integer, ForeignKey('adherents.id'), nullable=True)
     author = relationship('Adherents', lazy='joined')
-    filter_id = Column(Integer, ForeignKey('adherent_message_filters.id'), nullable=True)
+    filter_id = Column(
+        Integer,
+        ForeignKey('adherent_message_filters.id'),
+        nullable=True)
     filter = relationship('AdherentMessageFilters', lazy='joined')
     label = Column(String, nullable=False)
     subject = Column(String, nullable=False)
@@ -95,7 +109,7 @@ class GeoZone(Base):
     type = Column(String(255), nullable=False)
     code = Column(String(255), nullable=False)
     name = Column(String(255), nullable=False)
-    
+
     UniqueConstraint('code', 'type', name='geo_zone_code_type_unique')
 
 
@@ -108,7 +122,7 @@ class GeoZoneParent(Base):
     parent_id = Column(Integer, ForeignKey('geo_zone.id'), index=True)
     parent = relationship('GeoZone', foreign_keys='GeoZoneParent.parent_id')
 
-    __mapper_args__ = {'primary_key':[child_id, parent_id]}
+    __mapper_args__ = {'primary_key': [child_id, parent_id]}
 
 
 class GeoBorough(Base):
@@ -211,12 +225,20 @@ class MailChimpCampaign(Base):
     __tablename__ = 'mailchimp_campaign'
 
     id = Column(Integer, primary_key=True, index=True)
-    message_id = Column(Integer, ForeignKey('adherent_messages.id'), nullable=True)
+    message_id = Column(
+        Integer,
+        ForeignKey('adherent_messages.id'),
+        nullable=True)
     message = relationship('AdherentMessages', lazy='joined')
     recipient_count = Column(Integer, nullable=True)
     status = Column(String, nullable=False)
-    report_id = Column(Integer, ForeignKey('mailchimp_campaign_report.id'), nullable=True)
-    report = relationship('MailChimpCampaignReport', back_populates='mailchimp_campaign')
+    report_id = Column(
+        Integer,
+        ForeignKey('mailchimp_campaign_report.id'),
+        nullable=True)
+    report = relationship(
+        'MailChimpCampaignReport',
+        back_populates='mailchimp_campaign')
 
 
 class MailChimpCampaignReport(Base):
@@ -230,4 +252,5 @@ class MailChimpCampaignReport(Base):
     click_unique = Column(Integer, nullable=False)
     email_sent = Column(Integer, nullable=False)
     unsubscribed = Column(Integer, nullable=False)
-    mailchimp_campaign = relationship("MailChimpCampaign", back_populates="report")
+    mailchimp_campaign = relationship(
+        "MailChimpCampaign", back_populates="report")

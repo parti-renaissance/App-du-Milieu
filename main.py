@@ -12,7 +12,7 @@ from fastapi import FastAPI, Depends, Header, HTTPException
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import ORJSONResponse
 # profiling
-#from fastapi_profiler.profiler_middleware import PyInstrumentProfilerMiddleware
+# from fastapi_profiler.profiler_middleware import PyInstrumentProfilerMiddleware
 
 from starlette.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
@@ -53,11 +53,10 @@ async def get_scopes(
         scope: str,
         X_Scope: str = Header(None),
         db: Session = Depends(get_db)) -> dict:
-    if (scope is None):
+    if scope is None:
         raise HTTPException(status_code=400, detail='No scope parameter')
-    if (X_Scope is None):
+    if X_Scope is None:
         raise HTTPException(status_code=400, detail='No X-Scope in header')
-
     if (scope := enmarche.decode_scopes(db, X_Scope)) is None:
         raise HTTPException(status_code=203,
                             detail='You have no candidate area affected.')
@@ -102,8 +101,10 @@ async def jemengage_downloads(
     if res.empty:
         raise HTTPException(status_code=204, detail='No content')
 
+    total = int(res.unique_user.sum())
+
     res = res.to_json(orient='records')
-    return {'downloads': json.loads(res)}
+    return {'totalDownloads': total, 'downloads': json.loads(res)}
 
 
 @app.get('/jemengage/users', response_class=ORJSONResponse)

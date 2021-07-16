@@ -17,14 +17,14 @@ class GeoTypes(str, Enum):
         On ajoute ici les colonnes implementees dans la table contact pour pouvoir filtrer dessus
     '''
     borough = 'arrondissement_commune'
-    #canton = 'canton'
+    # canton = 'canton'
     city = 'commune'
-    #city_community = 'communaute_de_communes'
-    #consular_district = 'circonscription_consulaire'
-    #country = 'pays'
+    # city_community = 'communaute_de_communes'
+    # consular_district = 'circonscription_consulaire'
+    # country = 'pays'
     department = 'departement'
     district = 'circonscription'
-    #foreign_district = 'circonscription_des_FDE'
+    # foreign_district = 'circonscription_des_FDE'
     region = 'region'
 
 
@@ -45,11 +45,11 @@ def scope2dict(scope: dict, name: bool = False):
     '''
     res = defaultdict(list)
     for sub in scope['zones']:
-        if (type := getGeoType(sub.type)):
+        if geotype := getGeoType(sub.type):
             if name:
-                res[type].append(sub.name)
+                res[geotype].append(sub.name)
             else:
-                res['code_'+type].append(sub.code)
+                res['code_' + geotype].append(sub.code)
 
     return res
 
@@ -60,29 +60,28 @@ def decode_scopes(db: Session, scope: str):
     '''
     base64_bytes = scope.encode("latin1")
     scope_bytes = base64.b64decode(base64_bytes)
-    scope_string = scope_bytes.decode("latin1")  
+    scope_string = scope_bytes.decode("latin1")
     scope_dict = json.loads(scope_string)
 
     res_zone = []
     for zone in scope_dict['zones']:
         res_zone = [*res_zone,
-            db.query(GeoZone) \
-              .filter(GeoZone.uuid == zone['uuid']) \
-              .first()]
-    return {'code':scope_dict['code'], 'zones':res_zone}
+                    db.query(GeoZone)
+                    .filter(GeoZone.uuid == zone['uuid'])
+                    .first()]
+    return {'code': scope_dict['code'], 'zones': res_zone}
 
 
-def get_child(db: Session, parent: GeoZone, type: str = None):
-    if parent.type == type:
+def get_child(db: Session, parent: GeoZone, geotype: str = None):
+    if parent.type == geotype:
         return parent
 
     query = db.query(GeoZone) \
         .join(GeoZoneParent, and_(
-            GeoZoneParent.child_id  == GeoZone.id,
+            GeoZoneParent.child_id == GeoZone.id,
             GeoZoneParent.parent_id == parent.id))
-    
-    if type:
-        query = query.filter(GeoZone.type == type)
-    
-    return query.all()
 
+    if geotype:
+        query = query.filter(GeoZone.type == geotype)
+
+    return query.all()
