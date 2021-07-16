@@ -19,7 +19,6 @@ from sqlalchemy.orm import Session
 
 
 from app.crud import contact, enmarche, jemengage, mail_campaign
-from app.schemas import schemas
 from app.database import SessionLocal
 
 
@@ -105,23 +104,6 @@ async def jemengage_downloads(
 
     res = res.to_json(orient='records')
     return {'downloads': json.loads(res)}
-
-
-'''
-    Deprecated
-
-@app.get('/jemengage/downloadsRatios', response_class=ORJSONResponse)
-async def jemengage_downloads_ratio(
-    selected_scope: dict = Depends(get_scopes),
-    db: Session = Depends(get_db)
-    ):
-    res = jemengage.downloads_ratio(db, selected_scope)
-    if res.empty:
-        return HTTPException(status_code=204, detail='No content')
-
-    res = res.to_json(orient='records')
-    return {'downloads': json.loads(res)}
-'''
 
 
 @app.get('/jemengage/users', response_class=ORJSONResponse)
