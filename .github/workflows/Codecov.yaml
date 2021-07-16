@@ -40,6 +40,16 @@ jobs:
           pip install pytest-cov
           python -m pytest --cov=./ --cov-report=xml
 
+        env:
+          SQL_INST: ${{ secrets.SQL_INST_STAGING }}
+          DB_READ: ${{ secrets.DB_READ_STAGING }}
+          DB_USER: ${{ secrets.DB_USER_STAGING }}
+          DB_PASS: ${{ secrets.DB_PASS_STAGING }}
+          SQL_INST_PG: ${{ secrets.SQL_INST_PG_STAGING }}
+          DB_NAME_PG: ${{ secrets.DB_NAME_PG_STAGING }}
+          DB_USER_PG: ${{ secrets.DB_USER_PG_STAGING }}
+          DB_PASS_PG: ${{ secrets.DB_PASS_PG_STAGING }}
+
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
         with:
