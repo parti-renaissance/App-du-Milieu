@@ -6,4 +6,3 @@ SessionLocal = sessionmaker(
     autocommit=False,
     autoflush=False,
     binds={CRM: engine_crm, Base: engine_read_only})
-
