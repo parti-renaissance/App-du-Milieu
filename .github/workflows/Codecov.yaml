@@ -38,7 +38,7 @@ jobs:
         run: |
           pip install pytest
           pip install pytest-cov
-          python -m pytest --cov=./ --codecov
+          python -m pytest --cov=./
 
         env:
           # Google Cloud Env
@@ -56,4 +56,15 @@ jobs:
           DB_PASS_PG: ${{ secrets.DB_PASS_PG_STAGING }}
           CLOUDSQL_CONN_PG: $GCP_PROJECT_ID:$GCP_ZONE:$SQL_INST_PG
           CLOUDSQL_CONN: $GCP_PROJECT_ID:$GCP_ZONE:$SQL_INST
-          CODECOV_TOKEN  : ${{secrets.CODECOV_TOKEN}}
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          directory: ./
+          flags: unittests
+          env_vars: OS,PYTHON
+          name: codecov-umbrella
+          fail_ci_if_error: false
+          path_to_write_report: ./coverage/codecov_report.txt
+          verbose: true
