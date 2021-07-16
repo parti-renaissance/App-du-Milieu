@@ -16,7 +16,7 @@ class GeoTypes(str, Enum):
     '''
         On ajoute ici les colonnes implementees dans la table contact pour pouvoir filtrer dessus
     '''
-    #borough = 'arrondissement'
+    borough = 'arrondissement_commune'
     #canton = 'canton'
     city = 'commune'
     #city_community = 'communaute_de_communes'
@@ -62,7 +62,6 @@ def decode_scopes(db: Session, scope: str):
     scope_bytes = base64.b64decode(base64_bytes)
     scope_string = scope_bytes.decode("latin1")
     scope_dict = json.loads(scope_string)
-    print(f'scope_dict: {scope_dict}')
 
     res_zone = []
     for zone in scope_dict['zones']:

@@ -125,6 +125,19 @@ class GeoZoneParent(Base):
     __mapper_args__ = {'primary_key': [child_id, parent_id]}
 
 
+class GeoBorough(Base):
+    """ Table geo_borough """
+    __tablename__ = 'geo_borough'
+
+    id = Column(Integer, primary_key=True, index=True)
+    code = Column(String, nullable=False)
+    name = Column(String(255), nullable=False)
+    latitude = Column(Float, nullable=False)
+    longitude = Column(Float, nullable=False)
+    city_id = Column(Integer, ForeignKey('geo_city.id'))
+    geo_city = relationship('GeoCity')
+
+
 class GeoCity(Base):
     """ Table geo_city """
     __tablename__ = 'geo_city'
@@ -134,6 +147,19 @@ class GeoCity(Base):
     name = Column(String(255), nullable=False)
     postal_code = Column(String, nullable=False)
     active = Column(Boolean, nullable=True)
+    department_id = Column(Integer, ForeignKey('geo_department.id'))
+    geo_department = relationship('GeoDepartment')
+
+
+class GeoDistrict(Base):
+    """ Table geo_district """
+    __tablename__ = 'geo_district'
+
+    id = Column(Integer, primary_key=True, index=True)
+    code = Column(String, nullable=False)
+    name = Column(String(255), nullable=False)
+    latitude = Column(Float, nullable=False)
+    longitude = Column(Float, nullable=False)
     department_id = Column(Integer, ForeignKey('geo_department.id'))
     geo_department = relationship('GeoDepartment')
 

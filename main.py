@@ -3,6 +3,10 @@
 A sample flask application on Cloud Run. Version 1
 """
 from os import environ
+from datetime import datetime
+import json
+
+import uvicorn
 
 from fastapi import FastAPI, Depends, Header, HTTPException
 from fastapi.middleware.gzip import GZipMiddleware
@@ -13,14 +17,9 @@ from fastapi.responses import ORJSONResponse
 from starlette.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
-from datetime import datetime
 
 from app.crud import contact, enmarche, jemengage, mail_campaign
-from app.schemas import schemas
 from app.database import SessionLocal
-
-import uvicorn
-import json
 
 
 app = FastAPI(
@@ -54,9 +53,10 @@ async def get_scopes(
         scope: str,
         X_Scope: str = Header(None),
         db: Session = Depends(get_db)) -> dict:
-    if (scope is None) or (X_Scope is None):
-        raise HTTPException(status_code=401, detail='Scope problem')
-
+    if (scope is None):
+        raise HTTPException(status_code=400, detail='No scope parameter')
+    if (X_Scope is None):
+        raise HTTPException(status_code=400, detail='No X-Scope in header')
     if (scope := enmarche.decode_scopes(db, X_Scope)) is None:
         raise HTTPException(status_code=203,
                             detail='You have no candidate area affected.')
@@ -100,27 +100,11 @@ async def jemengage_downloads(
     res = jemengage.get_downloads(db, selected_scope)
     if res.empty:
         raise HTTPException(status_code=204, detail='No content')
+    
+    total = int(res.unique_user.sum())
 
     res = res.to_json(orient='records')
-    return {'downloads': json.loads(res)}
-
-
-'''
-    Deprecated
-
-@app.get('/jemengage/downloadsRatios', response_class=ORJSONResponse)
-async def jemengage_downloads_ratio(
-    selected_scope: dict = Depends(get_scopes),
-    db: Session = Depends(get_db)
-    ):
-    res = jemengage.downloads_ratio(db, selected_scope)
-    if res.empty:
-        return HTTPException(status_code=204, detail='No content')
-
-    res = res.to_json(orient='records')
-    return {'downloads': json.loads(res)}
-'''
-
+    return {'totalDownloads': total, 'downloads': json.loads(res)}
 
 @app.get('/jemengage/users', response_class=ORJSONResponse)
 async def jemengage_users(

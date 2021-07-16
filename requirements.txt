@@ -8,3 +8,5 @@ pymysql
 psycopg2-binary
 pandas
 orjson
+numexpr
+xarray
