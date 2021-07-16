@@ -41,6 +41,11 @@ jobs:
           python -m pytest --cov=./ --cov-report=xml
 
         env:
+          # Google Cloud Env
+          GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+          GCP_ZONE: ${{ secrets.GCP_ZONE }}
+
+          # Cloud SQL Env
           SQL_INST: ${{ secrets.SQL_INST_STAGING }}
           DB_READ: ${{ secrets.DB_READ_STAGING }}
           DB_USER: ${{ secrets.DB_USER_STAGING }}
@@ -49,6 +54,8 @@ jobs:
           DB_NAME_PG: ${{ secrets.DB_NAME_PG_STAGING }}
           DB_USER_PG: ${{ secrets.DB_USER_PG_STAGING }}
           DB_PASS_PG: ${{ secrets.DB_PASS_PG_STAGING }}
+          CLOUDSQL_CONN_PG: $GCP_PROJECT_ID:$GCP_ZONE:$SQL_INST_PG
+          CLOUDSQL_CONN: $GCP_PROJECT_ID:$GCP_ZONE:$SQL_INST
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v1
