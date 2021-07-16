@@ -231,4 +231,3 @@ class MailChimpCampaignReport(Base):
     email_sent = Column(Integer, nullable=False)
     unsubscribed = Column(Integer, nullable=False)
     mailchimp_campaign = relationship("MailChimpCampaign", back_populates="report")
-    #TODO define method to calculate rates ?

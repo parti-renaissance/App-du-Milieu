@@ -31,7 +31,7 @@ class EmailSubscriptions(str, Enum):
     senator = 'senator_email'
 
 
-def isSubscribed(role: str, subs: str):
+def isSubscribed(role: str, subs: list):
     '''
         Retourne le subscription_type en fonction du role
     '''
