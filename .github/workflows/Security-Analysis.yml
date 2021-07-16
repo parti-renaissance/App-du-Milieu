@@ -8,15 +8,35 @@ on:
       - 'Dockerfile'
       - 'requirements.txt'
 
-  pull_request:
-    branches: [ master ]
-    paths:
-      - '**.py'
-      - 'Dockerfile'
-      - 'requirements.txt'
-
+env:
+  # Image Env
+  IMAGE: app-du-milieu
+  TAG: build
 
 jobs:
+  Snyk-Analysis:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Build a Docker image
+      run: docker build -t "$IMAGE:$TAG" .
+
+    - name: Run Snyk to check Docker image for vulnerabilities
+      continue-on-error: true
+      uses: snyk/actions/docker@master
+      env:
+        SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+      with:
+        image: $IMAGE:$TAG
+        args: --file=Dockerfile
+
+    - name: Upload result to GitHub Code Scanning
+      uses: github/codeql-action/upload-sarif@v1
+      with:
+        sarif_file: snyk.sarif
 
   OSSAR-Scan:
     # OSSAR runs on windows-latest.
