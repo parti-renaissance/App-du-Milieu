@@ -102,9 +102,11 @@ async def jemengage_downloads(
     res = jemengage.get_downloads(db, selected_scope)
     if res.empty:
         raise HTTPException(status_code=204, detail='No content')
+    
+    total = int(res.unique_user.sum())
 
     res = res.to_json(orient='records')
-    return {'downloads': json.loads(res)}
+    return {'totalDownloads': total, 'downloads': json.loads(res)}
 
 
 '''
