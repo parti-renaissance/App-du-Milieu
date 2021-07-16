@@ -42,6 +42,4 @@ engine_crm = create_engine(
 
 @as_declarative()
 class CRM:
-    def __init__(self):
-        metadata.create_all(bind=engine_crm)
     pass
