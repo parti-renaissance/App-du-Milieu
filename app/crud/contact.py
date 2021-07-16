@@ -35,12 +35,10 @@ def isSubscribed(role: str, subs: str):
     '''
         Retourne le subscription_type en fonction du role
     '''
-    if subs == None:
-        return False
-
-    for t in EmailSubscriptions:
-        if t.name == role:
-            return t.value in subs
+    if subs is not None:
+        for t in EmailSubscriptions:
+            if t.name == role:
+                return t.value in subs
     return False
 
 
@@ -81,7 +79,7 @@ def get_contacts(db: Session, scope: dict):
     df.centres_interet = df.centres_interet.str.replace('[{}"]', '', regex=True).str.split(',')
     df.email_subscriptions = df.email_subscriptions.fillna('')
     df.email_subscriptions = df.email_subscriptions.str.replace('[{}"]', '', regex=True).str.split(',')
-    df.email_subscriptions = df.email_subscriptions.transform(lambda x: isSubscribed(scope['code'], x))
+    df.email_subscriptions = df.email_subscriptions.transform(lambda x: isSubscribed(scope['code'],))
     df.sub_tel.replace({'t': True, 'f': False}, inplace=True)
     df.columns = columns
     # not implemented in front yet
