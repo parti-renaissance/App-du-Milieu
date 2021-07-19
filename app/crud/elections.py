@@ -122,7 +122,7 @@ def get_participation(
 
 def ElectionAgregat(election: str, division: str):
     type_election = election.split()[0]
-    if type_election not in dict_agregat.keys():
+    if type_election not in dict_election.keys():
         raise HTTPException(status_code=400, detail=f'No data for election {election}')
     if division not in dict_maillage.keys():
         raise HTTPException(status_code=400, detail=f'The division {division} is not available yet')
@@ -130,6 +130,20 @@ def ElectionAgregat(election: str, division: str):
         return dict_agregat[election] \
                + (', ' + dict_detail[election] if dict_detail[election] else '')
     return dict_agregat[election]
+
+
+def get_election_nuance_color():
+    query = 'select * from elections_nuances_couleurs'
+    
+    with engine_crm.connect() as connection:
+        df = pd.read_sql(query, connection)
+    
+    df = pd.concat([
+        df[['election', 'nuance_candidat', 'code_couleur']].rename(columns={'nuance_candidat': 'nuance'}),
+        df[['election', 'nuance_binome', 'code_couleur']].rename(columns={'nuance_binome': 'nuance'}),
+        df[['election', 'nuance_liste', 'code_couleur']].rename(columns={'nuance_liste': 'nuance'})
+    ]).dropna().drop_duplicates()
+    return df
 
 
 # 1er endpoint bis Results
@@ -149,6 +163,7 @@ def get_results(
     
     query_resultats = f'''
         select
+          election,
           {agregat},
           cast(sum(voix) as integer) as voix
         from elections
@@ -156,6 +171,7 @@ def get_results(
           and election = '{election}'
           and tour = '{tour}'
         group by
+          election,
           {agregat}
         order by
           voix desc
@@ -170,4 +186,4 @@ def get_results(
     store.seek(0)
     df = pd.read_csv(store, encoding='utf-8')
 
-    return df
+    return df.merge(get_election_nuance_color(), how='left').drop(columns='election')
