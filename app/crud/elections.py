@@ -3,6 +3,8 @@ import io
 from sqlalchemy.orm import Session
 from app.database.database_crm import engine_crm
 
+from fastapi import HTTPException
+
 import pandas as pd
 
 
@@ -118,9 +120,13 @@ def get_participation(
     return df
 
 
-def ElectionAgregat(election: str, maillage: str):
+def ElectionAgregat(election: str, division: str):
     type_election = election.split()[0]
-    if dict_maillage[maillage] <= dict_election[type_election]:
+    if type_election not in dict_agregat.keys():
+        raise HTTPException(status_code=400, detail=f'No data for election {election}')
+    if division not in dict_maillage.keys():
+        raise HTTPException(status_code=400, detail=f'The division {division} is not available yet')
+    if dict_maillage[division] <= dict_election[type_election]:
         return dict_agregat[election] \
                + (', ' + dict_detail[election] if dict_detail[election] else '')
     return dict_agregat[election]
