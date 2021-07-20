@@ -17,7 +17,7 @@ import pandas as pd
 
 
 class EmailSubscriptions(str, Enum):
-    ''' Tableau des équivalent role - subscription_type '''
+    """ Tableau des équivalent role - subscription_type """
     # local_host = 'subscribed_emails_local_host'
     # national = 'subscribed_emails_movement_information'
     # newsletter = 'subscribed_emails_weekly_letter'
@@ -30,7 +30,7 @@ class EmailSubscriptions(str, Enum):
 
 
 def isSubscribed(role: str, subs: list):
-    ''' Retourne le subscription_type en fonction du role '''
+    """ Retourne le subscription_type en fonction du role """
     if subs is not None:
         for t in EmailSubscriptions:
             if t.name == role:
