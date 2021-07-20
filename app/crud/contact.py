@@ -17,9 +17,7 @@ import pandas as pd
 
 
 class EmailSubscriptions(str, Enum):
-    '''
-        Tableau des équivalent role - subscription_type
-    '''
+    ''' Tableau des équivalent role - subscription_type '''
     # local_host = 'subscribed_emails_local_host'
     # national = 'subscribed_emails_movement_information'
     # newsletter = 'subscribed_emails_weekly_letter'
@@ -32,9 +30,7 @@ class EmailSubscriptions(str, Enum):
 
 
 def isSubscribed(role: str, subs: list):
-    '''
-        Retourne le subscription_type en fonction du role
-    '''
+    ''' Retourne le subscription_type en fonction du role '''
     if subs is not None:
         for t in EmailSubscriptions:
             if t.name == role:
@@ -90,7 +86,7 @@ def get_contacts(db: Session, scope: dict):
     df.email_subscriptions = df.email_subscriptions.str.replace(
         '[{}"]', '', regex=True).str.split(',')
     df.email_subscriptions = df.email_subscriptions.transform(
-        lambda x: getEmailSubscription(scope['code']))
+        lambda x: isSubscribed(scope['code'], x))
     df.sub_tel.replace({'t': True, 'f': False}, inplace=True)
     df.columns = columns
     # not implemented in front yet
