@@ -27,11 +27,12 @@ class EmailSubscriptions(str, Enum):
     senator = 'senator_email'
 
 
-def getEmailSubscription(s: str):
+def isSubscribed(role: str, subs: list):
     """Retourne le subscription_type en fonction du role"""
-    for t in EmailSubscriptions:
-        if t.name == s:
-            return True
+    if subs is not None:
+        for t in EmailSubscriptions:
+            if t.name == role:
+                return t.value in subs
     return False
 
 
@@ -83,7 +84,7 @@ def get_contacts(db: Session, scope: dict):
     df.email_subscriptions = df.email_subscriptions.str.replace(
         '[{}"]', '', regex=True).str.split(',')
     df.email_subscriptions = df.email_subscriptions.transform(
-        lambda x: getEmailSubscription(scope['code']))
+        lambda x: isSubscribed(scope['code'], x))
     df.sub_tel.replace({'t': True, 'f': False}, inplace=True)
     df.columns = columns
     # not implemented in front yet
