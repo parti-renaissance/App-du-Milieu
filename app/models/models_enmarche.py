@@ -1,6 +1,4 @@
-"""
-SQLAlchemy de notre base de données Globale
-"""
+"""SQLAlchemy de notre base de données Globale"""
 from sqlalchemy import Column, Integer, Float, Boolean, String, DateTime, UniqueConstraint, ForeignKey
 from sqlalchemy.orm import relationship
 
@@ -11,7 +9,7 @@ from app.database import Base
 
 
 class Adherents(Base):
-    """ Table adherents id/uuid """
+    """Table adherents id/uuid"""
     __tablename__ = 'adherents'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -27,7 +25,7 @@ class Adherents(Base):
 
 
 class ReferentManagedAreasTags(Base):
-    """ Table referent_managed_areas_tags """
+    """Table referent_managed_areas_tags"""
     __tablename__ = 'referent_managed_areas_tags'
 
     referent_managed_area_id = Column(Integer, index=True)
@@ -44,7 +42,7 @@ class ReferentManagedAreasTags(Base):
 
 
 class AdherentMessageFilters(Base):
-    """ Table adherent_message_filters """
+    """Table adherent_message_filters"""
     __tablename__ = 'adherent_message_filters'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -58,7 +56,7 @@ class AdherentMessageFilters(Base):
 
 
 class ReferentTags(Base):
-    """ Table referent_tags """
+    """Table referent_tags"""
     __tablename__ = 'referent_tags'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -70,7 +68,7 @@ class ReferentTags(Base):
 
 
 class AdherentMessages(Base):
-    """ Table adherent_messages """
+    """Table adherent_messages"""
     __tablename__ = 'adherent_messages'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -89,7 +87,7 @@ class AdherentMessages(Base):
 
 
 class CandidateManagedArea(Base):
-    """ Table candidate_managed_area pour retrouver la zone_id """
+    """Table candidate_managed_area pour retrouver la zone_id"""
     __tablename__ = 'candidate_managed_area'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -101,7 +99,7 @@ class CandidateManagedArea(Base):
 
 
 class GeoZone(Base):
-    """ Table geo_zone pour retrouver la zone_id """
+    """Table geo_zone pour retrouver la zone_id"""
     __tablename__ = 'geo_zone'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -114,7 +112,7 @@ class GeoZone(Base):
 
 
 class GeoZoneParent(Base):
-    """ Table geo_zone_parent pour retrouver la zone_id """
+    """Table geo_zone_parent pour retrouver la zone_id"""
     __tablename__ = 'geo_zone_parent'
 
     child_id = Column(Integer, ForeignKey('geo_zone.id'), index=True)
@@ -126,7 +124,7 @@ class GeoZoneParent(Base):
 
 
 class GeoBorough(Base):
-    """ Table geo_borough """
+    """Table geo_borough"""
     __tablename__ = 'geo_borough'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -139,7 +137,7 @@ class GeoBorough(Base):
 
 
 class GeoCity(Base):
-    """ Table geo_city """
+    """Table geo_city"""
     __tablename__ = 'geo_city'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -152,7 +150,7 @@ class GeoCity(Base):
 
 
 class GeoDistrict(Base):
-    """ Table geo_district """
+    """Table geo_district"""
     __tablename__ = 'geo_district'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -165,7 +163,7 @@ class GeoDistrict(Base):
 
 
 class GeoDepartment(Base):
-    """ Table geo_department """
+    """Table geo_department"""
     __tablename__ = 'geo_department'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -178,7 +176,7 @@ class GeoDepartment(Base):
 
 
 class GeoRegion(Base):
-    """ Table geo_region """
+    """Table geo_region"""
     __tablename__ = 'geo_region'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -189,7 +187,7 @@ class GeoRegion(Base):
 
 
 class JecouteDataSurvey(Base):
-    """ Table jecoute_data_survey """
+    """Table jecoute_data_survey"""
     __tablename__ = 'jecoute_data_survey'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -206,7 +204,7 @@ class JecouteDataSurvey(Base):
 
 
 class JecouteSurvey(Base):
-    """ Table jecoute_data_survey """
+    """Table jecoute_data_survey"""
     __tablename__ = 'jecoute_survey'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -221,7 +219,7 @@ class JecouteSurvey(Base):
 
 
 class MailChimpCampaign(Base):
-    """ Table mailchimp_campaign """
+    """Table mailchimp_campaign"""
     __tablename__ = 'mailchimp_campaign'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -242,7 +240,7 @@ class MailChimpCampaign(Base):
 
 
 class MailChimpCampaignReport(Base):
-    """ Table mailchimp_campaign_report """
+    """Table mailchimp_campaign_report"""
     __tablename__ = 'mailchimp_campaign_report'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -254,4 +252,3 @@ class MailChimpCampaignReport(Base):
     unsubscribed = Column(Integer, nullable=False)
     mailchimp_campaign = relationship(
         "MailChimpCampaign", back_populates="report")
-    # TODO define method to calculate rates ?

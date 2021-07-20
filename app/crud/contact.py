@@ -1,6 +1,4 @@
-"""
-Endpoints de notre api
-"""
+"""Endpoints de notre api"""
 from json import loads
 import io
 from enum import Enum
@@ -17,9 +15,7 @@ import pandas as pd
 
 
 class EmailSubscriptions(str, Enum):
-    '''
-        Tableau des équivalent role - subscription_type
-    '''
+    """Tableau des équivalent role - subscription_type"""
     # local_host = 'subscribed_emails_local_host'
     # national = 'subscribed_emails_movement_information'
     # newsletter = 'subscribed_emails_weekly_letter'
@@ -32,9 +28,7 @@ class EmailSubscriptions(str, Enum):
 
 
 def getEmailSubscription(s: str):
-    '''
-        Retourne le subscription_type en fonction du role
-    '''
+    """Retourne le subscription_type en fonction du role"""
     for t in EmailSubscriptions:
         if t.name == s:
             return True
@@ -96,7 +90,7 @@ def get_contacts(db: Session, scope: dict):
     df.drop(columns=['Code_circonscription', 'Circonscription'], inplace=True)
     df.drop(columns=['Code_arrondissement_commune', 'Arrondissement_commune'], inplace=True)
 
-    """ metadata list of choices """
+    """metadata list of choices"""
     interests = {'interestsChoices': schemas.InterestsChoices.list()}
     gender = {'genderChoices': schemas.Gender.list()}
 

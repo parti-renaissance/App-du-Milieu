@@ -63,10 +63,9 @@ def get_participation(
     maillage: str,
     code_zone: str
 ):
-    """
-        1er endpoint: Participation
-        Retourne les informations de participations pour l'election
-        et la zone selectionnee
+    """1er endpoint: Participation
+    Retourne les informations de participations pour l'election
+    et la zone selectionnee
     """
     # pour le moment pas de scope, pas d'utilisation de db: Session (orm)
     query_participation = f'''
@@ -145,9 +144,8 @@ def get_results(
     maillage: str,
     code_zone: str
 ):
-    """
-        1er endpoint bis: Results
-        Retourne les resultats pour l'election et la zone selectionnee
+    """1er endpoint bis: Results
+    Retourne les resultats pour l'election et la zone selectionnee
     """
     # pour le moment pas de scope, pas d'utilisation de db: Session (orm)
     agregat = ElectionAgregat(election, maillage)
