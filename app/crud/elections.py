@@ -47,7 +47,7 @@ dict_maillage = {
 dict_election = {
     'Municipales': 1,
     'Départementales': 2,
-    'Legislatives': 3,
+    'Législatives': 3,
     'Régionales': 4,
     'Européennes': 6,
     'Présidentielles': 6
