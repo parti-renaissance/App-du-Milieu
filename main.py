@@ -10,7 +10,7 @@ import uvicorn
 
 from fastapi import FastAPI, Depends, Header, HTTPException
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import ORJSONResponse
+from fastapi.responses import ORJSONResponse, PlainTextResponse
 # profiling
 # from fastapi_profiler.profiler_middleware import PyInstrumentProfilerMiddleware
 
@@ -18,7 +18,7 @@ from starlette.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 
-from app.crud import contact, enmarche, jemengage, mail_campaign
+from app.crud import contact, enmarche, jemengage, mail_campaign, elections
 from app.database import SessionLocal
 
 
@@ -150,6 +150,39 @@ async def mail_ratios(
             zone.name for zone in selected_scope['zones']],
         'depuis': since,
         **result}
+
+
+@app.get('/election/participation', response_class=ORJSONResponse)
+async def election_participation(
+    election: str,
+    tour: int,
+    maillage: str,
+    code_zone: str,
+    selected_scope: dict = Depends(get_scopes),
+    db: Session = Depends(get_db)
+):
+    res = elections.get_participation(db, selected_scope, election, tour, maillage, code_zone)
+    if res.empty:
+        raise HTTPException(status_code=204, detail='No content')
+
+    res = res.to_json(orient='records')
+    return json.loads(res)
+
+
+@app.get('/election/results', response_class=PlainTextResponse)
+async def election_results(
+    election: str,
+    tour: int,
+    maillage: str,
+    code_zone: str,
+    selected_scope: dict = Depends(get_scopes),
+    db: Session = Depends(get_db)
+):
+    res = elections.get_results(db, selected_scope, election, tour, maillage, code_zone)
+    if res.empty:
+        raise HTTPException(status_code=204, detail='No content')
+
+    return res.to_csv(index=False)
 
 
 if __name__ == "__main__":

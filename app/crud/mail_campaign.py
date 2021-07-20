@@ -1,6 +1,4 @@
-"""
-Endpoints de notre api
-"""
+"""Endpoints de notre api"""
 from datetime import datetime
 from typing import List
 from sqlalchemy.orm import Session, Query
@@ -18,6 +16,9 @@ def filter_role(
         query: Query,
         zones: List[GeoZone],
         role: str):
+    """Allow to filter database
+    according to implemented roles
+    """
     all_zones = [[zone.id] +
                  [child.id for child in get_child(db, zone)] for zone in zones]
     all_zones = [item for sublist in all_zones for item in sublist]
@@ -43,6 +44,7 @@ async def get_campaign_reports(
         zone: GeoZone,
         since: datetime,
         role: str):
+    """Method to CRUD /campaign/reports"""
 
     query = db.query(
         MailChimpCampaign.id.label('id'),
@@ -87,6 +89,9 @@ async def get_mail_ratios(
         db: Session,
         scope: dict,
         since: datetime):
+    """Method to CRUD /campaign/reportsRatios
+    - Deprecated
+    """
 
     query = db.query(
         func.count(

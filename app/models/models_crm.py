@@ -1,13 +1,11 @@
-"""
-SQLAlchemy de notre base de données CRM
-"""
+"""SQLAlchemy de notre base de données CRM"""
 from sqlalchemy import Column, SmallInteger, Integer, Float, String, Boolean, Date, ARRAY
 
 from app.database import CRM
 
 
 class Contact(CRM):
-    """ Table contacts """
+    """Table contacts"""
     __tablename__ = 'contacts'
 
     id = Column(Integer, primary_key=True, index=True)
@@ -38,7 +36,7 @@ class ContactInDb(Contact):
 
 
 class Downloads(CRM):
-    """ Table crm_downloads """
+    """Table crm_downloads"""
     __tablename__ = 'crm_downloads'
 
     index = Column(Integer, primary_key=True, index=True)
@@ -50,7 +48,7 @@ class Downloads(CRM):
 
 
 class Users(CRM):
-    """ Table crm_usage """
+    """Table crm_usage"""
     __tablename__ = 'crm_usage'
 
     index = Column(Integer, primary_key=True, index=True)
@@ -61,7 +59,7 @@ class Users(CRM):
 
 
 class Elections(CRM):
-    """ Table elections """
+    """Table elections"""
     __tablename__ = 'elections'
 
     election = Column(String, nullable=False, index=True)

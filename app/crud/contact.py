@@ -1,6 +1,4 @@
-"""
-Endpoints de notre api
-"""
+"""Endpoints de notre api"""
 from json import loads
 import io
 from enum import Enum
@@ -93,7 +91,7 @@ def get_contacts(db: Session, scope: dict):
     df.drop(columns=['Code_circonscription', 'Circonscription'], inplace=True)
     df.drop(columns=['Code_arrondissement_commune', 'Arrondissement_commune'], inplace=True)
 
-    """ metadata list of choices """
+    """metadata list of choices"""
     interests = {'interestsChoices': schemas.InterestsChoices.list()}
     gender = {'genderChoices': schemas.Gender.list()}
 

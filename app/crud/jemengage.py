@@ -1,6 +1,4 @@
-"""
-Endpoints de notre api
-"""
+"""Endpoints de notre api"""
 from datetime import date, timedelta
 import pandas as pd
 from sqlalchemy.orm import Session, joinedload
