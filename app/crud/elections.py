@@ -1,12 +1,9 @@
-
+""" Endpoints elections """
 import io
 from sqlalchemy.orm import Session
 from app.database.database_crm import engine_crm
-
 from fastapi import HTTPException
-
 import pandas as pd
-
 
 
 dict_agregat = {
@@ -19,7 +16,7 @@ dict_agregat = {
     'Européennes 2019': 'nom_liste',
     'Présidentielles 2017': 'nuance, nom, prenom'
 }
-''' Always returned information by election '''
+""" Always returned information by election """
 
 
 dict_detail = {
@@ -32,7 +29,7 @@ dict_detail = {
     'Européennes 2019': None,
     'Présidentielles 2017': None
 }
-''' Detailled returned information by election '''
+""" Detailled returned information by election """
 
 
 dict_maillage = {
@@ -42,9 +39,9 @@ dict_maillage = {
     'circonscription': 3,
     'departement': 4,
     'region': 5,
-    'national': 6 
+    'national': 6
     }
-''' Hierarchical level of territorial division '''
+""" Hierarchical level of territorial division """
 
 
 dict_election = {
@@ -53,9 +50,9 @@ dict_election = {
     'Legislatives': 3,
     'Régionales': 4,
     'Européennes': 6,
-    'Présidentielles': 6    
+    'Présidentielles': 6
 }
-''' Election type with the level of division where we use detailled datas '''
+""" Election type with the level of division where we use detailled datas """
 
 
 def get_participation(
@@ -66,11 +63,11 @@ def get_participation(
     maillage: str,
     code_zone: str
 ):
-    ''' 
+    """
         1er endpoint: Participation
         
         Retourne les informations de participations pour l'election et la zone selectionnee
-    '''
+    """
     # pour le moment pas de scope, pas d'utilisation de db: Session (orm)
     query_participation = f'''
         select 
@@ -148,11 +145,11 @@ def get_results(
     maillage: str,
     code_zone: str
 ):
-    ''' 
+    """
         1er endpoint bis: Results
         
         Retourne les resultats pour l'election et la zone selectionnee
-    '''
+    """
     # pour le moment pas de scope, pas d'utilisation de db: Session (orm)
     agregat = ElectionAgregat(election, maillage)
     
