@@ -64,26 +64,27 @@ def get_participation(
     code_zone: str
 ):
     """1er endpoint: Participation
+
     Retourne les informations de participations pour l'election
     et la zone selectionnee
     """
     # pour le moment pas de scope, pas d'utilisation de db: Session (orm)
     query_participation = f'''
-        select 
+        select
           election,
           tour,
           {maillage},
           cast(sum(inscrits) as integer) as inscrits,
           cast(sum(votants) as integer) as votants,
-          cast(sum(exprimes) as integer) as exprimes 
+          cast(sum(exprimes) as integer) as exprimes
         from (
-          select distinct 
+          select distinct
             election,
             tour,
             {maillage},
             inscrits,
             votants,
-            exprimes 
+            exprimes
           from elections
           where {maillage} = '{code_zone}'
             and election = '{election}'
@@ -127,7 +128,7 @@ def get_election_nuance_color():
 
     with engine_crm.connect() as connection:
         df = pd.read_sql(query, connection)
-    
+
     df = pd.concat([
         df[['election', 'nuance_candidat', 'code_couleur']].rename(columns={'nuance_candidat': 'nuance'}),
         df[['election', 'nuance_binome', 'code_couleur']].rename(columns={'nuance_binome': 'nuance'}),
@@ -145,11 +146,12 @@ def get_results(
     code_zone: str
 ):
     """1er endpoint bis: Results
+
     Retourne les resultats pour l'election et la zone selectionnee
     """
     # pour le moment pas de scope, pas d'utilisation de db: Session (orm)
     agregat = ElectionAgregat(election, maillage)
-    
+
     query_resultats = f'''
         select
           election,
