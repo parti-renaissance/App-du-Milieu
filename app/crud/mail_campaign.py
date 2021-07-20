@@ -47,7 +47,6 @@ async def get_campaign_reports(
         since: datetime,
         role: str):
     """Method to CRUD /campaign/reports"""
-
     query = db.query(
         MailChimpCampaign.id.label('id'),
         AdherentMessages.sent_at.label('date'),
@@ -92,7 +91,6 @@ async def get_mail_ratios(
         scope: dict,
         since: datetime):
     """Method to CRUD /campaign/reportsRatios"""
-
     query = db.query(
         func.count(
             MailChimpCampaign.id).label('nbCampagnes'),
