@@ -1,4 +1,6 @@
-""" Endpoints elections """
+"""
+    Endpoints elections
+"""
 import io
 from sqlalchemy.orm import Session
 from app.database.database_crm import engine_crm
@@ -65,8 +67,8 @@ def get_participation(
 ):
     """
         1er endpoint: Participation
-        
-        Retourne les informations de participations pour l'election et la zone selectionnee
+        Retourne les informations de participations pour l'election
+        et la zone selectionnee
     """
     # pour le moment pas de scope, pas d'utilisation de db: Session (orm)
     query_participation = f'''
@@ -147,7 +149,6 @@ def get_results(
 ):
     """
         1er endpoint bis: Results
-        
         Retourne les resultats pour l'election et la zone selectionnee
     """
     # pour le moment pas de scope, pas d'utilisation de db: Session (orm)
