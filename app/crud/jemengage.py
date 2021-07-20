@@ -1,4 +1,4 @@
-"""Endpoints de notre api"""
+"""Endpoints de notre api."""
 from datetime import date, timedelta
 import pandas as pd
 from sqlalchemy.orm import Session, joinedload
@@ -15,9 +15,9 @@ def get_downloads(
     db: Session,
     scope: dict,
     before: Date = date.today(),
-    range: int = 28
+    range_days: int = 28
 ):
-    after = before - timedelta(days=range)
+    after = before - timedelta(days=range_days)
 
     # series of all date from min to max
     s_date = pd.date_range(after, before - timedelta(days=1))
@@ -52,60 +52,13 @@ def get_downloads(
     return big_df
 
 
-'''
-    Deprecated
-
-def downloads_ratio(
-    db: Session,
-    scope: dict,
-    before: Date = date.today(),
-    range: int = 28
-    ):
-    after = before - timedelta(days=range)
-
-    query = db.query(Downloads.date, Downloads.downloadsPer1000) \
-            .filter(Downloads.zone_type == zone.type) \
-            .filter(Downloads.zone_name == zone.name) \
-            .filter(Downloads.date < before) \
-            .filter(Downloads.date >= after) \
-            .statement
-
-    filter_nat = {'zone_type': 'pays', 'zone_name': 'France'}
-    query_nat = db.query(Downloads.date, Downloads.downloadsPer1000) \
-            .filter_by(**filter_nat) \
-            .filter(Downloads.date < before) \
-            .filter(Downloads.date >= after) \
-            .statement
-
-    df_nat = pd.read_sql(query_nat, engine_crm)
-    df_nat.rename(columns={'downloadsPer1000': 'nationalPer1000'}, inplace=True)
-    df_nat['date'] = pd.to_datetime(df_nat['date'], format='%Y-%m-%d')
-
-    df = pd.read_sql(query, engine_crm)
-    if not df.empty:
-        # series of all date from min to max
-        s_date = pd.date_range(after, before - timedelta(days=1))
-        # fill missing date
-        df['date'] = pd.to_datetime(df['date'], format='%Y-%m-%d')
-        df = df.set_index('date').reindex(s_date).rename_axis('date')
-        # fill unique user to 0
-        df['downloadsPer1000'] = df['downloadsPer1000'].fillna(method='ffill').round(3)
-        df_nat['nationalPer1000'] = df_nat['nationalPer1000'].fillna(method='ffill').round(3)
-
-        df.reset_index(inplace=True)
-        df = df.merge(df_nat)
-        df['date'] = df['date'].dt.strftime('%d/%m')
-    return df
-'''
-
-
 def get_users(
     db: Session,
     scope: dict,
     before: Date = date.today(),
-    range: int = 28
+    range_days: int = 28
 ):
-    after = before - timedelta(days=range)
+    after = before - timedelta(days=range_days)
 
     # series of all date from min to max
     s_date = pd.date_range(after - timedelta(7), before - timedelta(days=1))

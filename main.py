@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-A sample flask application on Cloud Run. Version 1
-"""
+"""A sample flask application on Cloud Run."""
 from os import environ
 from datetime import datetime
 import json
@@ -66,7 +64,7 @@ async def get_scopes(
 
 @app.get("/")
 async def home():
-    """ Message d'accueil """
+    """Message d'accueil"""
     return {
         'message': 'Welcome to building RESTful APIs with FastAPI'
     }

@@ -1,4 +1,4 @@
-"""SQLAlchemy de notre base de données Globale"""
+"""SQLAlchemy de notre base de données Globale."""
 from sqlalchemy import Column, Integer, Float, Boolean, String, DateTime, UniqueConstraint, ForeignKey
 from sqlalchemy.orm import relationship
 

@@ -1,4 +1,4 @@
-"""SQLAlchemy de notre base de données CRM"""
+"""SQLAlchemy de notre base de données CRM."""
 from sqlalchemy import Column, SmallInteger, Integer, Float, String, Boolean, Date, ARRAY
 
 from app.database import CRM

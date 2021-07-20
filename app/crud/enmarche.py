@@ -1,4 +1,4 @@
-"""Endpoints de notre api"""
+"""Endpoints de notre api."""
 from collections import defaultdict
 from enum import Enum
 import base64
@@ -11,7 +11,9 @@ from app.models.models_enmarche import GeoZone, GeoZoneParent
 
 
 class GeoTypes(str, Enum):
-    """On ajoute ici les colonnes implementees
+    """GeoTypes geres en base
+    
+    On ajoute ici les colonnes implementees
     dans la table contact pour pouvoir filtrer dessus
     """
     borough = 'arrondissement_commune'
@@ -27,7 +29,9 @@ class GeoTypes(str, Enum):
 
 
 def getGeoType(s: str):
-    """Retourne le nom equivalent a la colonne
+    """Fonction d'equivalence GeoType - Nom colonne
+
+    Retourne le nom equivalent a la colonne
     de la table contact d'un type de GeoZone
     """
     for t in GeoTypes:
@@ -37,7 +41,9 @@ def getGeoType(s: str):
 
 
 def scope2dict(scope: dict, name: bool = False):
-    """Transforme {'code':'roles', 'zones':[Liste de GeoZone]}
+    """Fonction de formatage d'un dictionary scope
+
+    Transforme {'code':'roles', 'zones':[Liste de GeoZone]}
     en dict utilisable par sqlalchemy pour filtrer les zones
     """
     res = defaultdict(list)
@@ -52,7 +58,11 @@ def scope2dict(scope: dict, name: bool = False):
 
 
 def decode_scopes(db: Session, scope: str):
-    """Recupere le X-Scope du header et le decode en base64"""
+    """Fonction qui decode le scope en base64
+    
+    Recupere le X-Scope du header et le decode en base64
+    Transforme les zones en GeoZone
+    """
     base64_bytes = scope.encode("latin1")
     scope_bytes = base64.b64decode(base64_bytes)
     scope_string = scope_bytes.decode("latin1")
