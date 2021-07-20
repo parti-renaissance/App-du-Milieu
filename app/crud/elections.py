@@ -8,9 +8,8 @@ from fastapi import HTTPException
 import pandas as pd
 
 
-'''
-    Always returned information by election
-'''
+
+# Always returned information by election
 dict_agregat = {
     'Municipales 2020': 'nuance',
     'Départementales 2015': 'nuance',
@@ -23,9 +22,7 @@ dict_agregat = {
 }
 
 
-'''
-    Detailled returned information by eelction
-'''
+# Detailled returned information by eelction
 dict_detail = {
     'Municipales 2020': 'nom, prenom',
     'Départementales 2015': 'num_dep_binome_candidat',
@@ -38,9 +35,7 @@ dict_detail = {
 }
 
 
-'''
-    Hierarchical level of territorial division
-'''
+# Hierarchical level of territorial division
 dict_maillage = {
     'bureau': 0,
     'commune': 1,
@@ -52,9 +47,7 @@ dict_maillage = {
     }
 
 
-'''
-    Election type with the level of division where we use detailled datas
-'''
+# Election type with the level of division where we use detailled datas
 dict_election = {
     'Municipales': 1,
     'Départementales': 2,
@@ -65,7 +58,7 @@ dict_election = {
 }
 
 
-# 1er endpoint Participation
+# 1st endpoint: Participation
 def get_participation(
     db: Session,
     scope: dict,
@@ -146,7 +139,7 @@ def get_election_nuance_color():
     return df
 
 
-# 1er endpoint bis Results
+# 1st endpoint bis: Results
 def get_results(
     db: Session,
     scope: dict,
