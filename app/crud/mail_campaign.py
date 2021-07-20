@@ -1,4 +1,4 @@
-"""Endpoints de notre api"""
+"""Endpoints de notre api."""
 from datetime import datetime
 from typing import List
 from sqlalchemy.orm import Session, Query

@@ -1,4 +1,4 @@
-"""Endpoints de notre api"""
+"""Endpoints de notre api."""
 from collections import defaultdict
 from enum import Enum
 import base64

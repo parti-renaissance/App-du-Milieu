@@ -1,4 +1,4 @@
-"""Endpoints de notre api"""
+"""Endpoints de notre api."""
 from json import loads
 import io
 from enum import Enum

@@ -1,4 +1,4 @@
-"""Endpoints elections"""
+"""Endpoints elections."""
 import io
 from sqlalchemy.orm import Session
 from app.database.database_crm import engine_crm
