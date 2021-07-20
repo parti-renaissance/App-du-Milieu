@@ -1,6 +1,4 @@
-"""
-    Endpoints elections
-"""
+"""Endpoints elections"""
 import io
 from sqlalchemy.orm import Session
 from app.database.database_crm import engine_crm
@@ -18,7 +16,7 @@ dict_agregat = {
     'Européennes 2019': 'nom_liste',
     'Présidentielles 2017': 'nuance, nom, prenom'
 }
-""" Always returned information by election """
+"""Always returned information by election"""
 
 
 dict_detail = {
@@ -31,7 +29,7 @@ dict_detail = {
     'Européennes 2019': None,
     'Présidentielles 2017': None
 }
-""" Detailled returned information by election """
+"""Detailled returned information by election"""
 
 
 dict_maillage = {
@@ -43,7 +41,7 @@ dict_maillage = {
     'region': 5,
     'national': 6
     }
-""" Hierarchical level of territorial division """
+"""Hierarchical level of territorial division"""
 
 
 dict_election = {
@@ -54,7 +52,7 @@ dict_election = {
     'Européennes': 6,
     'Présidentielles': 6
 }
-""" Election type with the level of division where we use detailled datas """
+"""Election type with the level of division where we use detailled datas"""
 
 
 def get_participation(
@@ -127,7 +125,7 @@ def ElectionAgregat(election: str, division: str):
 
 def get_election_nuance_color():
     query = 'select * from elections_nuances_couleurs'
-    
+
     with engine_crm.connect() as connection:
         df = pd.read_sql(query, connection)
     
