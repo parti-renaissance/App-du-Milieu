@@ -228,4 +228,3 @@ def get_colors(
     df = pd.read_csv(store, encoding='utf-8')
 
     return df.merge(get_election_nuance_color(), how='left').drop(columns='election')
-
