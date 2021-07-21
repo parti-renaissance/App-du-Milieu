@@ -227,4 +227,5 @@ def get_colors(
     store.seek(0)
     df = pd.read_csv(store, encoding='utf-8')
 
-    return df.merge(get_election_nuance_color(), how='left').drop(columns='election')
+    return df.merge(get_election_nuance_color(), how='left').drop(
+        columns='election')[[maillage, 'nuance', 'code_couleur']]
