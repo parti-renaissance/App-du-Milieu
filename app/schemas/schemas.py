@@ -44,37 +44,6 @@ class Gender(str, Enum):
         return list(map(lambda c: c.value, cls))[:-1]
 
 
-""" Marche mais ralenti le call api ...
-class Contact(BaseModel):
-    Genre: str = Field(alias="genre")
-    Prénom: str = Field(alias="prenom")
-    Nom: str = Field(alias="nom")
-    Abonné_email: bool = Field(alias="sub_email")
-    Abonné_tel: bool = Field(alias="sub_tel")
-    Code_postal: str = Field(alias="code_postal")
-    Code_commune: str = Field(alias="code_commune")
-    Commune: str = Field(alias="commune")
-    Code_département: str = Field(alias="code_departement")
-    Département: str = Field(alias="departement")
-    Code_région: str = Field(alias="code_region")
-    Région: str = Field(alias="region")
-    Centres_intérêt: Set[InterestsChoices] = Field(alias="centres_interet")
-
-    class Config:
-        orm_mode = True
-
-
-class ContactOut(BaseModel):
-    totalItems: int
-    interestsChoices: Set[InterestsChoices]
-    genderChoices: Set[Gender]
-    contacts: List[Contact]
-
-    class Config:
-        orm_mode = True
-"""
-
-
 class AdherentName(BaseModel):
     adherent_id: int = Field(alias="id")
     first_name: str

@@ -10,7 +10,7 @@ env:
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   GCP_ZONE: ${{ secrets.GCP_ZONE }}
 
-  # Cloud SQL Env  
+  # Cloud SQL Env
   SQL_INST: ${{ secrets.SQL_INST_PROD }}
   DB_READ: ${{ secrets.DB_READ_PROD }}
   DB_USER: ${{ secrets.DB_USER_PROD }}

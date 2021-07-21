@@ -7,7 +7,7 @@ WORKDIR /app
 FROM base AS dependencies
 COPY requirements.txt ./
 # install app dependencies
-RUN pip install -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # ---- Copy Files/Build ----
 FROM dependencies AS build

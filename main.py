@@ -82,6 +82,20 @@ async def read_contacts(
     return contacts
 
 
+@app.get("/contacts-v01", response_class=ORJSONResponse)
+async def read_contacts_v01(
+    selected_scope: dict = Depends(get_scopes),
+    db: Session = Depends(get_db),
+    skip: int = 0,
+    limit: int = 100
+    ):
+    try:
+        contacts = contact.get_contacts_v01(db, selected_scope, skip, limit)
+    except BaseException:
+        raise HTTPException(status_code=204, detail='No contact found')
+    return contacts
+
+
 @app.get('/adherents', response_class=ORJSONResponse)
 async def get_adherents(
     selected_scope: dict = Depends(get_scopes),
