@@ -91,8 +91,8 @@ async def read_contacts_v01(
     ):
     try:
         contacts = contact.get_contacts_v01(db, selected_scope, skip, limit)
-    except:
-        return HTTPException(status_code=204, detail='No contact found')
+    except BaseException:
+        raise HTTPException(status_code=204, detail='No contact found')
     return contacts
 
 
