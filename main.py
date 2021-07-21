@@ -6,7 +6,7 @@ import json
 
 import uvicorn
 
-from fastapi import FastAPI, Depends, Header, HTTPException
+from fastapi import FastAPI, Depends, Header, HTTPException, Query
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import ORJSONResponse, PlainTextResponse
 # profiling
@@ -88,9 +88,24 @@ async def read_contacts_v01(
     db: Session = Depends(get_db),
     skip: int = 0,
     limit: int = 100
-    ):
+):
     try:
         contacts = contact.get_contacts_v01(db, selected_scope, skip, limit)
+    except BaseException:
+        raise HTTPException(status_code=204, detail='No contact found')
+    return contacts
+
+
+@app.get("/contacts-v02", response_class=ORJSONResponse)
+async def read_contacts_v02(
+    selected_scope: dict = Depends(get_scopes),
+    db: Session = Depends(get_db),
+    skip: int = 0,
+    limit: int = 100,
+    q: list = Query([])
+):
+    try:
+        contacts = contact.get_contacts_v02(db, selected_scope, skip, limit, q)
     except BaseException:
         raise HTTPException(status_code=204, detail='No contact found')
     return contacts
