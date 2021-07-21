@@ -91,7 +91,7 @@ def get_contacts(db: Session, scope: dict):
     df.drop(columns=['Code_circonscription', 'Circonscription'], inplace=True)
     df.drop(columns=['Code_arrondissement_commune', 'Arrondissement_commune'], inplace=True)
 
-    """metadata list of choices"""
+    # metadata list of choices
     interests = {'interestsChoices': schemas.InterestsChoices.list()}
     gender = {'genderChoices': schemas.Gender.list()}
 
@@ -169,7 +169,7 @@ def get_contacts_v01(
     df.drop(columns=['Code_circonscription', 'Circonscription'], inplace=True)
     df.drop(columns=['Code_arrondissement_commune', 'Arrondissement_commune'], inplace=True)
 
-    """metadata list of choices"""
+    # metadata list of choices
     interests = {'interestsChoices': schemas.InterestsChoices.list()}
     gender = {'genderChoices': schemas.Gender.list()}
 
