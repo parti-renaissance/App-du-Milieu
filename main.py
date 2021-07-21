@@ -167,7 +167,7 @@ async def election_participation(
     return json.loads(res)
 
 
-@app.get('/election/results', response_class=PlainTextResponse)
+@app.get('/election/results', response_class=ORJSONResponse)
 async def election_results(
     election: str,
     tour: int,
@@ -180,7 +180,8 @@ async def election_results(
     if res.empty:
         raise HTTPException(status_code=204, detail='No content')
 
-    return res.to_csv(index=False)
+    res = res.to_json(orient='records')
+    return json.loads(res)
 
 
 if __name__ == "__main__":
