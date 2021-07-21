@@ -14,7 +14,7 @@ SCIM_OPERATORS = [
 
 
 def is_valid(q: Query):
-    """ check validity of a query """
+    """check validity of a query"""
     return True
 
 
@@ -43,5 +43,5 @@ def add_unique_filter(attribute: str, operator, value, query, myclass):
         return query.filter(getattr(myclass, attribute) < value)
     if operator == 'le':
         return query.filter(getattr(myclass, attribute) <= value)
-    
+
     return query
