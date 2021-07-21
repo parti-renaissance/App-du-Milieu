@@ -185,6 +185,22 @@ async def election_results(
     return res.to_csv(index=False)
 
 
+@app.get('/election/colors', response_class=ORJSONResponse)
+async def election_colors(
+    election: str,
+    tour: int,
+    maillage: str,
+    selected_scope: dict = Depends(get_scopes),
+    db: Session = Depends(get_db)
+):
+    res = elections.get_colors(db, selected_scope, election, tour, maillage)
+    if res.empty:
+        raise HTTPException(status_code=204, detail='No content')
+
+    res = res.to_json(orient='records')
+    return json.loads(res)
+
+
 if __name__ == "__main__":
     uvicorn.run(
         app,

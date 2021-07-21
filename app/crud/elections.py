@@ -61,8 +61,7 @@ def get_participation(
     election: str,
     tour: int,
     maillage: str,
-    code_zone: str
-):
+    code_zone: str):
     """1er endpoint: Participation
     Retourne les informations de participations pour l'election
     et la zone selectionnee
@@ -142,8 +141,7 @@ def get_results(
     election: str,
     tour: int,
     maillage: str,
-    code_zone: str
-):
+    code_zone: str):
     """1er endpoint bis: Results
     Retourne les resultats pour l'election et la zone selectionnee
     """
@@ -176,3 +174,58 @@ def get_results(
     df = pd.read_csv(store, encoding='utf-8')
 
     return df.merge(get_election_nuance_color(), how='left').drop(columns='election')
+
+
+def get_colors(
+    db: Session,
+    scope: dict,
+    election: str,
+    tour: int,
+    maillage: str):
+    """2eme endpoint: Couleurs
+
+    Retourne les couleurs de la liste/candidat arrivé
+    premier au tour de l'election par division
+    """
+    # pour le moment pas de scope, pas d'utilisation de db: Session (orm)
+    agregat = ElectionAgregat(election, maillage)
+
+    query_color = f'''
+    select distinct on ({maillage})
+      election,
+      {maillage},
+      {agregat},
+      first_value(voix) OVER wnd
+    FROM (
+      select
+        election,
+        {maillage},
+        {agregat},
+        cast(sum(voix) as integer) as voix
+      from elections
+      where election = '{election}'
+        and tour = '{tour}'
+      group by
+        election,
+        {maillage},
+        {agregat}
+    ) table_groupby
+    window wnd as (
+      partition by {maillage} order by voix desc
+      rows between unbounded preceding and unbounded following
+    )
+    '''
+
+    print(query_color)
+
+    copy_sql = "COPY ({query}) TO STDOUT WITH CSV {head}".format(
+        query=query_color, head="HEADER")
+    conn = engine_crm.raw_connection()
+    cur = conn.cursor()
+    store = io.StringIO()
+    cur.copy_expert(copy_sql, store)
+    store.seek(0)
+    df = pd.read_csv(store, encoding='utf-8')
+
+    return df.merge(get_election_nuance_color(), how='left').drop(columns='election')
+
