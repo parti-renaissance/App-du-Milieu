@@ -19,7 +19,6 @@ from sqlalchemy.orm import Session
 from app.crud import contact, enmarche, jemengage, mail_campaign, elections
 from app.database import SessionLocal
 
-
 app = FastAPI(
     title="API pour le CRM de LaREM",
     description="GET uniquements pour récupérer les données des contacts de notre base",
@@ -28,9 +27,9 @@ app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=['en-marche.fr'],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=['GET'],
     allow_headers=["*"],
 )
 
