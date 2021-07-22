@@ -9,6 +9,7 @@ import pandas as pd
 dict_agregat = {
     'Municipales 2020': 'nuance',
     'Départementales 2015': 'nuance',
+    'Départementales 2021': 'nuance',
     'Législatives 2017': 'nuance',
     'Régionales 2015': 'nuance',
     'Régionales 2021': 'nuance',
@@ -21,7 +22,8 @@ dict_agregat = {
 
 dict_detail = {
     'Municipales 2020': 'nom, prenom',
-    'Départementales 2015': 'num_dep_binome_candidat',
+    'Départementales 2015': 'composition_binome',
+    'Départementales 2021': 'composition_binome',
     'Législatives 2017': 'nom, prenom',
     'Régionales 2015': 'nom, prenom',
     'Régionales 2021': 'nom, prenom',
