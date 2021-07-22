@@ -163,7 +163,7 @@ async def election_participation(
 ):
     res = elections.get_participation(db, selected_scope, election, tour, maillage, code_zone)
     if res.empty:
-        raise HTTPException(status_code=204, detail='No content')
+        return []
 
     res = res.to_json(orient='records')
     return json.loads(res)
@@ -180,7 +180,7 @@ async def election_results(
 ):
     res = elections.get_results(db, selected_scope, election, tour, maillage, code_zone)
     if res.empty:
-        raise HTTPException(status_code=204, detail='No content')
+        return []
 
     return res.to_csv(index=False)
 
@@ -195,7 +195,7 @@ async def election_colors(
 ):
     res = elections.get_colors(db, selected_scope, election, tour, maillage)
     if res.empty:
-        raise HTTPException(status_code=204, detail='No content')
+        return []
 
     res = res.to_json(orient='records')
     return json.loads(res)
