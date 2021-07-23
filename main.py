@@ -6,6 +6,8 @@ import json
 
 import uvicorn
 
+from pydantic import constr
+
 from fastapi import FastAPI, Depends, Header, HTTPException, Query
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import ORJSONResponse, PlainTextResponse
@@ -14,7 +16,6 @@ from fastapi.responses import ORJSONResponse, PlainTextResponse
 
 from starlette.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
-
 
 from app.crud import contact, enmarche, jemengage, mail_campaign, elections
 from app.database import SessionLocal
@@ -181,10 +182,10 @@ async def mail_ratios(
 
 @app.get('/election/participation', response_class=ORJSONResponse)
 async def election_participation(
-    election: str,
-    tour: int,
-    maillage: str,
-    code_zone: str,
+    election: constr(min_length = 1),
+    maillage: constr(min_length = 1),
+    code_zone: constr(min_length = 1),
+    tour: int = 1,
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
 ):
@@ -198,10 +199,10 @@ async def election_participation(
 
 @app.get('/election/results', response_class=ORJSONResponse)
 async def election_results(
-    election: str,
-    tour: int,
-    maillage: str,
-    code_zone: str,
+    election: constr(min_length = 1),
+    maillage: constr(min_length = 1),
+    code_zone: constr(min_length = 1),
+    tour: int = 1,
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
 ):
@@ -215,9 +216,9 @@ async def election_results(
 
 @app.get('/election/colors', response_class=ORJSONResponse)
 async def election_colors(
-    election: str,
-    tour: int,
-    maillage: str,
+    election: constr(min_length = 1),
+    maillage: constr(min_length = 1),
+    tour: int = 1,
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
 ):
