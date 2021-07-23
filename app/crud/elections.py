@@ -197,7 +197,7 @@ def get_colors(
     query_color = f'''
     select distinct on ({maillage})
       election,
-      {maillage},
+      {maillage} as code,
       {agregat},
       first_value(voix) OVER wnd
     FROM (
@@ -220,8 +220,6 @@ def get_colors(
     )
     '''
 
-    print(query_color)
-
     copy_sql = "COPY ({query}) TO STDOUT WITH CSV {head}".format(
         query=query_color, head="HEADER")
     conn = engine_crm.raw_connection()
@@ -232,4 +230,4 @@ def get_colors(
     df = pd.read_csv(store, encoding='utf-8')
 
     return df.merge(get_election_nuance_color(), how='left').drop(
-        columns='election')[[maillage, 'nuance', 'code_couleur']]
+        columns='election')[['code', 'nuance', 'code_couleur']]
