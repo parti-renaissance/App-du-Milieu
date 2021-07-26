@@ -50,7 +50,7 @@ dict_election = {
     'Municipales': 1,
     'Départementales': 2,
     'Législatives': 3,
-    'Régionales': 4,
+    'Régionales': 5,
     'Européennes': 6,
     'Présidentielles': 6
 }
