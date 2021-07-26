@@ -142,20 +142,33 @@ jobs:
                 pip install codecov && codecov -t ${{ secrets.CODECOV_TOKEN }}
                 python -m pytest --cov=./ && codecov -f .\coverage.xml
     CodeQL:
-        name: CodeQL
-        runs-on: ubuntu-latest
-        steps:
-        - name: Checkout repository
-          uses: actions/checkout@v2
+      name: CodeQL
+      runs-on: ubuntu-latest
+      permissions:
+        actions: read
+        contents: read
+        security-events: write
 
-        # Initializes the CodeQL tools for scanning.
-        - name: Initialize CodeQL
-          uses: github/codeql-action/init@v1
-          with:
-            languages: 'python'
+      strategy:
+        fail-fast: false
+        matrix:
+          language: [ 'python' ]
 
-        - name: Perform CodeQL Analysis
-          uses: github/codeql-action/analyze@v1
+      steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v1
+        with:
+          languages: ${{ matrix.language }}
+
+      - name: Autobuild
+        uses: github/codeql-action/autobuild@v1
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v1
+
     OSSAR-Scan:
       runs-on: windows-latest
 
@@ -166,7 +179,6 @@ jobs:
         uses: github/ossar-action@v1
         id: ossar
 
-        # Upload results to the Security tab
       - name: Upload OSSAR results
         uses: github/codeql-action/upload-sarif@v1
         with:
