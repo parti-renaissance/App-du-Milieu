@@ -1,13 +1,13 @@
-name: Staging - Deploy to Cloud Run
+name: Publish to Staging Cloud Run
 
 on:
-  workflow_run:
-    workflows: ["Build and Publish Docker Image"]
-    types:
-      - completed
+  push:
+    branches: [ master ]
+    paths:
+      - '**.py'
+      - 'Dockerfile'
+      - 'requirements.txt'
 
-
-# General Environments variables
 env:
   # Google Cloud Env
   GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
@@ -29,10 +29,37 @@ env:
   C_RUN_NAME: app-du-milieu-staging
 
 jobs:
+  Build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    # Setup gcloud CLI
+    - name: Set up Cloud credentials
+      uses: google-github-actions/setup-gcloud@master
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true
+
+    - run: gcloud --quiet auth configure-docker
+
+    - name: Build
+      run: |-
+        docker build \
+          --tag "eu.gcr.io/$GCP_PROJECT_ID/$IMAGE:$TAG" \
+          .
+
+    - name: Publish
+      run: docker push eu.gcr.io/$GCP_PROJECT_ID/$IMAGE:$TAG
+
   Deploy:
     name: Deploy
     runs-on: ubuntu-latest
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    needs: [ Build ]
 
     steps:
     # Setup gcloud CLI
