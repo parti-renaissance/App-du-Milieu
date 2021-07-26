@@ -134,9 +134,9 @@ jobs:
 
             - name: PyTest
               run: |
-                pip install pytest
-                pip install pytest-cov
-                python -m pytest --doctest-modules --junitxml=junit/test-results.xml --cov=./ --cov-report=xml --cov-report=html
+                pip install pytest pytest-cov
+                pip install codecov && codecov -t ${{ secrets.CODECOV_TOKEN }}
+                python -m pytest --cov=./ && codecov -f .\coverage.xml
     CodeQL:
         name: CodeQL
         runs-on: ubuntu-latest
@@ -148,7 +148,7 @@ jobs:
         - name: Initialize CodeQL
           uses: github/codeql-action/init@v1
           with:
-            languages: [ 'python' ]
+            languages: 'python'
 
         - name: Perform CodeQL Analysis
           uses: github/codeql-action/analyze@v1
