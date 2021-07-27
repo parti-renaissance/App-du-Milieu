@@ -22,7 +22,7 @@ def translate_text(
         'from_language': from_language,
         'target_lang': target_lang
     }
-    res = requests.get('https://api-free.deepl.com/v2/translate', params=payload)
+    res = requests.get('https://api.deepl.com/v2/translate', params=payload)
     return res.json()
 
 
