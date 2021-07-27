@@ -14,8 +14,8 @@ def translate_text(
     payload = {
         'auth_key': environ.get("DEEPL_KEY", DEEPL["DEEPL_KEY"]),
         'text': text,
-        'from_language' : from_language,
-        'target_lang': target_lang    
+        'from_language': from_language,
+        'target_lang': target_lang
     }
     res = requests.get('https://api-free.deepl.com/v2/translate', params=payload)
     return res.json()
