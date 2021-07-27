@@ -80,6 +80,9 @@ def get_participation(
     Retourne les informations de participations pour l'election
     et la zone selectionnee
     """
+    if election not in dict_base.keys():
+        return pd.DataFrame()
+
     # pour le moment pas de scope, pas d'utilisation de db: Session (orm)
     query_participation = f'''
         select distinct
@@ -166,6 +169,9 @@ def get_results(
 
     Retourne les resultats pour l'election et la zone selectionnee
     """
+    if election not in dict_base.keys():
+        return pd.DataFrame()
+
     # pour le moment pas de scope, pas d'utilisation de db: Session (orm)
     agregat = ElectionAgregat(election, maillage)
 
