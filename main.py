@@ -18,6 +18,7 @@ from starlette.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from app.crud import contact, enmarche, jemengage, mail_campaign, elections
+from app.crud import text_generator
 from app.database import SessionLocal
 
 app = FastAPI(
@@ -227,6 +228,15 @@ async def election_colors(
 
     res = res.to_json(orient='records')
     return json.loads(res)
+
+
+@app.get('/textGenerator', response_class=ORJSONResponse)
+async def generate_text(
+    text: constr(min_length = 1),
+    from_language: str = 'FR'
+):
+    res = text_generator.generate_text(text, from_language)
+    return res
 
 
 if __name__ == "__main__":
