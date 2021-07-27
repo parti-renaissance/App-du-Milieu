@@ -23,7 +23,6 @@ env:
   # Image Env
   IMAGE: app-du-milieu
   TAG: build
-  C_RUN_NAME: app-du-milieu
 
 jobs:
   Deploy:
@@ -40,7 +39,7 @@ jobs:
 
     - name : Deploy Cloud Run
       run : |-
-        gcloud run deploy $C_RUN_NAME \
+        gcloud run deploy app-du-milieu \
         --image eu.gcr.io/$GCP_PROJECT_ID/$IMAGE:$TAG \
         --platform managed \
         --region $GCP_ZONE \
