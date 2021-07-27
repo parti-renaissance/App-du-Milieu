@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import as_declarative
 
 """
 # local
-from app.settings import DATABASE_CRM as DB_SETTINGS
+from app.local_settings.database import DATABASE_CRM as DB_SETTINGS
 engine_crm = create_engine(
     URL.create(
         drivername=DB_SETTINGS['DRIVER'],

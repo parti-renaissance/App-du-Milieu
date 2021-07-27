@@ -1,9 +1,16 @@
 from os import environ
 import requests
+from app.local_settings.deepl import DEEPL
+
+from better_profanity import profanity
 
 
 def sanitize_text(text: str):
     return text.encode("utf8").decode("utf8","ignore")
+
+
+def censor_profanity(text: str):
+    return profanity.censor(text)
 
 
 def translate_text(
@@ -11,7 +18,7 @@ def translate_text(
     from_language: str = 'FR',
     target_lang: str = 'EN'):
     payload = {
-        'auth_key': environ["DEEPL_KEY"],
+        'auth_key': environ.get("DEEPL_KEY", DEEPL["DEEPL_KEY"]),
         'text': text,
         'from_language': from_language,
         'target_lang': target_lang
@@ -26,7 +33,7 @@ def generate_text(
     # Translate text to EN
     if from_language != 'EN':
         translated = translate_text(
-            sanitize_text(text),
+            text,
             from_language=from_language,
             target_lang='EN')['translations'][0]
     else:
@@ -36,13 +43,16 @@ def generate_text(
     generated = requests.post(
         "https://api.deepai.org/api/text-generator",
         data=translated,
-        headers={'api-key': environ["DEEP_IA_KEY"]}
+        headers={'api-key': environ.get("DEEP_IA_KEY", DEEPL["DEEP_IA_KEY"])}
     ).json()
+
+    # Censor profainty before output
+    censored = censor_profanity(generated['output'])
 
     # Translate back to from_language
     if from_language != 'EN':
         res = translate_text(
-            generated['output'],
+            censored,
             from_language='EN',
             target_lang=from_language)['translations'][0]
     else:

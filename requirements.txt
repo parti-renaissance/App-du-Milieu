@@ -10,3 +10,4 @@ pandas
 orjson
 numexpr
 xarray
+better_profanity
