@@ -228,6 +228,23 @@ async def election_colors(
     return json.loads(res)
 
 
+@app.get('/election/nuanceResults', response_class=ORJSONResponse)
+async def nuanceResults(
+    election: constr(min_length = 1),
+    maillage: constr(min_length = 1),
+    nuance_liste: constr(min_length = 1),
+    tour: int = 1,
+    selected_scope: dict = Depends(get_scopes),
+    db: Session = Depends(get_db)
+):
+    res = elections.get_nuance_results(db, selected_scope, election, tour, maillage, nuance_liste)
+    if res.empty:
+        return []
+
+    res = res.to_json(orient='records')
+    return json.loads(res)
+
+
 @app.get('/textGenerator', response_class=ORJSONResponse)
 async def generate_text(
     text: constr(min_length = 1),
