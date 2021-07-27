@@ -20,3 +20,8 @@ DATABASE = {
     'HOST': environ["DB_HOST"],
     'PORT': environ["DB_PORT"]
 }
+
+DEEPL = {
+    'DEEP_IA_KEY': environ["DEEP_IA_KEY"],
+    'DEEPL_KEY': environ["DEEPL_KEY"]
+}
