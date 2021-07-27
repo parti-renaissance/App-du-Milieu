@@ -210,6 +210,9 @@ def get_colors(
     Retourne les couleurs de la liste/candidat arrivé
     premier au tour de l'election par division
     """
+    if election not in dict_base.keys():
+        return pd.DataFrame()
+
     # pour le moment pas de scope, pas d'utilisation de db: Session (orm)
     agregat = ElectionAgregat(election, maillage)
 
