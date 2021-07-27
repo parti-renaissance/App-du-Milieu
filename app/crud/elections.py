@@ -68,7 +68,6 @@ def format_table(election, tour):
       f'_t{tour}' if election not in ('Européennes 2014', 'Européennes 2019') else '')
 
 
-
 def get_participation(
     db: Session,
     scope: dict,
@@ -226,9 +225,7 @@ def get_colors(
         {maillage},
         {agregat},
         cast(sum(voix) as integer) as voix
-      from elections
-      where election = '{election}'
-        and tour = '{tour}'
+      from elections_{format_table(election, tour)}
       group by
         election,
         {maillage},
