@@ -236,6 +236,7 @@ async def generate_text(
     from_language: str = 'FR'
 ):
     res = text_generator.generate_text(text, from_language)
+    res.pop('detected_source_language')
     return res
 
 
