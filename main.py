@@ -5,7 +5,6 @@ from datetime import datetime
 import json
 
 import uvicorn
-
 from pydantic import constr
 
 from fastapi import FastAPI, Depends, Header, HTTPException, Query
