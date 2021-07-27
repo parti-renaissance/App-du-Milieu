@@ -6,7 +6,6 @@ import json
 
 import uvicorn
 from pydantic import constr
-
 from fastapi import FastAPI, Depends, Header, HTTPException, Query
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import ORJSONResponse, PlainTextResponse
