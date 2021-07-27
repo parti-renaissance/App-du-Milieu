@@ -1,5 +1,6 @@
 """Endpoints elections."""
 import io
+import unicodedata
 from sqlalchemy.orm import Session
 from app.database.database_crm import engine_crm
 from fastapi import HTTPException
@@ -55,6 +56,17 @@ dict_election = {
     'Présidentielles': 6
 }
 """Election type with the level of division where we use detailled datas"""
+
+
+def strip_accents(s):
+    return ''.join(c for c in unicodedata.normalize('NFD', s)
+                  if unicodedata.category(c) != 'Mn')
+
+
+def format_table(election, tour):
+    return strip_accents(election).replace(' ', '_').lower() + (
+      f'_t{tour}' if election not in ('Européennes 2014', 'Européennes 2019') else '')
+
 
 
 def get_participation(
