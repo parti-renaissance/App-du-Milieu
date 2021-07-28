@@ -145,7 +145,7 @@ async def jemengage_users(
     total = int(res.unique_user.sum())
 
     res = res.to_json(orient='records')
-    return {'totalUserss': total, 'users': json.loads(res)}
+    return {'totalUsers': total, 'users': json.loads(res)}
 
 
 @app.get('/jemengage/survey', response_class=ORJSONResponse)
