@@ -6,7 +6,7 @@ import json
 import base64
 
 import uvicorn
-from pydantic import constr
+from pydantic import constr, conint
 from fastapi import FastAPI, Depends, Header, HTTPException, Query
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import ORJSONResponse, PlainTextResponse
@@ -192,7 +192,7 @@ async def election_participation(
     election: constr(min_length = 1),
     maillage: constr(min_length = 1),
     code_zone: constr(min_length = 1),
-    tour: int = 1,
+    tour: conint(ge=1, le=2) = 1,
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
 ):
@@ -209,7 +209,7 @@ async def election_results(
     election: constr(min_length = 1),
     maillage: constr(min_length = 1),
     code_zone: constr(min_length = 1),
-    tour: int = 1,
+    tour: conint(ge=1, le=2) = 1,
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
 ):
@@ -225,7 +225,7 @@ async def election_results(
 async def election_colors(
     election: constr(min_length = 1),
     maillage: constr(min_length = 1),
-    tour: int = 1,
+    tour: conint(ge=1, le=2) = 1,
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
 ):
@@ -242,7 +242,7 @@ async def nuanceResults(
     election: constr(min_length = 1),
     maillage: constr(min_length = 1),
     nuance_liste: constr(min_length = 1),
-    tour: int = 1,
+    tour: conint(ge=1, le=2) = 1,
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
 ):
