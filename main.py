@@ -142,8 +142,10 @@ async def jemengage_users(
     if res.empty:
         raise HTTPException(status_code=204, detail='No content')
 
+    total = int(res.unique_user.sum())
+
     res = res.to_json(orient='records')
-    return {'users': json.loads(res)}
+    return {'totalUserss': total, 'users': json.loads(res)}
 
 
 @app.get('/jemengage/survey', response_class=ORJSONResponse)
