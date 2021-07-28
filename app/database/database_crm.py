@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.engine.url import URL
 from sqlalchemy.ext.declarative import as_declarative
 
-
+"""
 # local
 from app.settings import DATABASE_CRM as DB_SETTINGS
 engine_crm = create_engine(
@@ -37,7 +37,7 @@ engine_crm = create_engine(
     pool_timeout=30,
     pool_recycle=1800,
     max_overflow=2
-)"""
+)
 
 
 @as_declarative()
