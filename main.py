@@ -3,6 +3,7 @@
 from os import environ
 from datetime import datetime
 import json
+import base64
 
 import uvicorn
 from pydantic import constr
@@ -54,9 +55,15 @@ async def get_scopes(
         raise HTTPException(status_code=400, detail='No scope parameter')
     if X_Scope is None:
         raise HTTPException(status_code=400, detail='No X-Scope in header')
-    if (scope := enmarche.decode_scopes(db, X_Scope)) is None:
-        raise HTTPException(status_code=203,
-                            detail='You have no candidate area affected.')
+    
+    try:
+        scope = enmarche.decode_scopes(db, X_Scope)
+    except base64.binascii.Error as err:
+        raise HTTPException(status_code=422,
+                            detail=f'Could not decode scope - {err}')
+    except json.decoder.JSONDecodeError as err:
+        raise HTTPException(status_code=422,
+                            detail=f'Could not decode scope - {err}')
 
     return scope
 
