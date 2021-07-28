@@ -38,6 +38,7 @@ app.add_middleware(
 
 # Dependency
 
+MAILLAGE_PATTERN = r'^(region|departement|circonscription|canton|commune|bureau)$'
 
 def get_db():
     db = SessionLocal()
@@ -190,7 +191,7 @@ async def mail_ratios(
 @app.get('/election/participation', response_class=ORJSONResponse)
 async def election_participation(
     election: constr(min_length = 1),
-    maillage: constr(min_length = 1),
+    maillage: constr(regex = MAILLAGE_PATTERN),
     code_zone: constr(min_length = 1),
     tour: conint(ge=1, le=2) = 1,
     selected_scope: dict = Depends(get_scopes),
@@ -207,7 +208,7 @@ async def election_participation(
 @app.get('/election/results', response_class=ORJSONResponse)
 async def election_results(
     election: constr(min_length = 1),
-    maillage: constr(min_length = 1),
+    maillage: constr(regex = MAILLAGE_PATTERN),
     code_zone: constr(min_length = 1),
     tour: conint(ge=1, le=2) = 1,
     selected_scope: dict = Depends(get_scopes),
@@ -224,7 +225,7 @@ async def election_results(
 @app.get('/election/colors', response_class=ORJSONResponse)
 async def election_colors(
     election: constr(min_length = 1),
-    maillage: constr(min_length = 1),
+    maillage: constr(regex = MAILLAGE_PATTERN),
     tour: conint(ge=1, le=2) = 1,
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
@@ -240,7 +241,7 @@ async def election_colors(
 @app.get('/election/nuanceResults', response_class=ORJSONResponse)
 async def nuanceResults(
     election: constr(min_length = 1),
-    maillage: constr(min_length = 1),
+    maillage: constr(regex = MAILLAGE_PATTERN),
     nuance_liste: constr(min_length = 1),
     tour: conint(ge=1, le=2) = 1,
     selected_scope: dict = Depends(get_scopes),
