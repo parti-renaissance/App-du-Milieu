@@ -143,17 +143,15 @@ def ElectionAgregat(election: str, division: str):
 def get_election_nuance_color(election: str) -> pd.DataFrame:
     query = f'''
     select
-      nuance_candidat as nuance,
-      nuance_binome as nuance,
-      nuance_liste as nuance,
+      nuance,
       nom_liste,
       code_couleur
-    from elections_nuances_couleurs
+    from elections_nuances_couleurs_v2
     where election = '{election}'
     '''
 
     with engine_crm.connect() as connection:
-        df = pd.read_sql(query, connection).dropna(axis=1)
+        df = pd.read_sql(query, connection).dropna(how='all', axis=1)
 
     return df
 
@@ -202,7 +200,13 @@ def get_results(
     conn.close()
     df = pd.read_csv(store, encoding='utf-8')
 
-    return df.merge(get_election_nuance_color(election), how='left')
+    if df.empty:
+        return df
+
+    df = df.merge(get_election_nuance_color(election), how='left')
+    df.code_couleur.fillna('#FFFFFF', inplace=True)
+
+    return df
 
 
 def get_colors(
