@@ -140,7 +140,7 @@ def ElectionAgregat(election: str, division: str):
     return dict_base[election]
 
 
-def get_election_nuance_color(election: str) -> pd.DataFrame:
+def get_nuance_color(election: str) -> pd.DataFrame:
     query = f'''
     select
       nuance,
@@ -203,7 +203,7 @@ def get_results(
     if df.empty:
         return df
 
-    df = df.merge(get_election_nuance_color(election), how='left')
+    df = df.merge(get_nuance_color(election), how='left')
     df.code_couleur.fillna('#FFFFFF', inplace=True)
 
     return df
@@ -262,7 +262,7 @@ def get_colors(
     conn.close()
 
     return df.merge(
-        get_election_nuance_color(election),
+        get_nuance_color(election),
         how='left')[['code', dict_base[election], 'code_couleur']]
 
 
@@ -275,7 +275,7 @@ def get_compatible_nuance(
         return None
         
     # get nuance / nom_liste and color for the election
-    df = get_election_nuance_color(election)
+    df = get_nuance_color(election)
 
     # retrieve the color if matched 
     df_color = df.loc[df[dict_base[election]] == nuance_liste, 'code_couleur']
