@@ -26,6 +26,7 @@ class GeoTypes(str, Enum):
     district = 'circonscription'
     # foreign_district = 'circonscription_des_FDE'
     region = 'region'
+    country = 'pays'
 
 
 def getGeoType(s: str):
