@@ -58,9 +58,12 @@ def get_contacts(db: Session, scope: dict):
         'Centres_d\'intérêt'
     ]
 
-    filter_zone = scope2dict(scope)
-    query = db.query(Contact).filter(or_(getattr(Contact, k).in_(v)
-                                         for k, v in filter_zone.items()))
+    if scope['code'] == 'national':
+        query = db.query(Contact)
+    else:
+        filter_zone = scope2dict(scope)
+        query = db.query(Contact).filter(or_(getattr(Contact, k).in_(v)
+                                             for k, v in filter_zone.items()))
 
     query = str(
         query.statement.compile(
@@ -133,9 +136,12 @@ def get_contacts_v01(
         'Centres_d\'intérêt'
     ]
 
-    filter_zone = scope2dict(scope)
-    query = db.query(Contact).filter(or_(getattr(Contact, k).in_(v)
-                                         for k, v in filter_zone.items()))
+    if scope['code'] == 'national':
+        query = db.query(Contact)
+    else:
+        filter_zone = scope2dict(scope)
+        query = db.query(Contact).filter(or_(getattr(Contact, k).in_(v)
+                                             for k, v in filter_zone.items()))
 
     total_items = query.count()
 
@@ -211,9 +217,12 @@ def get_contacts_v02(
         'Centres_d\'intérêt'
     ]
 
-    filter_zone = scope2dict(scope)
-    base_query = db.query(Contact).filter(or_(getattr(Contact, k).in_(v)
-                                         for k, v in filter_zone.items()))
+    if scope['code'] == 'national':
+        base_query = db.query(Contact)
+    else:
+        filter_zone = scope2dict(scope)
+        base_query = db.query(Contact).filter(or_(getattr(Contact, k).in_(v)
+                                             for k, v in filter_zone.items()))
     base_query = filtering.add_filters(q, base_query, Contact)
 
     total_items = base_query.count()

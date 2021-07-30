@@ -3,9 +3,10 @@
 from os import environ
 from datetime import datetime
 import json
+import base64
 
 import uvicorn
-from pydantic import constr
+from pydantic import constr, conint
 from fastapi import FastAPI, Depends, Header, HTTPException, Query
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import ORJSONResponse, PlainTextResponse
@@ -37,6 +38,7 @@ app.add_middleware(
 
 # Dependency
 
+MAILLAGE_PATTERN = r'^(region|departement|circonscription|canton|commune|bureau)$'
 
 def get_db():
     db = SessionLocal()
@@ -54,9 +56,15 @@ async def get_scopes(
         raise HTTPException(status_code=400, detail='No scope parameter')
     if X_Scope is None:
         raise HTTPException(status_code=400, detail='No X-Scope in header')
-    if (scope := enmarche.decode_scopes(db, X_Scope)) is None:
-        raise HTTPException(status_code=203,
-                            detail='You have no candidate area affected.')
+
+    try:
+        scope = enmarche.decode_scopes(db, X_Scope)
+    except base64.binascii.Error as err:
+        raise HTTPException(status_code=422,
+                            detail=f'Could not decode scope - {err}')
+    except json.decoder.JSONDecodeError as err:
+        raise HTTPException(status_code=422,
+                            detail=f'Could not decode scope - {err}')
 
     return scope
 
@@ -183,9 +191,9 @@ async def mail_ratios(
 @app.get('/election/participation', response_class=ORJSONResponse)
 async def election_participation(
     election: constr(min_length = 1),
-    maillage: constr(min_length = 1),
+    maillage: constr(regex = MAILLAGE_PATTERN),
     code_zone: constr(min_length = 1),
-    tour: int = 1,
+    tour: conint(ge=1, le=2) = 1,
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
 ):
@@ -200,9 +208,9 @@ async def election_participation(
 @app.get('/election/results', response_class=ORJSONResponse)
 async def election_results(
     election: constr(min_length = 1),
-    maillage: constr(min_length = 1),
+    maillage: constr(regex = MAILLAGE_PATTERN),
     code_zone: constr(min_length = 1),
-    tour: int = 1,
+    tour: conint(ge=1, le=2) = 1,
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
 ):
@@ -217,8 +225,8 @@ async def election_results(
 @app.get('/election/colors', response_class=ORJSONResponse)
 async def election_colors(
     election: constr(min_length = 1),
-    maillage: constr(min_length = 1),
-    tour: int = 1,
+    maillage: constr(regex = MAILLAGE_PATTERN),
+    tour: conint(ge=1, le=2) = 1,
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
 ):
@@ -233,9 +241,9 @@ async def election_colors(
 @app.get('/election/nuanceResults', response_class=ORJSONResponse)
 async def nuanceResults(
     election: constr(min_length = 1),
-    maillage: constr(min_length = 1),
+    maillage: constr(regex = MAILLAGE_PATTERN),
     nuance_liste: constr(min_length = 1),
-    tour: int = 1,
+    tour: conint(ge=1, le=2) = 1,
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
 ):

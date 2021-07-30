@@ -186,6 +186,17 @@ class GeoRegion(Base):
     longitude = Column(Float, nullable=False)
 
 
+class GeoCountry(Base):
+    """Table geo_country"""
+    __tablename__ = 'geo_country'
+
+    id = Column(Integer, primary_key=True, index=True)
+    code = Column(String, nullable=False)
+    name = Column(String(255), nullable=False)
+    latitude = Column(Float, nullable=False)
+    longitude = Column(Float, nullable=False)
+
+
 class JecouteDataSurvey(Base):
     """Table jecoute_data_survey"""
     __tablename__ = 'jecoute_data_survey'

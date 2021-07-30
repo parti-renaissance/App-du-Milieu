@@ -6,7 +6,7 @@ from sqlalchemy import Date
 
 from app.crud.enmarche import scope2dict, get_child
 from app.database.database_crm import engine_crm
-from app.models.models_enmarche import GeoBorough, GeoCity, GeoDistrict, GeoDepartment, GeoRegion
+from app.models.models_enmarche import GeoBorough, GeoCity, GeoDistrict, GeoDepartment, GeoRegion, GeoCountry
 from app.models.models_enmarche import JecouteDataSurvey
 from app.models.models_crm import Downloads, Users
 
@@ -123,7 +123,14 @@ def get_survey(
 
     returned_zone = scope2dict(scope, True)
     res = {}
-    if 'region' in returned_zone.keys():
+    if 'pays' in returned_zone.keys():
+        geo_nat = db.query(GeoCountry) \
+            .filter(GeoCountry.name == returned_zone['pays'][0]) \
+            .first()
+        res['zone_name'] = geo_nat.name
+        res['latitude'] = geo_nat.latitude
+        res['longitude'] = geo_nat.longitude
+    elif 'region' in returned_zone.keys():
         geo_reg = db.query(GeoRegion) \
             .filter(GeoRegion.name == returned_zone['region'][0]) \
             .first()

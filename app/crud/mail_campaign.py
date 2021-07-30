@@ -35,7 +35,7 @@ def filter_role(
             .join(AdherentMessageFilters.referent_tag) \
             .join(ReferentTags.zone.and_(GeoZone.id.in_(all_zones)))
 
-    if role == 'candidate':
+    if role in ['candidate', 'national']:
         return query.join(AdherentMessages.filter) \
             .join(AdherentMessageFilters.zone.and_(GeoZone.id.in_(all_zones)))
     return query
@@ -72,10 +72,11 @@ async def get_campaign_reports(
                 4).label('txDesabonnement')) .join(
                     MailChimpCampaign.message) .filter(
                         AdherentMessages.status == 'sent') .filter(
-                            AdherentMessages.type == role) .filter(
-                                AdherentMessages.sent_at >= since) .join(
-                                    MailChimpCampaign.report) .join(
-                                        AdherentMessages.author)
+                            AdherentMessages.sent_at >= since) .join(
+                                MailChimpCampaign.report) .join(
+                                    AdherentMessages.author)
+    if role != 'national':
+        query = query.filter(AdherentMessages.type == role)
 
     query = filter_role(db, query, [zone], role)
 
