@@ -56,7 +56,7 @@ async def get_scopes(
         raise HTTPException(status_code=400, detail='No scope parameter')
     if X_Scope is None:
         raise HTTPException(status_code=400, detail='No X-Scope in header')
-    
+
     try:
         scope = enmarche.decode_scopes(db, X_Scope)
     except base64.binascii.Error as err:
