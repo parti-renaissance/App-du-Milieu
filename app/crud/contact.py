@@ -272,8 +272,12 @@ def get_contacts_v02(
 def get_number_of_contacts(db: Session, scope: dict):
     filter_zone = scope2dict(scope)
 
-    query = db.query(Contact).filter(or_(getattr(Contact, k).in_(v)
-                                         for k, v in filter_zone.items()))
+    if scope['code'] == 'national':
+        query = db.query(Contact)
+    else:
+        filter_zone = scope2dict(scope)
+        query = db.query(Contact).filter(or_(getattr(Contact, k).in_(v)
+                                             for k, v in filter_zone.items()))
 
     zones = []
     for k, v in scope2dict(scope, name=True).items():
