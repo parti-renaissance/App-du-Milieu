@@ -8,7 +8,7 @@ from os import environ
 import uvicorn
 from fastapi import Depends, FastAPI, Header, HTTPException, Query
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import ORJSONResponse, PlainTextResponse
+from fastapi.responses import ORJSONResponse
 from pydantic import conint, constr
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
