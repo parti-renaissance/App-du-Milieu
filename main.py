@@ -263,7 +263,8 @@ async def generate_text(
 
 if __name__ == "__main__":
     uvicorn.run(
-        app,
-        host="0.0.0.0",
+        app="main:app",
+        reload=True,
+        #host="0.0.0.0",
         port=int(environ.get("PORT", 8080))
     )

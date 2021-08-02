@@ -5,6 +5,7 @@ from typing import Literal
 from sqlalchemy.orm import Session
 from app.database.database_crm import engine_crm
 from fastapi import HTTPException
+from psycopg2 import sql, connect
 import pandas as pd
 
 
@@ -30,29 +31,29 @@ ELECTION = Literal[
 ]
 
 dict_base = {
-    'Municipales 2020': 'nuance',
-    'Départementales 2015': 'nuance',
-    'Départementales 2021': 'nuance',
-    'Législatives 2017': 'nuance',
-    'Régionales 2015': 'nuance',
-    'Régionales 2021': 'nuance',
-    'Européennes 2014': 'nuance',
-    'Européennes 2019': 'nom_liste',
-    'Présidentielles 2017': 'nuance'
+    'Municipales 2020': ('nuance',),
+    'Départementales 2015': ('nuance',),
+    'Départementales 2021': ('nuance',),
+    'Législatives 2017': ('nuance',),
+    'Régionales 2015': ('nuance',),
+    'Régionales 2021': ('nuance',),
+    'Européennes 2014': ('nuance',),
+    'Européennes 2019': ('nom_liste',),
+    'Présidentielles 2017': ('nuance',)
 }
 """Always returned information by election"""
 
 
 dict_detail = {
-    'Municipales 2020': 'nom, prenom',
-    'Départementales 2015': 'composition_binome',
-    'Départementales 2021': 'composition_binome',
-    'Législatives 2017': 'nom, prenom',
-    'Régionales 2015': 'nom, prenom',
-    'Régionales 2021': 'nom, prenom',
-    'Européennes 2014': 'nom, prenom',
-    'Européennes 2019': None,
-    'Présidentielles 2017': 'nom, prenom'
+    'Municipales 2020': ('nom', 'prenom',),
+    'Départementales 2015': ('composition_binome',),
+    'Départementales 2021': ('composition_binome',),
+    'Législatives 2017': ('nom', 'prenom',),
+    'Régionales 2015': ('nom', 'prenom',),
+    'Régionales 2021': ('nom', 'prenom',),
+    'Européennes 2014': ('nom', 'prenom',),
+    'Européennes 2019': (),
+    'Présidentielles 2017': ('nom', 'prenom',)
 }
 """Detailled returned information by election"""
 
@@ -83,6 +84,18 @@ dict_election = {
 def strip_accents(s):
     return ''.join(c for c in unicodedata.normalize('NFD', s)
                   if unicodedata.category(c) != 'Mn')
+
+
+def safe_query(query: str) -> pd.DataFrame:
+    with engine_crm.raw_connection().cursor() as cursor:
+        try:
+            cursor.execute(query)
+            names = [x[0] for x in cursor.description]
+            rows = cursor.fetchall()
+            return pd.DataFrame( rows, columns=names)
+        finally:
+            if cursor is not None:
+                cursor.close()
 
 
 def fast_query(query: str) -> pd.DataFrame:
@@ -116,23 +129,27 @@ def get_participation(
         return pd.DataFrame()
 
     # pour le moment pas de scope, pas d'utilisation de db: Session (orm)
-    query_participation = f'''
+    query = sql.SQL("""
         select distinct
           election,
           tour,
-          {maillage},
+          {division},
           cast(sum(inscrits) as integer) as inscrits,
           cast(sum(votants) as integer) as votants,
           cast(sum(exprimes) as integer) as exprimes
-        from election_bureau_{format_table(election, tour)}
-        where {maillage} = '{code_zone}'
+        from {table}
+        where {division} = {zone}
         group by
           election,
           tour,
-          {maillage}
-        '''
+          {division}
+        """).format(
+          division = sql.Identifier(maillage),
+          table = sql.Identifier('election_bureau_' + format_table(election, tour)),
+          zone = sql.Literal(code_zone),
+        )
 
-    return fast_query(query_participation)
+    return safe_query(query)
 
 
 def ElectionAgregat(election: str, division: str):
@@ -142,22 +159,23 @@ def ElectionAgregat(election: str, division: str):
     if division not in dict_maillage.keys():
         raise HTTPException(status_code=400, detail=f'The division {division} is not available yet')
     if dict_maillage[division] <= dict_election[type_election]:
-        return dict_base[election] \
-               + (', ' + dict_detail[election] if dict_detail[election] else '')
+        return dict_base[election] + dict_detail[election]
     return dict_base[election]
 
 
 def get_nuance_color(election: str) -> pd.DataFrame:
-    query = f'''
-    select
-      nuance,
-      nom_liste,
-      code_couleur
-    from elections_nuances_couleurs_v2
-    where election = '{election}'
-    '''
+    query = sql.SQL("""
+        select
+          nuance,
+          nom_liste,
+          code_couleur
+        from elections_nuances_couleurs_v2
+        where election = {election}
+        """).format(
+          election = sql.Literal(election),
+        )
 
-    return fast_query(query).dropna(how='all', axis=1)
+    return safe_query(query).dropna(how='all', axis=1)
 
 
 def get_results(
@@ -175,25 +193,30 @@ def get_results(
         return pd.DataFrame()
 
     # pour le moment pas de scope, pas d'utilisation de db: Session (orm)
-    agregat = ElectionAgregat(election, maillage)
-
-    query_results = f'''
+    query = sql.SQL("""
         select distinct
           election,
           {agregat},
           cast(sum(voix) as integer) as voix
         from elections
-        where {maillage} = '{code_zone}'
-          and election = '{election}'
-          and tour = '{tour}'
+        where {division} = {zone}
+          and election = {election}
+          and tour = {tour}
         group by
           election,
           {agregat}
         order by
           voix desc
-        '''
+        """).format(
+          agregat = sql.SQL(', ').join(map(
+              sql.Identifier, ElectionAgregat(election, maillage))),
+          division = sql.Identifier(maillage),
+          zone = sql.Literal(code_zone),
+          election = sql.Literal(election),
+          tour = sql.Literal(tour),
+        )
 
-    df = fast_query(query_results)
+    df = safe_query(query)
     if df.empty:
         return df
 
@@ -218,35 +241,41 @@ def get_colors(
         return pd.DataFrame()
 
     # pour le moment pas de scope, pas d'utilisation de db: Session (orm)
-    agregat = ElectionAgregat(election, maillage)
+    query = sql.SQL("""
+        select distinct on ({division})
+          election,
+          {division} as code,
+          {agregat},
+          first_value(voix) OVER wnd
+        FROM (
+          select
+            election,
+            {division},
+            {agregat},
+            cast(sum(voix) as integer) as voix
+          from {table_name}
+          group by
+            election,
+            {division},
+            {agregat}
+        ) table_groupby
+        window wnd as (
+          partition by {division} order by voix desc
+          rows between unbounded preceding and unbounded following
+        )
+        """).format(
+          agregat = sql.SQL(', ').join(map(
+              sql.Identifier, ElectionAgregat(election, maillage))),
+          division = sql.Identifier(maillage),
+          table_name = sql.Identifier('elections_' + format_table(election, tour)),
+        )
 
-    query_color = f'''
-    select distinct on ({maillage})
-      election,
-      {maillage} as code,
-      {agregat},
-      first_value(voix) OVER wnd
-    FROM (
-      select
-        election,
-        {maillage},
-        {agregat},
-        cast(sum(voix) as integer) as voix
-      from elections_{format_table(election, tour)}
-      group by
-        election,
-        {maillage},
-        {agregat}
-    ) table_groupby
-    window wnd as (
-      partition by {maillage} order by voix desc
-      rows between unbounded preceding and unbounded following
-    )
-    '''
-
-    return fast_query(query_color).merge(
+    df = safe_query(query).merge(
         get_nuance_color(election),
-        how='left')[['code', dict_base[election], 'code_couleur']]
+        how='left')[['code', dict_base[election][0], 'code_couleur']]
+    df.code_couleur.fillna('#FFFFFF', inplace=True)
+
+    return df
 
 
 def get_compatible_nuance(
@@ -261,13 +290,13 @@ def get_compatible_nuance(
     df = get_nuance_color(election)
 
     # retrieve the color if matched 
-    df_color = df.loc[df[dict_base[election]] == nuance_liste, 'code_couleur']
+    df_color = df.loc[df[dict_base[election][0]] == nuance_liste, 'code_couleur']
     if df_color.empty:
         return None
     color = df_color.iloc[0]
 
     # retrieve all match for the color
-    compatible_nuance = df.loc[df.code_couleur == color, dict_base[election]].tolist()
+    compatible_nuance = df.loc[df.code_couleur == color, dict_base[election][0]].tolist()
     
     return {'code_couleur': color, 'compatibles': compatible_nuance}
 
@@ -288,7 +317,7 @@ def get_density(
     if not (nuances_compatibles := get_compatible_nuance(db, scope, election, nuance)):
         return pd.DataFrame()
 
-    query_results = f'''
+    query = sql.SQL("""
     select 
       elections.code,
       elections.voix,
@@ -297,31 +326,37 @@ def get_density(
     from (
       select
         election,
-        {maillage} as code,
+        {division} as code,
         cast(sum(voix) as integer) as voix
-      from elections_{format_table(election, tour)}
-      where {dict_base[election]} in ({str(nuances_compatibles['compatibles']).strip('[]')})
+      from {table_elections}
+      where {nuance_liste} in ({compatibles})
       group by
         election,
-        {maillage}
+        {division}
     ) elections
     inner join (
       select 
         election,
         tour,
-        {maillage} as code,
+        {division} as code,
         cast(sum(inscrits) as integer) as inscrits,
         cast(sum(votants) as integer) as votants,
         cast(sum(exprimes) as integer) as exprimes
-      from election_bureau_{format_table(election, tour)}
+      from {table_bureau}
       group by
         election,
         tour,
-        {maillage}
+        {division}
     ) participation 
       on participation.code = elections.code
-    '''
+    """).format(
+      division = sql.Identifier(maillage),
+      table_elections = sql.Identifier('elections_' + format_table(election, tour)),
+      nuance_liste = sql.Identifier(dict_base[election][0]),
+      compatibles = sql.SQL(', ').join(map(sql.Literal, nuances_compatibles['compatibles'])),
+      table_bureau = sql.Identifier('election_bureau_' + format_table(election, tour))
+    )
 
-    df = fast_query(query_results)
+    df = safe_query(query)
     df['%voix'] = round(df.voix / df.exprimes, 3)
     return df
