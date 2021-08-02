@@ -30,12 +30,12 @@ def filter_role(
             .join(ReferentManagedAreasTags.referent_tag) \
             .join(ReferentTags.zone.and_(GeoZone.id.in_(all_zones)))
 
-    if role in ['deputy', 'senator']:
+    if role in {'deputy', 'senator'}:
         return query.join(AdherentMessages.filter) \
             .join(AdherentMessageFilters.referent_tag) \
             .join(ReferentTags.zone.and_(GeoZone.id.in_(all_zones)))
 
-    if role in ['candidate', 'national']:
+    if role in {'candidate', 'national'}:
         return query.join(AdherentMessages.filter) \
             .join(AdherentMessageFilters.zone.and_(GeoZone.id.in_(all_zones)))
     return query
@@ -89,8 +89,9 @@ async def get_campaign_reports(
 
 async def get_mail_ratios(
         db: Session,
-        scope: dict,
-        since: datetime):
+        zone: GeoZone,
+        since: datetime,
+        role: str):
     """Method to CRUD /campaign/reportsRatios"""
     query = db.query(
         func.count(
@@ -120,12 +121,14 @@ async def get_mail_ratios(
                 4),
             0).label('txDesabonnement')) .select_from(MailChimpCampaignReport) .join(
         MailChimpCampaignReport.mailchimp_campaign) .join(
-        MailChimpCampaign.message.and_(
-            AdherentMessages.type == scope['code'],
-            AdherentMessages.sent_at >= since)) .join(
+        MailChimpCampaign.message) .filter(
+            AdherentMessages.sent_at >= since) .join(
         AdherentMessages.author)
+    if role != 'national':
+        query = query.filter(AdherentMessages.type == role)
 
-    res = filter_role(db, query, scope['zones'], scope['code']).first()
+    res = filter_role(db, query, zone, role)
+
 
     nat = db.query(
         func.round(
@@ -147,7 +150,8 @@ async def get_mail_ratios(
                 MailChimpCampaignReport.email_sent),
             4).label('txDesabonnement')) .select_from(MailChimpCampaignReport) .join(
         MailChimpCampaignReport.mailchimp_campaign) .join(
-        MailChimpCampaign.message.and_(
-            AdherentMessages.type == scope['code'])) .first()
+        MailChimpCampaign.message)
+    if role != 'national':
+        nat = nat.filter(AdherentMessages.type == role)
 
-    return {'local': res, 'national': nat}
+    return {'local': res.first(), 'national': nat.first()}

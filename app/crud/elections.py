@@ -63,6 +63,18 @@ def strip_accents(s):
                   if unicodedata.category(c) != 'Mn')
 
 
+def fast_query(query: str) -> pd.DataFrame:
+    copy_sql = f"COPY ({query}) TO STDOUT WITH CSV HEADER"
+    conn = engine_crm.raw_connection()
+    cur = conn.cursor()
+    store = io.StringIO()
+    cur.copy_expert(copy_sql, store)
+    store.seek(0)
+    cur.close()
+    conn.close()
+    return pd.read_csv(store, encoding='utf-8')
+
+
 def format_table(election, tour):
     return strip_accents(election).replace(' ', '_').lower() + (
       f'_t{tour}' if election not in ('Européennes 2014', 'Européennes 2019') else '')
@@ -74,7 +86,7 @@ def get_participation(
     election: str,
     tour: int,
     maillage: str,
-    code_zone: str = None) -> pd.DataFrame:
+    code_zone: str) -> pd.DataFrame:
     """1er endpoint: Participation
 
     Retourne les informations de participations pour l'election
@@ -92,35 +104,15 @@ def get_participation(
           cast(sum(inscrits) as integer) as inscrits,
           cast(sum(votants) as integer) as votants,
           cast(sum(exprimes) as integer) as exprimes
-        from (
-          select distinct
-            election,
-            tour,
-            {maillage},
-            inscrits,
-            votants,
-            exprimes
-          from elections_{format_table(election, tour)}
-            {f"where {maillage} = '{code_zone}'" if code_zone else ""}
-        ) bureau_election
+        from election_bureau_{format_table(election, tour)}
+        where {maillage} = '{code_zone}'
         group by
           election,
           tour,
           {maillage}
         '''
 
-    copy_sql = "COPY ({query}) TO STDOUT WITH CSV {head}".format(
-        query=query_participation, head="HEADER")
-    conn = engine_crm.raw_connection()
-    cur = conn.cursor()
-    store = io.StringIO()
-    cur.copy_expert(copy_sql, store)
-    store.seek(0)
-    cur.close()
-    conn.close()
-    df = pd.read_csv(store, encoding='utf-8')
-
-    return df
+    return fast_query(query_participation)
 
 
 def ElectionAgregat(election: str, division: str):
@@ -168,7 +160,7 @@ def get_results(
     # pour le moment pas de scope, pas d'utilisation de db: Session (orm)
     agregat = ElectionAgregat(election, maillage)
 
-    query_resultats = f'''
+    query_results = f'''
         select distinct
           election,
           {agregat},
@@ -184,17 +176,7 @@ def get_results(
           voix desc
         '''
 
-    copy_sql = "COPY ({query}) TO STDOUT WITH CSV {head}".format(
-        query=query_resultats, head="HEADER")
-    conn = engine_crm.raw_connection()
-    cur = conn.cursor()
-    store = io.StringIO()
-    cur.copy_expert(copy_sql, store)
-    store.seek(0)
-    cur.close()
-    conn.close()
-    df = pd.read_csv(store, encoding='utf-8')
-
+    df = fast_query(query_results)
     if df.empty:
         return df
 
@@ -245,17 +227,7 @@ def get_colors(
     )
     '''
 
-    copy_sql = "COPY ({query}) TO STDOUT WITH CSV {head}".format(
-        query=query_color, head="HEADER")
-    conn = engine_crm.raw_connection()
-    cur = conn.cursor()
-    store = io.StringIO()
-    cur.copy_expert(copy_sql, store)
-    store.seek(0)
-    df = pd.read_csv(store, encoding='utf-8')
-    cur.close()
-    conn.close()
-
+    df = fast_query(query_color)
     return df.merge(
         get_nuance_color(election),
         how='left')[['code', dict_base[election], 'code_couleur']]
@@ -284,7 +256,7 @@ def get_compatible_nuance(
     return {'code_couleur': color, 'compatibles': compatible_nuance}
 
 
-def get_nuance_results(
+def get_density(
     db: Session,
     scope: dict,
     election: str,
@@ -300,28 +272,43 @@ def get_nuance_results(
     if not (nuances_compatibles := get_compatible_nuance(db, scope, election, nuance)):
         return pd.DataFrame()
 
-    query_color = f'''
-    select distinct
-      election,
-      {maillage} as code,
-      cast(sum(voix) as integer) as voix
-    from elections_{format_table(election, tour)}
-    where {dict_base[election]} in ({str(nuances_compatibles['compatibles']).strip('[]')})
-    group by
-      election,
-      {maillage}
+    query_results = f'''
+    select 
+      elections.code,
+      elections.voix,
+      participation.exprimes
+      -- ROUND(voix/exprimes, 3) as voix
+    from (
+      select
+        election,
+        {maillage} as code,
+        cast(sum(voix) as integer) as voix
+      from elections_{format_table(election, tour)}
+      where {dict_base[election]} in ({str(nuances_compatibles['compatibles']).strip('[]')})
+      group by
+        election,
+        {maillage}
+    ) elections
+    inner join (
+      select 
+        election,
+        tour,
+        {maillage} as code,
+        cast(sum(inscrits) as integer) as inscrits,
+        cast(sum(votants) as integer) as votants,
+        cast(sum(exprimes) as integer) as exprimes
+      from election_bureau_{format_table(election, tour)}
+      group by
+        election,
+        tour,
+        {maillage}
+    ) participation 
+      on participation.code = elections.code
     '''
 
-    copy_sql = "COPY ({query}) TO STDOUT WITH CSV {head}".format(
-        query=query_color, head="HEADER")
-    conn = engine_crm.raw_connection()
-    cur = conn.cursor()
-    store = io.StringIO()
-    cur.copy_expert(copy_sql, store)
-    store.seek(0)
-    cur.close()
-    conn.close()
-    df = pd.read_csv(store, encoding='utf-8')
+    print(f'query:\n{query_results}')
 
-    return df.drop(columns='election')
+    df = fast_query(query_results)
+    df['%voix'] = round(df.voix / df.exprimes, 3)
+    return df
 

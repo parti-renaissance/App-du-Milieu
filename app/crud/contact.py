@@ -279,9 +279,8 @@ def get_number_of_contacts(db: Session, scope: dict):
         query = db.query(Contact).filter(or_(getattr(Contact, k).in_(v)
                                              for k, v in filter_zone.items()))
 
-    zones = []
-    for k, v in scope2dict(scope, name=True).items():
-        zones.append({'zone_type': k, 'zone_name': [v]})
+    zones = [{'zone_type': k, 'zone_name': [v]}
+        for k, v in scope2dict(scope, name=True).items()]
 
     return {
         'adherentCount': query.count(),

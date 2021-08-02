@@ -9,7 +9,7 @@ import uvicorn
 from pydantic import constr, conint
 from fastapi import FastAPI, Depends, Header, HTTPException, Query
 from fastapi.middleware.gzip import GZipMiddleware
-from fastapi.responses import ORJSONResponse, PlainTextResponse
+from fastapi.responses import ORJSONResponse
 # profiling
 # from fastapi_profiler.profiler_middleware import PyInstrumentProfilerMiddleware
 
@@ -170,8 +170,8 @@ async def mail_reports(
     db: Session = Depends(get_db),
     since: datetime = datetime(2021, 1, 1)
 ):
-    result = [await mail_campaign.get_campaign_reports(db, zone, since, selected_scope['code']) for zone in selected_scope['zones']]
-    return result
+    return [await mail_campaign.get_campaign_reports(db, zone, since, selected_scope['code'])
+                  for zone in selected_scope['zones']]
 
 
 @app.get('/mailCampaign/reportsRatios', response_class=ORJSONResponse)
@@ -180,7 +180,7 @@ async def mail_ratios(
     db: Session = Depends(get_db),
     since: datetime = datetime(2021, 1, 1)
 ):
-    result = await mail_campaign.get_mail_ratios(db, selected_scope, since)
+    result = await mail_campaign.get_mail_ratios(db, selected_scope['zones'], since, selected_scope['code'])
     return {
         'zones': [
             zone.name for zone in selected_scope['zones']],
@@ -238,7 +238,7 @@ async def election_colors(
     return json.loads(res)
 
 
-@app.get('/election/nuanceResults', response_class=ORJSONResponse)
+@app.get('/election/density', response_class=ORJSONResponse)
 async def nuanceResults(
     election: constr(min_length = 1),
     maillage: constr(regex = MAILLAGE_PATTERN),
@@ -247,7 +247,7 @@ async def nuanceResults(
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
 ):
-    res = elections.get_nuance_results(db, selected_scope, election, tour, maillage, nuance_liste)
+    res = elections.get_density(db, selected_scope, election, tour, maillage, nuance_liste)
     if res.empty:
         return []
 
