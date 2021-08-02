@@ -30,14 +30,12 @@ engine_read_only = create_engine(
         username=CLOUDSQL_USER,
         password=CLOUDSQL_PASS,
         database=CLOUDSQL_READ,
-        query={
-            "unix_socket": "/cloudsql/{}".format(CLOUDSQL_CONN)
-        }
+        query={"unix_socket": "/cloudsql/{}".format(CLOUDSQL_CONN)},
     ),
     pool_size=5,
     pool_timeout=30,
     pool_recycle=1800,
-    max_overflow=2
+    max_overflow=2,
 )
 
 
