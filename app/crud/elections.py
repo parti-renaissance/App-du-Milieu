@@ -1,11 +1,11 @@
 """Endpoints elections."""
 import io
 import unicodedata
-from sqlalchemy.orm import Session
+
+import pandas as pd
 from app.database.database_crm import engine_crm
 from fastapi import HTTPException
-import pandas as pd
-
+from sqlalchemy.orm import Session
 
 dict_base = {
     'Municipales 2020': 'nuance',
@@ -123,9 +123,7 @@ def get_participation(
     store.seek(0)
     cur.close()
     conn.close()
-    df = pd.read_csv(store, encoding='utf-8')
-
-    return df
+    return pd.read_csv(store, encoding='utf-8')
 
 
 def ElectionAgregat(election: str, division: str):
@@ -329,4 +327,3 @@ def get_nuance_results(
     df = pd.read_csv(store, encoding='utf-8')
 
     return df.drop(columns='election')
-

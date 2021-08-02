@@ -1,6 +1,6 @@
 from os import environ
-import requests
 
+import requests
 from better_profanity import profanity
 
 
@@ -50,10 +50,9 @@ def generate_text(
 
     # Translate back to from_language
     if from_language != 'EN':
-        res = translate_text(
+        return translate_text(
             censored,
             from_language='EN',
             target_lang=from_language)['translations'][0]
     else:
-        res = generated['output']
-    return res
+        return generated['output']

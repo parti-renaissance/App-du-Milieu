@@ -1,14 +1,16 @@
 """Endpoints de notre api."""
 from datetime import datetime
 from typing import List
-from sqlalchemy.orm import Session, Query
-from sqlalchemy import func
-from sqlalchemy.sql.functions import coalesce
+
 from app.crud.enmarche import get_child
-from app.models.models_enmarche import AdherentMessages, Adherents
-from app.models.models_enmarche import AdherentMessageFilters, ReferentTags, ReferentManagedAreasTags
-from app.models.models_enmarche import MailChimpCampaign, MailChimpCampaignReport
-from app.models.models_enmarche import GeoZone
+from app.models.models_enmarche import (AdherentMessageFilters,
+                                        AdherentMessages, Adherents, GeoZone,
+                                        MailChimpCampaign,
+                                        MailChimpCampaignReport,
+                                        ReferentManagedAreasTags, ReferentTags)
+from sqlalchemy import func
+from sqlalchemy.orm import Query, Session
+from sqlalchemy.sql.functions import coalesce
 
 
 def filter_role(
@@ -30,12 +32,12 @@ def filter_role(
             .join(ReferentManagedAreasTags.referent_tag) \
             .join(ReferentTags.zone.and_(GeoZone.id.in_(all_zones)))
 
-    if role in ['deputy', 'senator']:
+    if role in {'deputy', 'senator'}:
         return query.join(AdherentMessages.filter) \
             .join(AdherentMessageFilters.referent_tag) \
             .join(ReferentTags.zone.and_(GeoZone.id.in_(all_zones)))
 
-    if role in ['candidate', 'national']:
+    if role in {'candidate', 'national'}:
         return query.join(AdherentMessages.filter) \
             .join(AdherentMessageFilters.zone.and_(GeoZone.id.in_(all_zones)))
     return query

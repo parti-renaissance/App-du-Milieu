@@ -1,18 +1,16 @@
 """Endpoints de notre api."""
-from json import loads
 import io
 from enum import Enum
-from app import filtering
-
-from sqlalchemy.orm import Session
-from sqlalchemy import or_
-
-from app.crud.enmarche import scope2dict
-from app.models.models_crm import Contact
-from app.schemas import schemas
-from app.database.database_crm import engine_crm
+from json import loads
 
 import pandas as pd
+from app import filtering
+from app.crud.enmarche import scope2dict
+from app.database.database_crm import engine_crm
+from app.models.models_crm import Contact
+from app.schemas import schemas
+from sqlalchemy import or_
+from sqlalchemy.orm import Session
 
 
 class EmailSubscriptions(str, Enum):
@@ -279,9 +277,10 @@ def get_number_of_contacts(db: Session, scope: dict):
         query = db.query(Contact).filter(or_(getattr(Contact, k).in_(v)
                                              for k, v in filter_zone.items()))
 
-    zones = []
-    for k, v in scope2dict(scope, name=True).items():
-        zones.append({'zone_type': k, 'zone_name': [v]})
+    zones = [
+        {'zone_type': k, 'zone_name': [v]}
+        for k, v in scope2dict(scope, name=True).items()
+    ]
 
     return {
         'adherentCount': query.count(),

@@ -1,8 +1,8 @@
 """SQLAlchemy de notre base de données Globale."""
-from sqlalchemy import Column, Integer, Float, Boolean, String, DateTime, UniqueConstraint, ForeignKey
-from sqlalchemy.orm import relationship
-
 from app.database import Base
+from sqlalchemy import (Boolean, Column, DateTime, Float, ForeignKey, Integer,
+                        String, UniqueConstraint)
+from sqlalchemy.orm import relationship
 
 # import datetime
 # 'tim': int ((self.tim - datetime.datetime (1970, 1, 1)).total_seconds ()),

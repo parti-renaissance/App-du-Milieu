@@ -1,24 +1,26 @@
 # -*- coding: utf-8 -*-
 """A sample flask application on Cloud Run."""
-from os import environ
-from datetime import datetime
-import json
 import base64
+import json
+from datetime import datetime
+from os import environ
 
 import uvicorn
-from pydantic import constr, conint
-from fastapi import FastAPI, Depends, Header, HTTPException, Query
+from fastapi import Depends, FastAPI, Header, HTTPException, Query
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import ORJSONResponse, PlainTextResponse
+from pydantic import conint, constr
+from sqlalchemy.orm import Session
+from starlette.middleware.cors import CORSMiddleware
+
+from app.crud import (contact, elections, enmarche, jemengage, mail_campaign,
+                      text_generator)
+from app.database import SessionLocal
+
 # profiling
 # from fastapi_profiler.profiler_middleware import PyInstrumentProfilerMiddleware
 
-from starlette.middleware.cors import CORSMiddleware
-from sqlalchemy.orm import Session
 
-from app.crud import contact, enmarche, jemengage, mail_campaign, elections
-from app.crud import text_generator
-from app.database import SessionLocal
 
 app = FastAPI(
     title="API pour le CRM de LaREM",
@@ -170,8 +172,12 @@ async def mail_reports(
     db: Session = Depends(get_db),
     since: datetime = datetime(2021, 1, 1)
 ):
-    result = [await mail_campaign.get_campaign_reports(db, zone, since, selected_scope['code']) for zone in selected_scope['zones']]
-    return result
+    return [
+        await mail_campaign.get_campaign_reports(
+            db, zone, since, selected_scope['code']
+        )
+        for zone in selected_scope['zones']
+    ]
 
 
 @app.get('/mailCampaign/reportsRatios', response_class=ORJSONResponse)

@@ -1,13 +1,12 @@
 """Endpoints de notre api."""
-from collections import defaultdict
-from enum import Enum
 import base64
 import json
-
-from sqlalchemy.orm import Session
-from sqlalchemy import and_
+from collections import defaultdict
+from enum import Enum
 
 from app.models.models_enmarche import GeoZone, GeoZoneParent
+from sqlalchemy import and_
+from sqlalchemy.orm import Session
 
 
 class GeoTypes(str, Enum):
