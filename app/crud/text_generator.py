@@ -13,9 +13,10 @@ def censor_profanity(text: str):
 
 
 def translate_text(
-    text: str,
-    from_language: str = 'FR',
-    target_lang: str = 'EN'):
+        text: str,
+        from_language: str = 'FR',
+        target_lang: str = 'EN'
+):
     payload = {
         'auth_key': environ["DEEPL_KEY"],
         'text': text,

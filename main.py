@@ -21,11 +21,10 @@ from app.database import SessionLocal
 # from fastapi_profiler.profiler_middleware import PyInstrumentProfilerMiddleware
 
 
-
 app = FastAPI(
-    title="API pour le CRM de LaREM",
-    description="GET uniquements pour récupérer les données des contacts de notre base",
-    version="1.0.0")
+title="API pour le CRM de LaREM",
+description="GET uniquements pour récupérer les données des contacts de notre base",
+version="1.0.0")
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 app.add_middleware(
@@ -197,9 +196,9 @@ async def mail_ratios(
 @app.get('/election/participation', response_class=ORJSONResponse)
 async def election_participation(
     election: constr(min_length = 1),
-    maillage: constr(regex = MAILLAGE_PATTERN),
-    code_zone: constr(min_length = 1),
-    tour: conint(ge=1, le=2) = 1,
+    maillage: constr(regex=MAILLAGE_PATTERN),
+    code_zone: constr(min_length=1),
+    tour: conint(ge=1, le=2)=1,
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
 ):
@@ -214,9 +213,9 @@ async def election_participation(
 @app.get('/election/results', response_class=ORJSONResponse)
 async def election_results(
     election: constr(min_length = 1),
-    maillage: constr(regex = MAILLAGE_PATTERN),
-    code_zone: constr(min_length = 1),
-    tour: conint(ge=1, le=2) = 1,
+    maillage: constr(regex=MAILLAGE_PATTERN),
+    code_zone: constr(min_length=1),
+    tour: conint(ge=1, le=2)=1,
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
 ):
@@ -231,8 +230,8 @@ async def election_results(
 @app.get('/election/colors', response_class=ORJSONResponse)
 async def election_colors(
     election: constr(min_length = 1),
-    maillage: constr(regex = MAILLAGE_PATTERN),
-    tour: conint(ge=1, le=2) = 1,
+    maillage: constr(regex=MAILLAGE_PATTERN),
+    tour: conint(ge=1, le=2)=1,
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
 ):
@@ -247,9 +246,9 @@ async def election_colors(
 @app.get('/election/nuanceResults', response_class=ORJSONResponse)
 async def nuanceResults(
     election: constr(min_length = 1),
-    maillage: constr(regex = MAILLAGE_PATTERN),
-    nuance_liste: constr(min_length = 1),
-    tour: conint(ge=1, le=2) = 1,
+    maillage: constr(regex=MAILLAGE_PATTERN),
+    nuance_liste: constr(min_length=1),
+    tour: conint(ge=1, le=2)=1,
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db)
 ):

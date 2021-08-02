@@ -265,10 +265,11 @@ def get_colors(
 
 
 def get_compatible_nuance(
-    db: Session,
-    scope: dict,
-    election: str,
-    nuance_liste: str):
+      db: Session,
+      scope: dict,
+      election: str,
+      nuance_liste: str
+    ):
     if election not in dict_base.keys():
         return None
         

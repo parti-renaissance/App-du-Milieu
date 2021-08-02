@@ -11,7 +11,7 @@ from sqlalchemy.orm import Session
 
 class GeoTypes(str, Enum):
     """GeoTypes geres en base
-    
+
     On ajoute ici les colonnes implementees
     dans la table contact pour pouvoir filtrer dessus
     """

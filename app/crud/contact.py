@@ -171,7 +171,8 @@ def get_contacts_v01(
     df.columns = columns
     # not implemented in front yet
     df.drop(columns=['Code_circonscription', 'Circonscription'], inplace=True)
-    df.drop(columns=['Code_arrondissement_commune', 'Arrondissement_commune'], inplace=True)
+    df.drop(columns=['Code_arrondissement_commune', 'Arrondissement_commune'],
+            inplace=True)
 
     # metadata list of choices
     interests = {'interestsChoices': schemas.InterestsChoices.list()}
