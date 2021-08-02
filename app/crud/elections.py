@@ -87,15 +87,11 @@ def strip_accents(s):
 
 def fast_query(query: str) -> pd.DataFrame:
     copy_sql = f"COPY ({query}) TO STDOUT WITH CSV HEADER"
-    connection = engine_crm.raw_connection()
-    try:
-        cursor = connection.cursor()
+    with engine_crm.raw_connection().cursor() as cursor:
         store = io.StringIO()
         cursor.copy_expert(copy_sql, store)
         store.seek(0)
         cursor.close()
-    finally:
-        connection.close()
     return pd.read_csv(store, encoding='utf-8')
 
 
