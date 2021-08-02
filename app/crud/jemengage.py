@@ -1,15 +1,14 @@
 """Endpoints de notre api."""
 from datetime import date, timedelta
-
 import pandas as pd
-from app.crud.enmarche import get_child, scope2dict
-from app.database.database_crm import engine_crm
-from app.models.models_crm import Downloads, Users
-from app.models.models_enmarche import (GeoBorough, GeoCity, GeoCountry,
-                                        GeoDepartment, GeoDistrict, GeoRegion,
-                                        JecouteDataSurvey)
-from sqlalchemy import Date
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import Date
+
+from app.crud.enmarche import scope2dict, get_child
+from app.database.database_crm import engine_crm
+from app.models.models_enmarche import GeoBorough, GeoCity, GeoDistrict, GeoDepartment, GeoRegion, GeoCountry
+from app.models.models_enmarche import JecouteDataSurvey
+from app.models.models_crm import Downloads, Users
 
 
 def get_downloads(
@@ -124,12 +123,6 @@ def get_survey(
 
     returned_zone = scope2dict(scope, True)
     res = {}
-    newmethod161(returned_zone, db, res)
-
-    res['survey_datas'] = survey_datas
-    return res
-
-def newmethod161(returned_zone, db, res):
     if 'pays' in returned_zone.keys():
         geo_nat = db.query(GeoCountry) \
             .filter(GeoCountry.name == returned_zone['pays'][0]) \
@@ -170,3 +163,6 @@ def newmethod161(returned_zone, db, res):
         # Chez Xavier
         res['latitude'] = 48.835633
         res['longitude'] = 2.323433
+
+    res['survey_datas'] = survey_datas
+    return res
