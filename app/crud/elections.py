@@ -1,11 +1,33 @@
 """Endpoints elections."""
 import io
 import unicodedata
+from typing import Literal
 from sqlalchemy.orm import Session
 from app.database.database_crm import engine_crm
 from fastapi import HTTPException
 import pandas as pd
 
+
+DIVISION = Literal[
+    'region',
+    'departement',
+    'circonscription',
+    'canton',
+    'commune',
+    'bureau'
+]
+
+ELECTION = Literal[
+    'Municipales 2020',
+    'Départementales 2015',
+    'Départementales 2021',
+    'Législatives 2017',
+    'Régionales 2015',
+    'Régionales 2021',
+    'Européennes 2014',
+    'Européennes 2019',
+    'Présidentielles 2017'
+]
 
 dict_base = {
     'Municipales 2020': 'nuance',
@@ -137,10 +159,7 @@ def get_nuance_color(election: str) -> pd.DataFrame:
     where election = '{election}'
     '''
 
-    with engine_crm.connect() as connection:
-        df = pd.read_sql(query, connection).dropna(how='all', axis=1)
-
-    return df
+    return fast_query(query).dropna(how='all', axis=1)
 
 
 def get_results(
@@ -311,4 +330,3 @@ def get_density(
     df = fast_query(query_results)
     df['%voix'] = round(df.voix / df.exprimes, 3)
     return df
-
