@@ -87,13 +87,15 @@ def strip_accents(s):
 
 def fast_query(query: str) -> pd.DataFrame:
     copy_sql = f"COPY ({query}) TO STDOUT WITH CSV HEADER"
-    conn = engine_crm.raw_connection()
-    cur = conn.cursor()
-    store = io.StringIO()
-    cur.copy_expert(copy_sql, store)
-    store.seek(0)
-    cur.close()
-    conn.close()
+    connection = engine_crm.raw_connection()
+    try:
+        cursor = connection.cursor()
+        store = io.StringIO()
+        cursor.copy_expert(copy_sql, store)
+        store.seek(0)
+        cursor.close()
+    finally:
+        connection.close()
     return pd.read_csv(store, encoding='utf-8')
 
 
@@ -246,8 +248,7 @@ def get_colors(
     )
     '''
 
-    df = fast_query(query_color)
-    return df.merge(
+    return fast_query(query_color).merge(
         get_nuance_color(election),
         how='left')[['code', dict_base[election], 'code_couleur']]
 
@@ -324,8 +325,6 @@ def get_density(
     ) participation 
       on participation.code = elections.code
     '''
-
-    print(f'query:\n{query_results}')
 
     df = fast_query(query_results)
     df['%voix'] = round(df.voix / df.exprimes, 3)
