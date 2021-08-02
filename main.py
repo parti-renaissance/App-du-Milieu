@@ -13,8 +13,14 @@ from pydantic import conint, constr
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
 
-from app.crud import (contact, elections, enmarche, jemengage, mail_campaign,
-                      text_generator)
+from app.crud import (
+    contact,
+    elections,
+    enmarche,
+    jemengage,
+    mail_campaign,
+    text_generator,
+)
 from app.database import SessionLocal
 
 # profiling
@@ -22,9 +28,10 @@ from app.database import SessionLocal
 
 
 app = FastAPI(
-title="API pour le CRM de LaREM",
-description="GET uniquements pour récupérer les données des contacts de notre base",
-version="1.0.0")
+    title="API pour le CRM de LaREM",
+    description="GET uniquements pour récupérer les données des contacts de notre base",
+    version="1.0.0",
+)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
 app.add_middleware(
@@ -39,7 +46,8 @@ app.add_middleware(
 
 # Dependency
 
-MAILLAGE_PATTERN = r'^(region|departement|circonscription|canton|commune|bureau)$'
+MAILLAGE_PATTERN = r"^(region|departement|circonscription|canton|commune|bureau)$"
+
 
 def get_db():
     db = SessionLocal()
@@ -50,22 +58,19 @@ def get_db():
 
 
 async def get_scopes(
-        scope: str,
-        X_Scope: str = Header(None),
-        db: Session = Depends(get_db)) -> dict:
+    scope: str, X_Scope: str = Header(None), db: Session = Depends(get_db)
+) -> dict:
     if scope is None:
-        raise HTTPException(status_code=400, detail='No scope parameter')
+        raise HTTPException(status_code=400, detail="No scope parameter")
     if X_Scope is None:
-        raise HTTPException(status_code=400, detail='No X-Scope in header')
+        raise HTTPException(status_code=400, detail="No X-Scope in header")
 
     try:
         scope = enmarche.decode_scopes(db, X_Scope)
     except base64.binascii.Error as err:
-        raise HTTPException(status_code=422,
-                            detail=f'Could not decode scope - {err}')
+        raise HTTPException(status_code=422, detail=f"Could not decode scope - {err}")
     except json.decoder.JSONDecodeError as err:
-        raise HTTPException(status_code=422,
-                            detail=f'Could not decode scope - {err}')
+        raise HTTPException(status_code=422, detail=f"Could not decode scope - {err}")
 
     return scope
 
@@ -73,20 +78,17 @@ async def get_scopes(
 @app.get("/")
 async def home():
     """Message d'accueil"""
-    return {
-        'message': 'Welcome to building RESTful APIs with FastAPI'
-    }
+    return {"message": "Welcome to building RESTful APIs with FastAPI"}
 
 
 @app.get("/contacts", response_class=ORJSONResponse)
 async def read_contacts(
-    selected_scope: dict = Depends(get_scopes),
-    db: Session = Depends(get_db)
+    selected_scope: dict = Depends(get_scopes), db: Session = Depends(get_db)
 ):
     try:
         contacts = contact.get_contacts(db, selected_scope)
     except BaseException:
-        raise HTTPException(status_code=204, detail='No contact found')
+        raise HTTPException(status_code=204, detail="No contact found")
     return contacts
 
 
@@ -95,12 +97,12 @@ async def read_contacts_v01(
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db),
     skip: int = 0,
-    limit: int = 100
+    limit: int = 100,
 ):
     try:
         contacts = contact.get_contacts_v01(db, selected_scope, skip, limit)
     except BaseException:
-        raise HTTPException(status_code=204, detail='No contact found')
+        raise HTTPException(status_code=204, detail="No contact found")
     return contacts
 
 
@@ -110,168 +112,161 @@ async def read_contacts_v02(
     db: Session = Depends(get_db),
     skip: int = 0,
     limit: int = 100,
-    q: list = Query([])
+    q: list = Query([]),
 ):
     try:
         contacts = contact.get_contacts_v02(db, selected_scope, skip, limit, q)
     except BaseException:
-        raise HTTPException(status_code=204, detail='No contact found')
+        raise HTTPException(status_code=204, detail="No contact found")
     return contacts
 
 
-@app.get('/adherents', response_class=ORJSONResponse)
+@app.get("/adherents", response_class=ORJSONResponse)
 async def get_adherents(
-    selected_scope: dict = Depends(get_scopes),
-    db: Session = Depends(get_db)
+    selected_scope: dict = Depends(get_scopes), db: Session = Depends(get_db)
 ):
     return contact.get_number_of_contacts(db, selected_scope)
 
 
-@app.get('/jemengage/downloads', response_class=ORJSONResponse)
+@app.get("/jemengage/downloads", response_class=ORJSONResponse)
 async def jemengage_downloads(
-    selected_scope: dict = Depends(get_scopes),
-    db: Session = Depends(get_db)
+    selected_scope: dict = Depends(get_scopes), db: Session = Depends(get_db)
 ):
     res = jemengage.get_downloads(db, selected_scope)
     if res.empty:
-        raise HTTPException(status_code=204, detail='No content')
+        raise HTTPException(status_code=204, detail="No content")
 
     total = int(res.unique_user.sum())
 
-    res = res.to_json(orient='records')
-    return {'totalDownloads': total, 'downloads': json.loads(res)}
+    res = res.to_json(orient="records")
+    return {"totalDownloads": total, "downloads": json.loads(res)}
 
 
-@app.get('/jemengage/users', response_class=ORJSONResponse)
+@app.get("/jemengage/users", response_class=ORJSONResponse)
 async def jemengage_users(
-    selected_scope: dict = Depends(get_scopes),
-    db: Session = Depends(get_db)
+    selected_scope: dict = Depends(get_scopes), db: Session = Depends(get_db)
 ):
     res = jemengage.get_users(db, selected_scope)
     if res.empty:
-        raise HTTPException(status_code=204, detail='No content')
+        raise HTTPException(status_code=204, detail="No content")
 
     total = int(res.unique_user.sum())
 
-    res = res.to_json(orient='records')
-    return {'totalUsers': total, 'users': json.loads(res)}
+    res = res.to_json(orient="records")
+    return {"totalUsers": total, "users": json.loads(res)}
 
 
-@app.get('/jemengage/survey', response_class=ORJSONResponse)
+@app.get("/jemengage/survey", response_class=ORJSONResponse)
 async def jemengage_survey(
-    selected_scope: dict = Depends(get_scopes),
-    db: Session = Depends(get_db)
+    selected_scope: dict = Depends(get_scopes), db: Session = Depends(get_db)
 ):
     return jemengage.get_survey(db, selected_scope)
 
 
-@app.get('/mailCampaign/reports', response_class=ORJSONResponse)
+@app.get("/mailCampaign/reports", response_class=ORJSONResponse)
 async def mail_reports(
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db),
-    since: datetime = datetime(2021, 1, 1)
+    since: datetime = datetime(2021, 1, 1),
 ):
     return [
         await mail_campaign.get_campaign_reports(
-            db, zone, since, selected_scope['code']
+            db, zone, since, selected_scope["code"]
         )
-        for zone in selected_scope['zones']
+        for zone in selected_scope["zones"]
     ]
 
 
-@app.get('/mailCampaign/reportsRatios', response_class=ORJSONResponse)
+@app.get("/mailCampaign/reportsRatios", response_class=ORJSONResponse)
 async def mail_ratios(
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db),
-    since: datetime = datetime(2021, 1, 1)
+    since: datetime = datetime(2021, 1, 1),
 ):
     result = await mail_campaign.get_mail_ratios(db, selected_scope, since)
     return {
-        'zones': [
-            zone.name for zone in selected_scope['zones']],
-        'depuis': since,
-        **result}
+        "zones": [zone.name for zone in selected_scope["zones"]],
+        "depuis": since,
+        **result,
+    }
 
 
-@app.get('/election/participation', response_class=ORJSONResponse)
+@app.get("/election/participation", response_class=ORJSONResponse)
 async def election_participation(
-    election: constr(min_length = 1),
+    election: constr(min_length=1),
     maillage: constr(regex=MAILLAGE_PATTERN),
     code_zone: constr(min_length=1),
-    tour: conint(ge=1, le=2)=1,
+    tour: conint(ge=1, le=2) = 1,
     selected_scope: dict = Depends(get_scopes),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
-    res = elections.get_participation(db, selected_scope, election, tour, maillage, code_zone)
+    res = elections.get_participation(
+        db, selected_scope, election, tour, maillage, code_zone
+    )
     if res.empty:
         return []
 
-    res = res.to_json(orient='records')
+    res = res.to_json(orient="records")
     return json.loads(res)
 
 
-@app.get('/election/results', response_class=ORJSONResponse)
+@app.get("/election/results", response_class=ORJSONResponse)
 async def election_results(
-    election: constr(min_length = 1),
+    election: constr(min_length=1),
     maillage: constr(regex=MAILLAGE_PATTERN),
     code_zone: constr(min_length=1),
-    tour: conint(ge=1, le=2)=1,
+    tour: conint(ge=1, le=2) = 1,
     selected_scope: dict = Depends(get_scopes),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     res = elections.get_results(db, selected_scope, election, tour, maillage, code_zone)
     if res.empty:
         return []
 
-    res = res.to_json(orient='records')
+    res = res.to_json(orient="records")
     return json.loads(res)
 
 
-@app.get('/election/colors', response_class=ORJSONResponse)
+@app.get("/election/colors", response_class=ORJSONResponse)
 async def election_colors(
-    election: constr(min_length = 1),
+    election: constr(min_length=1),
     maillage: constr(regex=MAILLAGE_PATTERN),
-    tour: conint(ge=1, le=2)=1,
+    tour: conint(ge=1, le=2) = 1,
     selected_scope: dict = Depends(get_scopes),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     res = elections.get_colors(db, selected_scope, election, tour, maillage)
     if res.empty:
         return []
 
-    res = res.to_json(orient='records')
+    res = res.to_json(orient="records")
     return json.loads(res)
 
 
-@app.get('/election/nuanceResults', response_class=ORJSONResponse)
+@app.get("/election/nuanceResults", response_class=ORJSONResponse)
 async def nuanceResults(
-    election: constr(min_length = 1),
+    election: constr(min_length=1),
     maillage: constr(regex=MAILLAGE_PATTERN),
     nuance_liste: constr(min_length=1),
-    tour: conint(ge=1, le=2)=1,
+    tour: conint(ge=1, le=2) = 1,
     selected_scope: dict = Depends(get_scopes),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
-    res = elections.get_nuance_results(db, selected_scope, election, tour, maillage, nuance_liste)
+    res = elections.get_nuance_results(
+        db, selected_scope, election, tour, maillage, nuance_liste
+    )
     if res.empty:
         return []
 
-    res = res.to_json(orient='records')
+    res = res.to_json(orient="records")
     return json.loads(res)
 
 
-@app.get('/textGenerator', response_class=ORJSONResponse)
-async def generate_text(
-    text: constr(min_length = 1),
-    from_language: str = 'FR'
-):
+@app.get("/textGenerator", response_class=ORJSONResponse)
+async def generate_text(text: constr(min_length=1), from_language: str = "FR"):
     res = text_generator.generate_text(text, from_language)
-    return res['text']
+    return res["text"]
 
 
 if __name__ == "__main__":
-    uvicorn.run(
-        app,
-        host="0.0.0.0",
-        port=int(environ.get("PORT", 8080))
-    )
+    uvicorn.run(app, host="0.0.0.0", port=int(environ.get("PORT", 8080)))

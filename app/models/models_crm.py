@@ -1,12 +1,21 @@
 """SQLAlchemy de notre base de données CRM."""
 from app.database import CRM
-from sqlalchemy import (ARRAY, Boolean, Column, Date, Float, Integer,
-                        SmallInteger, String)
+from sqlalchemy import (
+    ARRAY,
+    Boolean,
+    Column,
+    Date,
+    Float,
+    Integer,
+    SmallInteger,
+    String,
+)
 
 
 class Contact(CRM):
     """Table contacts"""
-    __tablename__ = 'contacts'
+
+    __tablename__ = "contacts"
 
     id = Column(Integer, primary_key=True, index=True)
     genre = Column(String, nullable=True)
@@ -37,7 +46,8 @@ class ContactInDb(Contact):
 
 class Downloads(CRM):
     """Table crm_downloads"""
-    __tablename__ = 'crm_downloads'
+
+    __tablename__ = "crm_downloads"
 
     index = Column(Integer, primary_key=True, index=True)
     date = Column(Date, nullable=False)
@@ -49,7 +59,8 @@ class Downloads(CRM):
 
 class Users(CRM):
     """Table crm_usage"""
-    __tablename__ = 'crm_usage'
+
+    __tablename__ = "crm_usage"
 
     index = Column(Integer, primary_key=True, index=True)
     date = Column(Date, nullable=False)
@@ -60,7 +71,8 @@ class Users(CRM):
 
 class Elections(CRM):
     """Table elections"""
-    __tablename__ = 'elections'
+
+    __tablename__ = "elections"
 
     election = Column(String, nullable=False, index=True)
     departement = Column(String, nullable=False)
@@ -86,7 +98,7 @@ class Elections(CRM):
     composition_binome = Column(String, nullable=True)
 
     __mapper_args__ = {
-        'primary_key': [
+        "primary_key": [
             election,
             departement,
             commune,
@@ -96,6 +108,6 @@ class Elections(CRM):
             nom,
             prenom,
             num_dep_binome_candidat,
-            tour
+            tour,
         ]
     }
