@@ -74,7 +74,7 @@ def get_participation(
     election: str,
     tour: int,
     maillage: str,
-    code_zone: str) -> pd.DataFrame:
+    code_zone: str = None) -> pd.DataFrame:
     """1er endpoint: Participation
 
     Retourne les informations de participations pour l'election
@@ -100,14 +100,9 @@ def get_participation(
             inscrits,
             votants,
             exprimes
-          from elections
-          where {maillage} = '{code_zone}'
-            and election = '{election}'
-            and tour = '{tour}'
+          from elections_{format_table(election, tour)}
+            {f"where {maillage} = '{code_zone}'" if code_zone else ""}
         ) bureau_election
-        where {maillage} = '{code_zone}'
-          and election = '{election}'
-          and tour = '{tour}'
         group by
           election,
           tour,
