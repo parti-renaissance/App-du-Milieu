@@ -5,6 +5,9 @@ import json
 from datetime import datetime
 from os import environ
 
+import sentry_sdk
+from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
+
 import uvicorn
 from fastapi import Depends, FastAPI, Header, HTTPException, Query
 from fastapi.middleware.gzip import GZipMiddleware
@@ -26,11 +29,8 @@ from app.database import SessionLocal
 # profiling
 # from fastapi_profiler.profiler_middleware import PyInstrumentProfilerMiddleware
 
-import sentry_sdk
-sentry_sdk.init(
-    "https://3c3c435fe4f245a3ba551475ff8dfa53@o62282.ingest.sentry.io/5890683",
-    traces_sample_rate=1.0
-)
+
+sentry_sdk.init(dsn="https://3c3c435fe4f245a3ba551475ff8dfa53@o62282.ingest.sentry.io/5890683")
 
 app = FastAPI(
     title="API pour le CRM de LaREM",
@@ -46,6 +46,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(SentryAsgiMiddleware)
 
 # app.add_middleware(PyInstrumentProfilerMiddleware)
 
