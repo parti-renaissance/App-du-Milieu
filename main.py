@@ -179,7 +179,9 @@ async def mail_ratios(
     db: Session = Depends(get_db),
     since: datetime = datetime(2021, 1, 1),
 ):
-    result = await mail_campaign.get_mail_ratios(db, selected_scope['zones'], since, selected_scope['code'])
+    result = await mail_campaign.get_mail_ratios(
+        db, selected_scope['zones'], since, selected_scope['code']
+    )
     return {
         "zones": [zone.name for zone in selected_scope["zones"]],
         "depuis": since,
