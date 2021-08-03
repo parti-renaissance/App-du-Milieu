@@ -1,32 +1,32 @@
 """Schemas."""
+from datetime import datetime
 from enum import Enum
 from typing import List, Optional
-from pydantic import BaseModel, Field
-from datetime import datetime
 
+from pydantic import BaseModel, Field
 
 
 class InterestsChoices(str, Enum):
-    economie = 'economie'
-    agriculture = 'agriculture'
-    sante = 'sante'
-    education = 'education'
-    culture = 'culture'
-    numerique = 'numerique'
-    emploi = 'emploi'
-    environement = 'environement'
-    social = 'social'
-    europe = 'europe'
-    international = 'international'
-    justice = 'justice'
-    jeunesse = 'jeunesse'
-    institution = 'institution'
-    egalite = 'egalite'
-    securite = 'securite'
-    territoire = 'territoire'
-    logement = 'logement'
-    sport = 'sport'
-    vide = ''
+    economie = "economie"
+    agriculture = "agriculture"
+    sante = "sante"
+    education = "education"
+    culture = "culture"
+    numerique = "numerique"
+    emploi = "emploi"
+    environement = "environement"
+    social = "social"
+    europe = "europe"
+    international = "international"
+    justice = "justice"
+    jeunesse = "jeunesse"
+    institution = "institution"
+    egalite = "egalite"
+    securite = "securite"
+    territoire = "territoire"
+    logement = "logement"
+    sport = "sport"
+    vide = ""
 
     @classmethod
     def list(cls):
@@ -34,10 +34,10 @@ class InterestsChoices(str, Enum):
 
 
 class Gender(str, Enum):
-    homme = 'Homme'
-    femme = 'Femme'
-    autre = 'Autre'
-    vide = ''
+    homme = "Homme"
+    femme = "Femme"
+    autre = "Autre"
+    vide = ""
 
     @classmethod
     def list(cls):

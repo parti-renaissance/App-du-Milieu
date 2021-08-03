@@ -2,88 +2,89 @@
 import io
 import unicodedata
 from typing import Literal
-from sqlalchemy.orm import Session
+from psycopg2 import sql, connect
+
+import pandas as pd
 from app.database.database_crm import engine_crm
 from fastapi import HTTPException
-from psycopg2 import sql, connect
-import pandas as pd
-
+from sqlalchemy.orm import Session
 
 DIVISION = Literal[
-    'region',
-    'departement',
-    'circonscription',
-    'canton',
-    'commune',
-    'bureau'
+    "region",
+    "departement",
+    "circonscription",
+    "canton",
+    "commune",
+    "bureau"
 ]
 
 ELECTION = Literal[
-    'Municipales 2020',
-    'Départementales 2015',
-    'Départementales 2021',
-    'Législatives 2017',
-    'Régionales 2015',
-    'Régionales 2021',
-    'Européennes 2014',
-    'Européennes 2019',
-    'Présidentielles 2017'
+    "Municipales 2020",
+    "Départementales 2015",
+    "Départementales 2021",
+    "Législatives 2017",
+    "Régionales 2015",
+    "Régionales 2021",
+    "Européennes 2014",
+    "Européennes 2019",
+    "Présidentielles 2017"
 ]
 
 dict_base = {
-    'Municipales 2020': ('nuance',),
-    'Départementales 2015': ('nuance',),
-    'Départementales 2021': ('nuance',),
-    'Législatives 2017': ('nuance',),
-    'Régionales 2015': ('nuance',),
-    'Régionales 2021': ('nuance',),
-    'Européennes 2014': ('nuance',),
-    'Européennes 2019': ('nom_liste',),
-    'Présidentielles 2017': ('nuance',)
+    "Municipales 2020": ("nuance",),
+    "Départementales 2015": ("nuance",),
+    "Départementales 2021": ("nuance",),
+    "Législatives 2017": ("nuance",),
+    "Régionales 2015": ("nuance",),
+    "Régionales 2021": ("nuance",),
+    "Européennes 2014": ("nuance",),
+    "Européennes 2019": ("nom_liste",),
+    "Présidentielles 2017": ("nuance",)
 }
 """Always returned information by election"""
 
 
 dict_detail = {
-    'Municipales 2020': ('nom', 'prenom',),
-    'Départementales 2015': ('composition_binome',),
-    'Départementales 2021': ('composition_binome',),
-    'Législatives 2017': ('nom', 'prenom',),
-    'Régionales 2015': ('nom', 'prenom',),
-    'Régionales 2021': ('nom', 'prenom',),
-    'Européennes 2014': ('nom', 'prenom',),
-    'Européennes 2019': (),
-    'Présidentielles 2017': ('nom', 'prenom',)
+    "Municipales 2020": ("nom", "prenom",),
+    "Départementales 2015": ("composition_binome",),
+    "Départementales 2021": ("composition_binome",),
+    "Législatives 2017": ("nom", "prenom",),
+    "Régionales 2015": ("nom", "prenom",),
+    "Régionales 2021": ("nom", "prenom",),
+    "Européennes 2014": ("nom", "prenom",),
+    "Européennes 2019": (),
+    "Présidentielles 2017": ("nom", "prenom",)
 }
 """Detailled returned information by election"""
 
 
 dict_maillage = {
-    'bureau': 0,
-    'commune': 1,
-    'canton': 2,
-    'circonscription': 3,
-    'departement': 4,
-    'region': 5,
-    'national': 6
-    }
+    "bureau": 0,
+    "commune": 1,
+    "canton": 2,
+    "circonscription": 3,
+    "departement": 4,
+    "region": 5,
+    "national": 6,
+}
 """Hierarchical level of territorial division"""
 
 
 dict_election = {
-    'Municipales': 1,
-    'Départementales': 2,
-    'Législatives': 3,
-    'Régionales': 5,
-    'Européennes': 6,
-    'Présidentielles': 6
+    "Municipales": 1,
+    "Départementales": 2,
+    "Législatives": 3,
+    "Régionales": 5,
+    "Européennes": 6,
+    "Présidentielles": 6,
 }
 """Election type with the level of division where we use detailled datas"""
 
 
 def strip_accents(s):
-    return ''.join(c for c in unicodedata.normalize('NFD', s)
-                  if unicodedata.category(c) != 'Mn')
+    return "".join(
+        c for c in unicodedata.normalize("NFD", s) if unicodedata.category(c) != "Mn"
+    )
 
 
 def safe_query(query: str) -> pd.DataFrame:
@@ -105,21 +106,18 @@ def fast_query(query: str) -> pd.DataFrame:
         cursor.copy_expert(copy_sql, store)
         store.seek(0)
         cursor.close()
-    return pd.read_csv(store, encoding='utf-8')
+    return pd.read_csv(store, encoding="utf-8")
 
 
 def format_table(election, tour):
-    return strip_accents(election).replace(' ', '_').lower() + (
-      f'_t{tour}' if election not in ('Européennes 2014', 'Européennes 2019') else '')
+    return strip_accents(election).replace(" ", "_").lower() + (
+        f"_t{tour}" if election not in ("Européennes 2014", "Européennes 2019") else ""
+    )
 
 
 def get_participation(
-    db: Session,
-    scope: dict,
-    election: str,
-    tour: int,
-    maillage: str,
-    code_zone: str) -> pd.DataFrame:
+    db: Session, scope: dict, election: str, tour: int, maillage: str, code_zone: str
+) -> pd.DataFrame:
     """1er endpoint: Participation
 
     Retourne les informations de participations pour l'election
@@ -145,7 +143,7 @@ def get_participation(
           {division}
         """).format(
           division = sql.Identifier(maillage),
-          table = sql.Identifier('election_bureau_' + format_table(election, tour)),
+          table = sql.Identifier("election_bureau_" + format_table(election, tour)),
           zone = sql.Literal(code_zone),
         )
 
@@ -155,9 +153,11 @@ def get_participation(
 def ElectionAgregat(election: str, division: str):
     type_election = election.split()[0]
     if type_election not in dict_election.keys():
-        raise HTTPException(status_code=400, detail=f'No data for election {election}')
+        raise HTTPException(status_code=400, detail=f"No data for election {election}")
     if division not in dict_maillage.keys():
-        raise HTTPException(status_code=400, detail=f'The division {division} is not available yet')
+        raise HTTPException(
+            status_code=400, detail=f"The division {division} is not available yet"
+        )
     if dict_maillage[division] <= dict_election[type_election]:
         return dict_base[election] + dict_detail[election]
     return dict_base[election]
@@ -175,16 +175,12 @@ def get_nuance_color(election: str) -> pd.DataFrame:
           election = sql.Literal(election),
         )
 
-    return safe_query(query).dropna(how='all', axis=1)
+    return safe_query(query).dropna(how="all", axis=1)
 
 
 def get_results(
-    db: Session,
-    scope: dict,
-    election: str,
-    tour: int,
-    maillage: str,
-    code_zone: str) -> pd.DataFrame:
+    db: Session, scope: dict, election: str, tour: int, maillage: str, code_zone: str
+) -> pd.DataFrame:
     """1er endpoint bis: Results
 
     Retourne les resultats pour l'election et la zone selectionnee
@@ -208,7 +204,7 @@ def get_results(
         order by
           voix desc
         """).format(
-          agregat = sql.SQL(', ').join(map(
+          agregat = sql.SQL(", ").join(map(
               sql.Identifier, ElectionAgregat(election, maillage))),
           division = sql.Identifier(maillage),
           zone = sql.Literal(code_zone),
@@ -220,18 +216,15 @@ def get_results(
     if df.empty:
         return df
 
-    df = df.merge(get_nuance_color(election), how='left')
-    df.code_couleur.fillna('#FFFFFF', inplace=True)
+    df = df.merge(get_nuance_color(election), how="left")
+    df.code_couleur.fillna("#FFFFFF", inplace=True)
 
     return df
 
 
 def get_colors(
-    db: Session,
-    scope: dict,
-    election: str,
-    tour: int,
-    maillage: str) -> pd.DataFrame:
+    db: Session, scope: dict, election: str, tour: int, maillage: str
+) -> pd.DataFrame:
     """2eme endpoint: Couleurs
 
     Retourne les couleurs de la liste/candidat arrivé
@@ -264,33 +257,29 @@ def get_colors(
           rows between unbounded preceding and unbounded following
         )
         """).format(
-          agregat = sql.SQL(', ').join(map(
+          agregat = sql.SQL(", ").join(map(
               sql.Identifier, ElectionAgregat(election, maillage))),
           division = sql.Identifier(maillage),
-          table_name = sql.Identifier('elections_' + format_table(election, tour)),
+          table_name = sql.Identifier("elections_" + format_table(election, tour)),
         )
 
     df = safe_query(query).merge(
         get_nuance_color(election),
-        how='left')[['code', dict_base[election][0], 'code_couleur']]
-    df.code_couleur.fillna('#FFFFFF', inplace=True)
+        how="left")[["code", dict_base[election][0], "code_couleur"]]
+    df.code_couleur.fillna("#FFFFFF", inplace=True)
 
     return df
 
 
-def get_compatible_nuance(
-    db: Session,
-    scope: dict,
-    election: str,
-    nuance_liste: str):
+def get_compatible_nuance(db: Session, scope: dict, election: str, nuance_liste: str):
     if election not in dict_base.keys():
         return None
-        
+
     # get nuance / nom_liste and color for the election
     df = get_nuance_color(election)
 
     # retrieve the color if matched 
-    df_color = df.loc[df[dict_base[election][0]] == nuance_liste, 'code_couleur']
+    df_color = df.loc[df[dict_base[election][0]] == nuance_liste, "code_couleur"]
     if df_color.empty:
         return None
     color = df_color.iloc[0]
@@ -298,7 +287,7 @@ def get_compatible_nuance(
     # retrieve all match for the color
     compatible_nuance = df.loc[df.code_couleur == color, dict_base[election][0]].tolist()
     
-    return {'code_couleur': color, 'compatibles': compatible_nuance}
+    return {"code_couleur": color, "compatibles": compatible_nuance}
 
 
 def get_density(
@@ -351,12 +340,12 @@ def get_density(
       on participation.code = elections.code
     """).format(
       division = sql.Identifier(maillage),
-      table_elections = sql.Identifier('elections_' + format_table(election, tour)),
+      table_elections = sql.Identifier("elections_" + format_table(election, tour)),
       nuance_liste = sql.Identifier(dict_base[election][0]),
-      compatibles = sql.SQL(', ').join(map(sql.Literal, nuances_compatibles['compatibles'])),
-      table_bureau = sql.Identifier('election_bureau_' + format_table(election, tour))
+      compatibles = sql.SQL(", ").join(map(sql.Literal, nuances_compatibles["compatibles"])),
+      table_bureau = sql.Identifier("election_bureau_" + format_table(election, tour))
     )
 
     df = safe_query(query)
-    df['%voix'] = round(df.voix / df.exprimes, 3)
+    df["%voix"] = round(df.voix / df.exprimes, 3)
     return df
