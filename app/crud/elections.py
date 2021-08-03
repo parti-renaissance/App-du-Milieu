@@ -217,7 +217,7 @@ def get_results(
         return df
 
     df = df.merge(get_nuance_color(election), how="left")
-    df.code_couleur.fillna("#FFFFFF", inplace=True)
+    df.code_couleur.fillna("#E0E0E0", inplace=True)
 
     return df
 
@@ -266,7 +266,7 @@ def get_colors(
     df = safe_query(query).merge(
         get_nuance_color(election),
         how="left")[["code", dict_base[election][0], "code_couleur"]]
-    df.code_couleur.fillna("#FFFFFF", inplace=True)
+    df.code_couleur.fillna("#E0E0E0", inplace=True)
 
     return df
 
