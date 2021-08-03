@@ -26,6 +26,11 @@ from app.database import SessionLocal
 # profiling
 # from fastapi_profiler.profiler_middleware import PyInstrumentProfilerMiddleware
 
+import sentry_sdk
+sentry_sdk.init(
+    "https://3c3c435fe4f245a3ba551475ff8dfa53@o62282.ingest.sentry.io/5890683",
+    traces_sample_rate=1.0
+)
 
 app = FastAPI(
     title="API pour le CRM de LaREM",
