@@ -11,3 +11,4 @@ orjson
 numexpr
 xarray
 better_profanity
+sentry-sdk
