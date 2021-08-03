@@ -71,10 +71,10 @@ def decode_scopes(db: Session, scope: str):
     scope_dict = json.loads(scope_string)
 
     res_zone = [
-        db.query(GeoZone).filter(GeoZone.uuid == zone["uuid"]).first() 
+        db.query(GeoZone).filter(GeoZone.uuid == zone["uuid"]).first()
         for zone in scope_dict["zones"]
     ]
-    
+
     if res_zone == [None]:
         raise HTTPException(status_code=400, detail="GeoZone not found")
     return {"code": scope_dict["code"], "zones": res_zone}

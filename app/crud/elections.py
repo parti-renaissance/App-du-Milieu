@@ -2,7 +2,7 @@
 import io
 import unicodedata
 from typing import Literal
-from psycopg2 import sql, connect
+from psycopg2 import sql
 
 import pandas as pd
 from app.database.database_crm import engine_crm
@@ -278,7 +278,7 @@ def get_compatible_nuance(db: Session, scope: dict, election: str, nuance_liste:
     # get nuance / nom_liste and color for the election
     df = get_nuance_color(election)
 
-    # retrieve the color if matched 
+    # retrieve the color if matched
     df_color = df.loc[df[dict_base[election][0]] == nuance_liste, "code_couleur"]
     if df_color.empty:
         return None
@@ -286,7 +286,7 @@ def get_compatible_nuance(db: Session, scope: dict, election: str, nuance_liste:
 
     # retrieve all match for the color
     compatible_nuance = df.loc[df.code_couleur == color, dict_base[election][0]].tolist()
-    
+
     return {"code_couleur": color, "compatibles": compatible_nuance}
 
 
