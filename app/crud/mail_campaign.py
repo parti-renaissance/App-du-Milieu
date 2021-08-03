@@ -96,7 +96,7 @@ async def get_campaign_reports(db: Session, zone: GeoZone, since: datetime, role
     }
 
 
-async def get_mail_ratios(db: Session, scope: dict, since: datetime):
+async def get_mail_ratios(db: Session, zone: GeoZone, since: datetime, role: str):
     """Method to CRUD /campaign/reportsRatios"""
     query = (
         db.query(
@@ -128,16 +128,14 @@ async def get_mail_ratios(db: Session, scope: dict, since: datetime):
         )
         .select_from(MailChimpCampaignReport)
         .join(MailChimpCampaignReport.mailchimp_campaign)
-        .join(
-            MailChimpCampaign.message.and_(
-                AdherentMessages.type == scope["code"],
-                AdherentMessages.sent_at >= since,
-            )
-        )
+        .join(MailChimpCampaign.message)
+        .filter(AdherentMessages.sent_at >= since)
         .join(AdherentMessages.author)
     )
+    if role != "national":
+        query = query.filter(AdherentMessages.type == role)
 
-    res = filter_role(db, query, scope["zones"], scope["code"]).first()
+    res = filter_role(db, query, zone, role)
 
     nat = (
         db.query(
@@ -159,8 +157,9 @@ async def get_mail_ratios(db: Session, scope: dict, since: datetime):
         )
         .select_from(MailChimpCampaignReport)
         .join(MailChimpCampaignReport.mailchimp_campaign)
-        .join(MailChimpCampaign.message.and_(AdherentMessages.type == scope["code"]))
-        .first()
+        .join(MailChimpCampaign.message)
     )
+    if role != "national":
+        nat = nat.filter(AdherentMessages.type == role)
 
-    return {"local": res, "national": nat}
+    return {"local": res.first(), "national": nat.first()}

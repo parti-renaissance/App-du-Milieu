@@ -4,9 +4,11 @@ import json
 from collections import defaultdict
 from enum import Enum
 
+from fastapi import HTTPException
 from app.models.models_enmarche import GeoZone, GeoZoneParent
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
+from app.resources.strings import NO_GEOZONE
 
 
 class GeoTypes(str, Enum):
@@ -69,12 +71,13 @@ def decode_scopes(db: Session, scope: str):
     scope_string = scope_bytes.decode("latin1")
     scope_dict = json.loads(scope_string)
 
-    res_zone = []
-    for zone in scope_dict["zones"]:
-        res_zone = [
-            *res_zone,
-            db.query(GeoZone).filter(GeoZone.uuid == zone["uuid"]).first(),
-        ]
+    res_zone = [
+        db.query(GeoZone).filter(GeoZone.uuid == zone["uuid"]).first()
+        for zone in scope_dict["zones"]
+    ]
+
+    if res_zone == [None]:
+        raise HTTPException(status_code=400, detail=NO_GEOZONE)
     return {"code": scope_dict["code"], "zones": res_zone}
 
 

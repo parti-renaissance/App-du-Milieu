@@ -15,6 +15,7 @@ from fastapi.responses import ORJSONResponse
 from pydantic import conint, constr
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
+from app.resources.strings import NO_SCOPE, NO_X_SCOPE, NO_CONTACT, NO_CONTENT
 
 from app.crud import (
     contact,
@@ -51,10 +52,6 @@ app.add_middleware(SentryAsgiMiddleware)
 
 # app.add_middleware(PyInstrumentProfilerMiddleware)
 
-# Dependency
-
-MAILLAGE_PATTERN = r"^(region|departement|circonscription|canton|commune|bureau)$"
-
 
 def get_db():
     db = SessionLocal()
@@ -68,9 +65,9 @@ async def get_scopes(
     scope: str, X_Scope: str = Header(None), db: Session = Depends(get_db)
 ) -> dict:
     if scope is None:
-        raise HTTPException(status_code=400, detail="No scope parameter")
+        raise HTTPException(status_code=400, detail=NO_SCOPE)
     if X_Scope is None:
-        raise HTTPException(status_code=400, detail="No X-Scope in header")
+        raise HTTPException(status_code=400, detail=NO_X_SCOPE)
 
     try:
         scope = enmarche.decode_scopes(db, X_Scope)
@@ -95,7 +92,7 @@ async def read_contacts(
     try:
         contacts = contact.get_contacts(db, selected_scope)
     except BaseException:
-        raise HTTPException(status_code=204, detail="No contact found")
+        raise HTTPException(status_code=204, detail=NO_CONTACT)
     return contacts
 
 
@@ -109,7 +106,7 @@ async def read_contacts_v01(
     try:
         contacts = contact.get_contacts_v01(db, selected_scope, skip, limit)
     except BaseException:
-        raise HTTPException(status_code=204, detail="No contact found")
+        raise HTTPException(status_code=204, detail=NO_CONTACT)
     return contacts
 
 
@@ -124,7 +121,7 @@ async def read_contacts_v02(
     try:
         contacts = contact.get_contacts_v02(db, selected_scope, skip, limit, q)
     except BaseException:
-        raise HTTPException(status_code=204, detail="No contact found")
+        raise HTTPException(status_code=204, detail=NO_CONTACT)
     return contacts
 
 
@@ -141,7 +138,7 @@ async def jemengage_downloads(
 ):
     res = jemengage.get_downloads(db, selected_scope)
     if res.empty:
-        raise HTTPException(status_code=204, detail="No content")
+        raise HTTPException(status_code=204, detail=NO_CONTENT)
 
     total = int(res.unique_user.sum())
 
@@ -155,7 +152,7 @@ async def jemengage_users(
 ):
     res = jemengage.get_users(db, selected_scope)
     if res.empty:
-        raise HTTPException(status_code=204, detail="No content")
+        raise HTTPException(status_code=204, detail=NO_CONTENT)
 
     total = int(res.unique_user.sum())
 
@@ -190,7 +187,9 @@ async def mail_ratios(
     db: Session = Depends(get_db),
     since: datetime = datetime(2021, 1, 1),
 ):
-    result = await mail_campaign.get_mail_ratios(db, selected_scope, since)
+    result = await mail_campaign.get_mail_ratios(
+        db, selected_scope['zones'], since, selected_scope['code']
+    )
     return {
         "zones": [zone.name for zone in selected_scope["zones"]],
         "depuis": since,
@@ -200,8 +199,8 @@ async def mail_ratios(
 
 @app.get("/election/participation", response_class=ORJSONResponse)
 async def election_participation(
-    election: constr(min_length=1),
-    maillage: constr(regex=MAILLAGE_PATTERN),
+    election: elections.ELECTION,
+    maillage: elections.DIVISION,
     code_zone: constr(min_length=1),
     tour: conint(ge=1, le=2) = 1,
     selected_scope: dict = Depends(get_scopes),
@@ -219,8 +218,8 @@ async def election_participation(
 
 @app.get("/election/results", response_class=ORJSONResponse)
 async def election_results(
-    election: constr(min_length=1),
-    maillage: constr(regex=MAILLAGE_PATTERN),
+    election: elections.ELECTION,
+    maillage: elections.DIVISION,
     code_zone: constr(min_length=1),
     tour: conint(ge=1, le=2) = 1,
     selected_scope: dict = Depends(get_scopes),
@@ -236,8 +235,8 @@ async def election_results(
 
 @app.get("/election/colors", response_class=ORJSONResponse)
 async def election_colors(
-    election: constr(min_length=1),
-    maillage: constr(regex=MAILLAGE_PATTERN),
+    election: elections.ELECTION,
+    maillage: elections.DIVISION,
     tour: conint(ge=1, le=2) = 1,
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db),
@@ -250,16 +249,16 @@ async def election_colors(
     return json.loads(res)
 
 
-@app.get("/election/nuanceResults", response_class=ORJSONResponse)
+@app.get("/election/density", response_class=ORJSONResponse)
 async def nuanceResults(
-    election: constr(min_length=1),
-    maillage: constr(regex=MAILLAGE_PATTERN),
+    election: elections.ELECTION,
+    maillage: elections.DIVISION,
     nuance_liste: constr(min_length=1),
     tour: conint(ge=1, le=2) = 1,
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db),
 ):
-    res = elections.get_nuance_results(
+    res = elections.get_density(
         db, selected_scope, election, tour, maillage, nuance_liste
     )
     if res.empty:

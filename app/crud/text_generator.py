@@ -47,5 +47,4 @@ def generate_text(text: str, from_language: str = "FR"):
         return translate_text(censored, from_language="EN", target_lang=from_language)[
             "translations"
         ][0]
-    else:
-        return generated["output"]
+    return generated["output"]
