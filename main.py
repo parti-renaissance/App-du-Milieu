@@ -5,6 +5,9 @@ import json
 from datetime import datetime
 from os import environ
 
+import sentry_sdk
+from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
+
 import uvicorn
 from fastapi import Depends, FastAPI, Header, HTTPException, Query
 from fastapi.middleware.gzip import GZipMiddleware
@@ -12,6 +15,7 @@ from fastapi.responses import ORJSONResponse
 from pydantic import conint, constr
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
+from app.resources.strings import NO_SCOPE, NO_X_SCOPE, NO_CONTACT, NO_CONTENT
 
 from app.crud import (
     contact,
@@ -26,6 +30,8 @@ from app.database import SessionLocal
 # profiling
 # from fastapi_profiler.profiler_middleware import PyInstrumentProfilerMiddleware
 
+
+sentry_sdk.init(dsn="https://3c3c435fe4f245a3ba551475ff8dfa53@o62282.ingest.sentry.io/5890683")
 
 app = FastAPI(
     title="API pour le CRM de LaREM",
@@ -42,6 +48,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.add_middleware(SentryAsgiMiddleware)
+
 # app.add_middleware(PyInstrumentProfilerMiddleware)
 
 
@@ -57,9 +65,9 @@ async def get_scopes(
     scope: str, X_Scope: str = Header(None), db: Session = Depends(get_db)
 ) -> dict:
     if scope is None:
-        raise HTTPException(status_code=400, detail="No scope parameter")
+        raise HTTPException(status_code=400, detail=NO_SCOPE)
     if X_Scope is None:
-        raise HTTPException(status_code=400, detail="No X-Scope in header")
+        raise HTTPException(status_code=400, detail=NO_X_SCOPE)
 
     try:
         scope = enmarche.decode_scopes(db, X_Scope)
@@ -84,7 +92,7 @@ async def read_contacts(
     try:
         contacts = contact.get_contacts(db, selected_scope)
     except BaseException:
-        raise HTTPException(status_code=204, detail="No contact found")
+        raise HTTPException(status_code=204, detail=NO_CONTACT)
     return contacts
 
 
@@ -98,7 +106,7 @@ async def read_contacts_v01(
     try:
         contacts = contact.get_contacts_v01(db, selected_scope, skip, limit)
     except BaseException:
-        raise HTTPException(status_code=204, detail="No contact found")
+        raise HTTPException(status_code=204, detail=NO_CONTACT)
     return contacts
 
 
@@ -113,7 +121,7 @@ async def read_contacts_v02(
     try:
         contacts = contact.get_contacts_v02(db, selected_scope, skip, limit, q)
     except BaseException:
-        raise HTTPException(status_code=204, detail="No contact found")
+        raise HTTPException(status_code=204, detail=NO_CONTACT)
     return contacts
 
 
@@ -130,7 +138,7 @@ async def jemengage_downloads(
 ):
     res = jemengage.get_downloads(db, selected_scope)
     if res.empty:
-        raise HTTPException(status_code=204, detail="No content")
+        raise HTTPException(status_code=204, detail=NO_CONTENT)
 
     total = int(res.unique_user.sum())
 
@@ -144,7 +152,7 @@ async def jemengage_users(
 ):
     res = jemengage.get_users(db, selected_scope)
     if res.empty:
-        raise HTTPException(status_code=204, detail="No content")
+        raise HTTPException(status_code=204, detail=NO_CONTENT)
 
     total = int(res.unique_user.sum())
 
