@@ -8,6 +8,7 @@ from fastapi import HTTPException
 from app.models.models_enmarche import GeoZone, GeoZoneParent
 from sqlalchemy import and_
 from sqlalchemy.orm import Session
+from app.resources.strings import NO_GEOZONE
 
 
 class GeoTypes(str, Enum):
@@ -76,7 +77,7 @@ def decode_scopes(db: Session, scope: str):
     ]
 
     if res_zone == [None]:
-        raise HTTPException(status_code=400, detail="GeoZone not found")
+        raise HTTPException(status_code=400, detail=NO_GEOZONE)
     return {"code": scope_dict["code"], "zones": res_zone}
 
 
