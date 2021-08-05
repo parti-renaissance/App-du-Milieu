@@ -222,55 +222,6 @@ def get_results(
     return df
 
 
-def get_colors(
-    db: Session, scope: dict, election: str, tour: int, maillage: str
-) -> pd.DataFrame:
-    """2eme endpoint: Couleurs
-
-    Retourne les couleurs de la liste/candidat arrivé
-    premier au tour de l'election par division
-    """
-    if election not in dict_base.keys():
-        return pd.DataFrame()
-
-    # pour le moment pas de scope, pas d'utilisation de db: Session (orm)
-    query = sql.SQL("""
-        select distinct on ({division})
-          election,
-          {division} as code,
-          {agregat},
-          first_value(voix) OVER wnd
-        FROM (
-          select
-            election,
-            {division},
-            {agregat},
-            cast(sum(voix) as integer) as voix
-          from {table_name}
-          group by
-            election,
-            {division},
-            {agregat}
-        ) table_groupby
-        window wnd as (
-          partition by {division} order by voix desc
-          rows between unbounded preceding and unbounded following
-        )
-        """).format(
-          agregat = sql.SQL(", ").join(map(
-              sql.Identifier, ElectionAgregat(election, maillage))),
-          division = sql.Identifier(maillage),
-          table_name = sql.Identifier("elections_" + format_table(election, tour)),
-        )
-
-    df = safe_query(query).merge(
-        get_nuance_color(election),
-        how="left")[["code", dict_base[election][0], "code_couleur"]]
-    df.code_couleur.fillna("#E0E0E0", inplace=True)
-
-    return df
-
-
 def get_compatible_nuance(db: Session, scope: dict, election: str, nuance_liste: str):
     if election not in dict_base.keys():
         return None

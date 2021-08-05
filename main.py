@@ -233,22 +233,6 @@ async def election_results(
     return json.loads(res)
 
 
-@app.get("/election/colors", response_class=ORJSONResponse)
-async def election_colors(
-    election: elections.ELECTION,
-    maillage: elections.DIVISION,
-    tour: conint(ge=1, le=2) = 1,
-    selected_scope: dict = Depends(get_scopes),
-    db: Session = Depends(get_db),
-):
-    res = elections.get_colors(db, selected_scope, election, tour, maillage)
-    if res.empty:
-        return []
-
-    res = res.to_json(orient="records")
-    return json.loads(res)
-
-
 @app.get("/election/density", response_class=ORJSONResponse)
 async def nuanceResults(
     election: elections.ELECTION,
