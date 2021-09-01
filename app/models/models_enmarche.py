@@ -112,6 +112,7 @@ class GeoZone(Base):
     type = Column(String(255), nullable=False)
     code = Column(String(255), nullable=False)
     name = Column(String(255), nullable=False)
+    postal_code = Column(String(255), nullable=True)
 
     UniqueConstraint("code", "type", name="geo_zone_code_type_unique")
 
@@ -209,6 +210,21 @@ class GeoCountry(Base):
     longitude = Column(Float, nullable=False)
 
 
+class JemarcheDataSurvey(Base):
+    """Table jemarche_data_survey"""
+
+    __tablename__ = "jemarche_data_survey"
+
+    id = Column(Integer, primary_key=True, index=True)
+    data_survey_id = Column(Integer, ForeignKey("jecoute_data_survey.id"), nullable=True)
+    data_survey = relationship("JecouteDataSurvey", lazy="joined")
+    postal_code = Column(String, nullable=True)
+    age_range = Column(String, nullable=True)
+    gender = Column(String, nullable=True)
+    latitude = Column(Float, nullable=True)
+    longitude = Column(Float, nullable=True)
+
+
 class JecouteDataSurvey(Base):
     """Table jecoute_data_survey"""
 
@@ -217,14 +233,9 @@ class JecouteDataSurvey(Base):
     id = Column(Integer, primary_key=True, index=True)
     author_id = Column(Integer, ForeignKey("adherents.id"), nullable=True)
     author = relationship("Adherents", lazy="joined")
-    posted_at = Column(DateTime, nullable=False)
-    postal_code = Column(String, nullable=True)
-    age_range = Column(String, nullable=True)
-    gender = Column(String, nullable=True)
-    latitude = Column(Float, nullable=True)
-    longitude = Column(Float, nullable=True)
     survey_id = Column(Integer, ForeignKey("jecoute_survey.id"))
     survey = relationship("JecouteSurvey", lazy="joined")
+    posted_at = Column(DateTime, nullable=False)
 
 
 class JecouteSurvey(Base):

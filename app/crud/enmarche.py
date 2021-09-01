@@ -31,6 +31,20 @@ class GeoTypes(str, Enum):
     country = "pays"
 
 
+dict_geoZone_Hierarchy = {    
+    "borough": 0,
+    "city": 1,
+    "city_community": 2,
+    "district": 3,
+    "foreign_district": 3,
+    "consular_district": 3,
+    "canton": 4,
+    "department": 5,
+    "region": 6,
+    "country": 7,
+}
+
+
 def getGeoType(s: str):
     """Fonction d'equivalence GeoType - Nom colonne
 
@@ -81,18 +95,24 @@ def decode_scopes(db: Session, scope: str):
     return {"code": scope_dict["code"], "zones": res_zone}
 
 
-def get_child(db: Session, parent: GeoZone, geotype: str = None):
-    if parent.type == geotype:
-        return parent
+def get_child(db: Session, zone: GeoZone, typeCible: str = None):
+    if zone.type == typeCible:
+        return [zone]
+
+    try:
+        lookingForChild = dict_geoZone_Hierarchy[zone.type] >= dict_geoZone_Hierarchy[typeCible]
+    except:
+        lookingForChild = True
 
     query = db.query(GeoZone).join(
         GeoZoneParent,
         and_(
-            GeoZoneParent.child_id == GeoZone.id, GeoZoneParent.parent_id == parent.id
+            GeoZoneParent.child_id == (GeoZone.id if lookingForChild else zone.id),
+            GeoZoneParent.parent_id == (zone.id if lookingForChild else GeoZone.id)
         ),
     )
 
-    if geotype:
-        query = query.filter(GeoZone.type == geotype)
+    if typeCible:
+        query = query.filter(GeoZone.type == typeCible)
 
     return query.all()

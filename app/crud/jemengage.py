@@ -12,10 +12,11 @@ from app.models.models_enmarche import (
     GeoDepartment,
     GeoDistrict,
     GeoRegion,
+    JemarcheDataSurvey,
     JecouteDataSurvey,
 )
 from sqlalchemy import Date
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session
 
 
 def get_downloads(
@@ -101,26 +102,30 @@ def get_users(
     return big_df
 
 
-def get_survey(db: Session, scope: dict):
 
+def get_survey_datas(db: Session, scope: dict):
     city_codes = []
     for zone in scope["zones"]:
         city_codes += [zone.code for zone in get_child(db, zone, "city")]
+        city_codes += [zone.code for zone in get_child(db, zone, "borough")]
 
-    survey_datas = (
-        db.query(JecouteDataSurvey)
-        .options(joinedload(JecouteDataSurvey.author))
-        .options(joinedload(JecouteDataSurvey.survey))
-        .filter(JecouteDataSurvey.postal_code != "")
+    return (
+        db.query(JemarcheDataSurvey)
+        .join(JemarcheDataSurvey.data_survey)
+        .join(JecouteDataSurvey.author)
+        .join(JecouteDataSurvey.survey)
+        .filter(JemarcheDataSurvey.postal_code != "")
         .join(
-            GeoCity, GeoCity.postal_code.like("%" + JecouteDataSurvey.postal_code + "%")
+            GeoCity, GeoCity.postal_code.like("%" + JemarcheDataSurvey.postal_code + "%")
         )
         .filter(GeoCity.code.in_(city_codes))
-        .filter(JecouteDataSurvey.latitude != "")
-        .filter(JecouteDataSurvey.longitude != "")
+        .filter(JemarcheDataSurvey.latitude != "")
+        .filter(JemarcheDataSurvey.longitude != "")
         .all()
     )
 
+
+def get_survey(db: Session, scope: dict):
     returned_zone = scope2dict(scope, True)
     res = {}
     if "pays" in returned_zone.keys():
@@ -174,5 +179,5 @@ def get_survey(db: Session, scope: dict):
         res["latitude"] = 48.835633
         res["longitude"] = 2.323433
 
-    res["survey_datas"] = survey_datas
+    res["survey_datas"] = get_survey_datas(db, scope)
     return res
