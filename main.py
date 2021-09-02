@@ -26,6 +26,7 @@ from app.crud import (
     text_generator,
 )
 from app.database import SessionLocal
+from app.schemas import schemas
 
 # profiling
 # from fastapi_profiler.profiler_middleware import PyInstrumentProfilerMiddleware
@@ -160,7 +161,7 @@ async def jemengage_users(
     return {"totalUsers": total, "users": json.loads(res)}
 
 
-@app.get("/jemengage/survey", response_class=ORJSONResponse)
+@app.get("/jemengage/survey", response_class=ORJSONResponse, response_model=schemas.JemarcheDataSurveyOut)
 async def jemengage_survey(
     selected_scope: dict = Depends(get_scopes), db: Session = Depends(get_db)
 ):
