@@ -92,11 +92,11 @@ def get_users(
             df["rolling_seven_users"] = df.rolling(7).sum().fillna(0).astype(int)
 
             df.reset_index(inplace=True)
-            df = df[df.date >= pd.to_datetime(after)]
             df_list = [*df_list, df]
 
     big_df = pd.concat(df_list)
     big_df = big_df.groupby(["date"]).sum().reset_index()
+    big_df = big_df[big_df.date >= pd.to_datetime(after)]
     big_df["date"] = big_df["date"].dt.strftime("%d/%m")
 
     return big_df
