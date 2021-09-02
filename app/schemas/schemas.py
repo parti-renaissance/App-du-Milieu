@@ -45,7 +45,7 @@ class Gender(str, Enum):
 
 
 class AdherentName(BaseModel):
-    adherent_id: int = Field(alias="id")
+    #adherent_id: int = Field(alias="id")
     first_name: str
     last_name: str
 
@@ -54,36 +54,42 @@ class AdherentName(BaseModel):
 
 
 class JecouteSurvey(BaseModel):
-    id: int
-    survey_author: Optional[AdherentName] = Field(alias="author")
     name: str
     created_at: datetime
     updated_at: datetime
+    survey_author: Optional[AdherentName] = Field(alias="survey_author")
 
     class Config:
         orm_mode = True
 
 
 class JecouteDataSurvey(BaseModel):
-    id: int
-    author: Optional[AdherentName] = Field(alias="author")
     posted_at: datetime
-    postal_code: Optional[str]
-    age_range: Optional[str]
-    gender: Optional[str]
-    latitude: Optional[float]
-    longitude: Optional[float]
+    author: Optional[AdherentName] = Field(alias="author")
     survey: JecouteSurvey = Field(alias="survey")
 
     class Config:
         orm_mode = True
 
 
-class JecouteDataSurveyOut(BaseModel):
+class JemarcheDataSurvey(BaseModel):
+    id: int
+    postal_code: Optional[str]
+    gender: Optional[str]
+    age_range: Optional[str]
+    latitude: Optional[float]
+    longitude: Optional[float]
+    data_survey: Optional[JecouteDataSurvey] = Field(alias="data_survey")
+
+    class Config:
+        orm_mode = True
+
+
+class JemarcheDataSurveyOut(BaseModel):
     zone_name: str
     latitude: float
     longitude: float
-    survey_datas: List[JecouteDataSurvey]
+    survey_datas: List[JemarcheDataSurvey]
 
     class Config:
         json_encoders = {datetime: lambda v: v.strftime("%d/%m/%y à %H:%M")}
