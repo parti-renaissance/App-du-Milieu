@@ -15,7 +15,7 @@ WORKDIR /app
 COPY . /app
 
 # --- Release with Slim ----
-FROM python:slim AS release
+FROM python:3.11.0a1-slim-bullseye AS release
 # Create app directory
 WORKDIR /app
 
