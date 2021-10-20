@@ -36,7 +36,7 @@ jobs:
         service_account_key: ${{ secrets.GCP_SA_KEY }}
         export_default_credentials: true
 
-    - run: gcloud --quiet auth configure-docker
+    - run: gcloud auth configure-docker
 
     - name: Build
       run: |-
