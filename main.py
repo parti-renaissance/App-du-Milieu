@@ -31,7 +31,6 @@ from app.schemas import schemas
 # profiling
 # from fastapi_profiler.profiler_middleware import PyInstrumentProfilerMiddleware
 
-# TEST REMI TETE CARRE
 
 sentry_sdk.init(dsn="https://3c3c435fe4f245a3ba551475ff8dfa53@o62282.ingest.sentry.io/5890683")
 
