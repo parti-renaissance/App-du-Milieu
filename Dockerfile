@@ -7,7 +7,9 @@ WORKDIR /app
 FROM base AS dependencies
 COPY requirements.txt ./
 # install app dependencies
-RUN pip install -r requirements.txt
+RUN pip install --upgrade pip \
+    pip list --outdated --format=freeze | grep -v '^\-e' | cut -d = -f 1  | xargs -n1 pip install -U \
+    pip install -r requirements.txt
 
 # ---- Copy Files/Build ----
 FROM dependencies AS build
@@ -23,6 +25,7 @@ COPY --from=dependencies /app/requirements.txt ./
 COPY --from=dependencies /root/.cache /root/.cache
 
 # Install app dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip \
+    pip list --outdated --format=freeze | grep -v '^\-e' | cut -d = -f 1  | xargs -n1 pip install -U \pip install --no-cache-dir -r requirements.txt
 COPY --from=build /app/ ./
 CMD exec gunicorn --bind :$PORT --workers 4 --worker-class uvicorn.workers.UvicornWorker --threads 8 --timeout 0 main:app
