@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""A sample flask application on Cloud Run."""
+"""A FastAPI application on Cloud Run."""
 import base64
 import json
 from datetime import datetime
