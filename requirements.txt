@@ -3,7 +3,7 @@ sqlalchemy
 pydantic
 uvicorn[standard]
 requests
-gunicorn
+gunicorn==19.3.0
 pymysql
 psycopg2-binary
 numpy
