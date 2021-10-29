@@ -93,11 +93,11 @@ jobs:
                 pip install flake8
                 flake8 --exit-zero --ignore=E501,W505 .
 
-            - name: PyTest
-              run: |
-                pip install pytest
-                pip install pytest-cov
-                python -m pytest --doctest-modules --junitxml=junit/test-results.xml --cov=./ --cov-report=xml --cov-report=html
+            #- name: PyTest
+            #  run: |
+            #    pip install pytest
+            #    pip install pytest-cov
+            #    python -m pytest --doctest-modules --junitxml=junit/test-results.xml --cov=./ --cov-report=xml --cov-report=html
 
 
     BuildImage:
