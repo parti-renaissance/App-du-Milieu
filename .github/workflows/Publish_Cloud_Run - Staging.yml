@@ -38,7 +38,7 @@ jobs:
         # CRM
         SQL_INST_PG: ${{ secrets.SQL_INST_CRM }}
         DB_NAME_PG: ${{ secrets.DB_NAME_CRM }}
-        DB_PASS_PG: ${{secrets.DB_PASS_CRM}}
+        DB_PASS_PG: ${{secrets.DB_CRM_PASS}}
         
         # Image Env
         IMAGE: app-du-milieu
