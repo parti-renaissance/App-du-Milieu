@@ -16,7 +16,7 @@ WORKDIR /app
 COPY . /app
 
 # --- Release with Slim ----
-FROM python:3.9-slim-buster AS release
+FROM python:3.9 AS release
 # Create app directory
 WORKDIR /app
 
