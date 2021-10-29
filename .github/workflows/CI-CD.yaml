@@ -170,7 +170,7 @@ jobs:
     DeployProduction:
         name: Deploy PRODUCTION 🚀
         runs-on: ubuntu-latest
-        needs: [ Build ]
+        needs: [ BuildImage ]
         environment: production
 
         steps:
