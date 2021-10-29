@@ -16,7 +16,6 @@ on:
 env:
     # Google Cloud Env
     GCP_REGISTRY_PROJECT_ID: ${{ secrets.GCP_REGISTRY_PROJECT_ID }}
-    GCP_REGISTRY_SA_KEY: ${{ secrets.GCP_REGISTRY_SA_KEY }}
     GCP_ZONE: ${{ secrets.GCP_ZONE }}
 
     # Databases
@@ -114,8 +113,8 @@ jobs:
             -   name: Set up Cloud credentials
                 uses: google-github-actions/setup-gcloud@master
                 with:
-                    project_id: "$GCP_REGISTRY_PROJECT_ID"
-                    service_account_key: "$GCP_REGISTRY_SA_KEY"
+                    project_id: ${{ secrets.GCP_REGISTRY_PROJECT_ID }}
+                    service_account_key: ${{ secrets.GCP_REGISTRY_SA_KEY }}
                     export_default_credentials: true
 
             -   name: Build
