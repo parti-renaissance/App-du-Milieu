@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 """A FastAPI application on Cloud Run"""
-
 import base64
 import json
 from datetime import datetime
