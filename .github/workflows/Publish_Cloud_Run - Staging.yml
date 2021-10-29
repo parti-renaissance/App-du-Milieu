@@ -53,6 +53,5 @@ jobs:
         --ingress internal-and-cloud-load-balancing \
         --memory 512Mi \
         --cpu 1 \
-        --member=allUsers
         --set-cloudsql-instances=$SQL_INST,$SQL_INST_PG \
         --set-env-vars=DB_USER=$DB_USER,DB_PASS=$DB_PASS,DB_READ=$DB_READ,CLOUDSQL_CONN=$GCP_PROJECT_ID:$GCP_ZONE:$SQL_INST,DB_USER_PG=$DB_USER,DB_PASS_PG=$DB_PASS_PG,DB_NAME_PG=$DB_NAME_PG,CLOUDSQL_CONN_PG=$GCP_PROJECT_ID:$GCP_ZONE:$SQL_INST_PG
