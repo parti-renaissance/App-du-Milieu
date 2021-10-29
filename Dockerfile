@@ -26,4 +26,5 @@ COPY --from=dependencies /root/.cache /root/.cache
 # Install app dependencies
 RUN pip install --upgrade pip
 COPY --from=build /app/ ./
+EXPOSE 8080
 CMD gunicorn --bind :$PORT --workers 4 --worker-class uvicorn.workers.UvicornWorker --threads 8 --timeout 0 main:app
