@@ -138,7 +138,7 @@ jobs:
         steps:
             # Setup gcloud CLI
             - name: Set up Cloud credentials
-              uses: google-github-actions/deploy-cloudrun@main
+              uses: google-github-actions/setup-gcloud@master
               with:
                 project_id: ${{ secrets.GCP_PROJECT_ID }}
                 service_account_key: ${{ secrets.GCP_SA_KEY }}
@@ -175,7 +175,7 @@ jobs:
         steps:
             # Setup gcloud CLI
             - name: Set up Cloud credentials
-              uses: google-github-actions/deploy-cloudrun@main
+              uses: google-github-actions/setup-gcloud@master
               with:
                 project_id: ${{ secrets.GCP_PROJECT_ID }}
                 service_account_key: ${{ secrets.GCP_SA_KEY }}
