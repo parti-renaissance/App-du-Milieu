@@ -45,7 +45,7 @@ jobs:
         TAG: build
 
       run : |-
-        gcloud run deploy app-du-milieu-staging \
+        gcloud run deploy app-du-milieu \
         --image eu.gcr.io/$GCP_PROJECT_ID/$IMAGE:$TAG \
         --platform managed \
         --region $GCP_ZONE \
