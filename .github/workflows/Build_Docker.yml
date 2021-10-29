@@ -12,8 +12,8 @@ on:
 # General Environments variables
 env:
   # Google Cloud Env
-  GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
-  GCP_SA_KEY: ${{ secrets.GCP_SA_KEY }}
+  GCP_PROJECT_ID: ${{ secrets.GCP_REGISTRY_PROJECT_ID }}
+  GCP_SA_KEY: ${{ secrets.GCP_REGISTRY_SA_KEY }}
 
   # Image Env
   IMAGE: app-du-milieu
