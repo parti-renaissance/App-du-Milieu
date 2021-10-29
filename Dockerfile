@@ -20,10 +20,11 @@ FROM python:3.9-slim AS release
 # Create app directory
 WORKDIR /app
 
-COPY --from=dependencies requirements.txt ./
+COPY --from=dependencies /app/requirements.txt ./
 COPY --from=dependencies /root/.cache /root/.cache
 
 # Install app dependencies
-RUN pip install --upgrade pip
+RUN pip install --upgrade pip \
+    pip install -r requirements.txt
 COPY --from=build /app/ ./
 CMD gunicorn --bind :$PORT --workers 4 --worker-class uvicorn.workers.UvicornWorker --threads 8 --timeout 0 main:app
