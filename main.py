@@ -24,7 +24,6 @@ from app.crud import (
     enmarche,
     jemengage,
     mail_campaign,
-    text_generator,
 )
 from app.database import SessionLocal
 from app.schemas import schemas
@@ -252,12 +251,6 @@ async def nuanceResults(
 
     res = res.to_json(orient="records")
     return json.loads(res)
-
-
-@app.get("/textGenerator", response_class=ORJSONResponse)
-async def generate_text(text: constr(min_length=1), from_language: str = "FR"):
-    res = text_generator.generate_text(text, from_language)
-    return res["text"]
 
 
 if __name__ == "__main__":
