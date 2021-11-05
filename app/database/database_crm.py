@@ -22,7 +22,7 @@ engine_crm = create_engine(
 CLOUDSQL_USER = environ["DB_USER_PG"]
 CLOUDSQL_PASS = environ["DB_PASS_PG"]
 CLOUDSQL_NAME = environ["DB_NAME_PG"]
-CLOUDSQL_CONN = environ["CLOUDSQL_CONN_PG"]
+CLOUDSQL_HOST = environ["DB_HOST_PG"]
 
 engine_crm = create_engine(
     URL.create(
@@ -30,7 +30,8 @@ engine_crm = create_engine(
         username=CLOUDSQL_USER,
         password=CLOUDSQL_PASS,
         database=CLOUDSQL_NAME,
-        query={"host": "/cloudsql/{}".format(CLOUDSQL_CONN)},
+        host=CLOUDSQL_HOST,
+        port=5432
     ),
     pool_size=5,
     pool_timeout=30,
