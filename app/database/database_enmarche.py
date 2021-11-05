@@ -22,7 +22,8 @@ engine_read_only = create_engine(
 CLOUDSQL_USER = environ["DB_USER"]
 CLOUDSQL_PASS = environ["DB_PASS"]
 CLOUDSQL_READ = environ["DB_READ"]
-CLOUDSQL_CONN = environ["CLOUDSQL_CONN"]
+CLOUDSQL_HOST = environ["DB_HOST"]
+CLOUDSQL_PORT = environ["DB_PORT"]
 
 engine_read_only = create_engine(
     URL.create(
@@ -30,7 +31,8 @@ engine_read_only = create_engine(
         username=CLOUDSQL_USER,
         password=CLOUDSQL_PASS,
         database=CLOUDSQL_READ,
-        query={"unix_socket": "/cloudsql/{}".format(CLOUDSQL_CONN)},
+        host=CLOUDSQL_HOST,
+        port=CLOUDSQL_PORT
     ),
     pool_size=5,
     pool_timeout=30,
