@@ -21,10 +21,8 @@ env:
     # Databases
     DB_USER: ${{ secrets.DB_USER }}
     # BO
-    SQL_INST: ${{secrets.SQL_INST}}
     DB_READ: ${{ secrets.DB_NAME}}
     # CRM
-    SQL_INST_PG: ${{ secrets.SQL_INST_CRM }}
     DB_NAME_PG: ${{ secrets.DB_NAME_CRM }}
 
     # Image Env
@@ -149,6 +147,8 @@ jobs:
                     # Google Cloud Env
                     GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
                     # Cloud SQL Env
+                    DB_HOST: ${{ secrets.DB_HOST }}
+                    BD_HOST_PG: ${{ secrets.DB_HOST_PG }}
                     DB_PASS: ${{ secrets.DB_PASS }}
                     DB_PASS_PG: ${{secrets.DB_CRM_PASS}}
 
@@ -161,8 +161,7 @@ jobs:
                     --ingress internal-and-cloud-load-balancing \
                     --memory 512Mi \
                     --cpu 1 \
-                    --set-cloudsql-instances=$SQL_INST,$SQL_INST_PG \
-                    --set-env-vars=DB_USER=$DB_USER,DB_PASS=$DB_PASS,DB_READ=$DB_READ,CLOUDSQL_CONN=$GCP_PROJECT_ID:$GCP_ZONE:$SQL_INST,DB_USER_PG=$DB_USER,DB_PASS_PG=$DB_PASS_PG,DB_NAME_PG=$DB_NAME_PG,CLOUDSQL_CONN_PG=$GCP_PROJECT_ID:$GCP_ZONE:$SQL_INST_PG
+                    --set-env-vars=DB_USER=$DB_USER,DB_PASS=$DB_PASS,DB_READ=$DB_READ,DB_HOST=$DB_HOST,DB_USER_PG=$DB_USER,DB_PASS_PG=$DB_PASS_PG,DB_NAME_PG=$DB_NAME_PG,DB_HOST_PG=$DB_HOST_PG
 
 
     DeployProduction:
@@ -186,6 +185,8 @@ jobs:
                     # Google Cloud Env
                     GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
                     # Cloud SQL Env
+                    DB_HOST: ${{ secrets.DB_HOST }}
+                    BD_HOST_PG: ${{ secrets.DB_HOST_PG }}
                     DB_PASS: ${{ secrets.DB_PASS }}
                     DB_PASS_PG: ${{secrets.DB_CRM_PASS}}
 
@@ -199,5 +200,4 @@ jobs:
                     --memory 2Gi \
                     --cpu 4 \
                     --min-instances 1 \
-                    --set-cloudsql-instances $SQL_INST,$SQL_INST_PG \
-                    --set-env-vars=DB_USER=$DB_USER,DB_PASS=$DB_PASS,DB_READ=$DB_READ,CLOUDSQL_CONN=$GCP_PROJECT_ID:$GCP_ZONE:$SQL_INST,DB_USER_PG=$DB_USER,DB_PASS_PG=$DB_PASS_PG,DB_NAME_PG=$DB_NAME_PG,CLOUDSQL_CONN_PG=$GCP_PROJECT_ID:$GCP_ZONE:$SQL_INST_PG
+                    --set-env-vars=DB_USER=$DB_USER,DB_PASS=$DB_PASS,DB_READ=$DB_READ,DB_HOST=$DB_HOST,DB_USER_PG=$DB_USER,DB_PASS_PG=$DB_PASS_PG,DB_NAME_PG=$DB_NAME_PG,DB_HOST_PG=$DB_HOST_PG
