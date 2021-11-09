@@ -21,7 +21,6 @@ env:
     # Databases
     DB_USER: ${{ secrets.DB_USER }}
     # BO
-    SQL_INST: ${{secrets.SQL_INST}}
     DB_READ: ${{ secrets.DB_NAME}}
     # CRM
     SQL_INST_PG: ${{ secrets.SQL_INST_CRM }}
@@ -149,6 +148,7 @@ jobs:
                     # Google Cloud Env
                     GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
                     # Cloud SQL Env
+                    SQL_INST: ${{secrets.SQL_INST}}
                     DB_PASS: ${{ secrets.DB_PASS }}
                     DB_PASS_PG: ${{secrets.DB_CRM_PASS}}
 
@@ -186,6 +186,7 @@ jobs:
                     # Google Cloud Env
                     GCP_PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
                     # Cloud SQL Env
+                    SQL_INST: ${{secrets.SQL_INST}}
                     DB_PASS: ${{ secrets.DB_PASS }}
                     DB_PASS_PG: ${{secrets.DB_CRM_PASS}}
 
