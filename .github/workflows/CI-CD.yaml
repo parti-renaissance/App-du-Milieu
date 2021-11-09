@@ -192,7 +192,7 @@ jobs:
 
                 run : |-
                     gcloud run deploy app-du-milieu \
-                    --image eu.gcr.io/$GCP_PROJECT_ID/$IMAGE:$TAG \
+                    --image eu.gcr.io/$GCP_REGISTRY_PROJECT_ID/$IMAGE:$TAG \
                     --platform managed \
                     --region $GCP_ZONE \
                     --allow-unauthenticated \
