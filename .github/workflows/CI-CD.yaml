@@ -114,7 +114,7 @@ jobs:
                 uses: google-github-actions/setup-gcloud@master
                 with:
                     project_id: ${{ secrets.GCP_REGISTRY_PROJECT_ID }}
-                    service_account_key: ${{ secrets.GCP_SA_GITHUB_CR }}
+                    service_account_key: ${{ secrets.GCP_SA_KEY_GCR_PUSHER }}
                     export_default_credentials: true
 
             -   name: Build
@@ -141,7 +141,7 @@ jobs:
               uses: google-github-actions/setup-gcloud@master
               with:
                 project_id: ${{ secrets.GCP_PROJECT_ID }}
-                service_account_key: ${{ secrets.GCP_SA_CLOUDRUN_DEPLOYER }}
+                service_account_key: ${{ secrets.GCP_SA_KEY_CLOUDRUN_DEPLOYER }}
                 export_default_credentials: true
 
             -   name: Deploy to Cloud Run
@@ -179,7 +179,7 @@ jobs:
               uses: google-github-actions/setup-gcloud@master
               with:
                 project_id: ${{ secrets.GCP_PROJECT_ID }}
-                service_account_key: ${{ secrets.GCP_SA_CLOUDRUN_DEPLOYER }}
+                service_account_key: ${{ secrets.GCP_SA_KEY_CLOUDRUN_DEPLOYER }}
                 export_default_credentials: true
 
             -   name: Deploy to Cloud Run
