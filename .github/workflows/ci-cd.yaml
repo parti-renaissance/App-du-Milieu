@@ -1,4 +1,14 @@
-name: Continuous Integration & Deployment
+#
+# Requires secrets:
+#   GCP_HOST_GCR                  The base host of the Google Cloud Registry
+#   GCP_REGISTRY_PROJECT_ID       The GCP Project ID of the Google Cloud Registry
+#   GCP_SA_KEY_GCR_PUSHER         The GCP Service Account key used to push on the Google Cloud Registry
+#   GCP_GCR_REPOSITORY            The repository name of the app on the Google Cloud Registry
+#   GCP_SA_KEY_CLOUDRUN_DEPLOYER  The GCP Service Account key used to deploy services on Cloud Run
+#   GCP_PROJECT_ID                The GCP Project ID to deploy the app
+#   GCP_CLOUDRUN_SERVICE          The name of the Cloud Run service to deploy
+#   GCP_ZONE                      The region of the Cloud Run service
+#
 
 on:
   push:
@@ -107,7 +117,7 @@ jobs:
           credentials: ${{ secrets.GCP_SA_KEY_CLOUDRUN_DEPLOYER }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           service: ${{ secrets.GCP_CLOUDRUN_SERVICE }}
-          image: ${{ env.IMAGE }}
+          image: ${{ env.IMAGE }}:${{ env.TAG }}
           region: ${{ secrets.GCP_ZONE }}
 
   deploy-prod:
@@ -123,5 +133,5 @@ jobs:
             credentials: ${{ secrets.GCP_SA_KEY_CLOUDRUN_DEPLOYER }}
             project_id: ${{ secrets.GCP_PROJECT_ID }}
             service: ${{ secrets.GCP_CLOUDRUN_SERVICE }}
-            image: ${{ env.IMAGE }}
+            image: ${{ env.IMAGE }}:${{ env.TAG }}
             region: ${{ secrets.GCP_ZONE }}
