@@ -82,7 +82,7 @@ jobs:
 
       - name: Cleanup old images on Google Container Registry
         run: |-
-          limitDate=$(date "+%Y-%m-%d %H:%M:%S" -d "15 days ago")
+          limitDate=$(date "+%Y-%m-%d %H:%M:%S" -d "60 days ago")
 
           digests=$(gcloud container images list-tags $IMAGE \
           --filter="timestamp.datetime < '$limitDate'" \
@@ -106,8 +106,8 @@ jobs:
         with:
           credentials: ${{ secrets.GCP_SA_KEY_CLOUDRUN_DEPLOYER }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
-          service: ${{ secrets.service }}
-          image: $IMAGE
+          service: ${{ secrets.GCP_CLOUDRUN_SERVICE }}
+          image: ${{ env.IMAGE }}
           region: ${{ secrets.GCP_ZONE }}
 
   deploy-prod:
@@ -123,5 +123,5 @@ jobs:
             credentials: ${{ secrets.GCP_SA_KEY_CLOUDRUN_DEPLOYER }}
             project_id: ${{ secrets.GCP_PROJECT_ID }}
             service: ${{ secrets.GCP_CLOUDRUN_SERVICE }}
-            image: $IMAGE
+            image: ${{ env.IMAGE }}
             region: ${{ secrets.GCP_ZONE }}
