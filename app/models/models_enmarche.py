@@ -250,7 +250,7 @@ class JecouteSurvey(Base):
     created_at = Column(DateTime, nullable=False)
     updated_at = Column(DateTime, nullable=False)
     type = Column(String, nullable=False)
-    zone_id = Column(Integer, ForeignKey("geo_zone.id"))
+    zone_id = Column(Integer, ForeignKey("geo_zone.id"), nullable=True)
     geo_zone_relation = relationship("GeoZone")
 
 
