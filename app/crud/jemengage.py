@@ -119,8 +119,8 @@ def get_survey_datas(db: Session, scope: dict):
             GeoCity, GeoCity.postal_code.like("%" + JemarcheDataSurvey.postal_code + "%")
         )
         .filter(GeoCity.code.in_(city_codes))
-        .filter(JemarcheDataSurvey.latitude != "")
-        .filter(JemarcheDataSurvey.longitude != "")
+        .filter(JemarcheDataSurvey.latitude is not None)
+        .filter(JemarcheDataSurvey.longitude is not None)
         .all()
     )
 
