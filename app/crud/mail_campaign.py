@@ -24,6 +24,9 @@ def filter_role(db: Session, query: Query, zones: List[GeoZone], role: str):
     Allow to filter database
     according to implemented roles
     """
+    if role not in ("referent", "deputy", "senator", "candidate"):
+        return query
+
     all_zones = [
         [zone.id] + [child.id for child in get_child(db, zone)] for zone in zones
     ]
@@ -43,11 +46,10 @@ def filter_role(db: Session, query: Query, zones: List[GeoZone], role: str):
             .join(ReferentTags.zone.and_(GeoZone.id.in_(all_zones)))
         )
 
-    if role in {"candidate", "national"}:
-        return query.join(AdherentMessages.filter).join(
-            AdherentMessageFilters.zone.and_(GeoZone.id.in_(all_zones))
-        )
-    return query
+    #if role in {"candidate"}:
+    return query.join(AdherentMessages.filter).join(
+        AdherentMessageFilters.zone.and_(GeoZone.id.in_(all_zones))
+    )
 
 
 async def get_campaign_reports(db: Session, zone: GeoZone, since: datetime, role: str):
@@ -129,37 +131,18 @@ async def get_mail_ratios(db: Session, zone: GeoZone, since: datetime, role: str
         .select_from(MailChimpCampaignReport)
         .join(MailChimpCampaignReport.mailchimp_campaign)
         .join(MailChimpCampaign.message)
+        .filter(AdherentMessages.status == "sent")
         .filter(AdherentMessages.sent_at >= since)
         .join(AdherentMessages.author)
     )
-    if role != "national":
-        query = query.filter(AdherentMessages.type == role)
 
-    res = filter_role(db, query, zone, role)
+    if role == "national":
+        return {"local": query.first(), "national": query.first()}
 
-    nat = (
-        db.query(
-            func.round(
-                func.sum(MailChimpCampaignReport.open_unique)
-                / func.sum(MailChimpCampaignReport.email_sent),
-                4,
-            ).label("txOuverture"),
-            func.round(
-                func.sum(MailChimpCampaignReport.click_unique)
-                / func.sum(MailChimpCampaignReport.email_sent),
-                4,
-            ).label("txClique"),
-            func.round(
-                func.sum(MailChimpCampaignReport.unsubscribed)
-                / func.sum(MailChimpCampaignReport.email_sent),
-                4,
-            ).label("txDesabonnement"),
-        )
-        .select_from(MailChimpCampaignReport)
-        .join(MailChimpCampaignReport.mailchimp_campaign)
-        .join(MailChimpCampaign.message)
-    )
-    if role != "national":
-        nat = nat.filter(AdherentMessages.type == role)
+    query = query.filter(AdherentMessages.type == role)
+    res = {"national": query.first()}
 
-    return {"local": res.first(), "national": nat.first()}
+    # filtre sur la zone locale
+    query = filter_role(db, query, zone, role)
+
+    return {"local": query.first(), **res}
