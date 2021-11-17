@@ -181,7 +181,7 @@ def get_survey(db: Session, scope: dict):
         res["longitude"] = geo_borough.longitude
     else:
         res["zone_name"] = next(iter(returned_zone.values()))[0]
-    
+
     # Si pas de latitude,longitude par defaut la France
     if not res["latitude"]:
         res["latitude"] = 47.260834
