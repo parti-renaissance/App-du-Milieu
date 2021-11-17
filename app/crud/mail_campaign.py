@@ -140,9 +140,5 @@ async def get_mail_ratios(db: Session, zone: GeoZone, since: datetime, role: str
         return {"local": query.first(), "national": query.first()}
 
     query = query.filter(AdherentMessages.type == role)
-    res = {"national": query.first()}
 
-    # filtre sur la zone locale
-    query = filter_role(db, query, zone, role)
-
-    return {"local": query.first(), **res}
+    return {"local": filter_role(db, query, zone, role).first(), "national": query.first()}
