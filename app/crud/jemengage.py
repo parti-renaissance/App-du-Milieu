@@ -104,30 +104,35 @@ def get_users(
 
 
 def get_survey_datas(db: Session, scope: dict):
-    city_codes = []
-    for zone in scope["zones"]:
-        city_codes += [zone.code for zone in get_child(db, zone, "city")]
-        city_codes += [zone.code for zone in get_child(db, zone, "borough")]
-
-    return (
+    query = (
         db.query(JemarcheDataSurvey)
         .join(JemarcheDataSurvey.data_survey)
         .join(JecouteDataSurvey.author)
         .join(JecouteDataSurvey.survey)
-        .filter(JemarcheDataSurvey.postal_code != "")
-        .join(
-            GeoCity, GeoCity.postal_code.like("%" + JemarcheDataSurvey.postal_code + "%")
-        )
-        .filter(GeoCity.code.in_(city_codes))
-        .filter(JemarcheDataSurvey.latitude is not None)
-        .filter(JemarcheDataSurvey.longitude is not None)
-        .all()
+        .filter(JemarcheDataSurvey.latitude != "")
+        .filter(JemarcheDataSurvey.longitude != "")
     )
+
+    if not scope['code'] == 'national':
+        city_codes = []
+        for zone in scope["zones"]:
+            city_codes += [zone.code for zone in get_child(db, zone, "city")]
+            city_codes += [zone.code for zone in get_child(db, zone, "borough")]
+
+        query = (
+            query
+            .filter(JemarcheDataSurvey.postal_code != "")
+            .join(
+                GeoCity, GeoCity.postal_code.like("%" + JemarcheDataSurvey.postal_code + "%")
+            ).filter(GeoCity.code.in_(city_codes))
+        )
+
+    return query.all()
 
 
 def get_survey(db: Session, scope: dict):
     returned_zone = scope2dict(scope, True)
-    res = {}
+    res = {"latitude": None, "longitude": None}
     if "pays" in returned_zone.keys():
         geo_nat = (
             db.query(GeoCountry)
@@ -175,9 +180,12 @@ def get_survey(db: Session, scope: dict):
         res["longitude"] = geo_borough.longitude
     else:
         res["zone_name"] = next(iter(returned_zone.values()))[0]
-        # Chez Xavier
-        res["latitude"] = 48.835633
-        res["longitude"] = 2.323433
+    
+    # Si pas de latitude,longitude par defaut la France
+    if not res["latitude"]:
+        res["latitude"] = 47.260834
+    if not res["longitude"]:
+        res["longitude"] = 2.418889
 
     res["survey_datas"] = get_survey_datas(db, scope)
     return res
