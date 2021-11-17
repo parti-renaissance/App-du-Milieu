@@ -102,7 +102,6 @@ def get_users(
     return big_df
 
 
-
 def get_survey_datas(db: Session, scope: dict):
     query = (
         db.query(JemarcheDataSurvey)
@@ -113,19 +112,21 @@ def get_survey_datas(db: Session, scope: dict):
         .filter(JemarcheDataSurvey.longitude != "")
     )
 
-    if scope['code'] != 'national':
-        city_codes = []
-        for zone in scope["zones"]:
-            city_codes += [zone.code for zone in get_child(db, zone, "city")]
-            city_codes += [zone.code for zone in get_child(db, zone, "borough")]
+    if scope['code'] == 'national':
+        return query.all()
 
-        query = (
-            query
-            .filter(JemarcheDataSurvey.postal_code != "")
-            .join(
-                GeoCity, GeoCity.postal_code.like("%" + JemarcheDataSurvey.postal_code + "%")
-            ).filter(GeoCity.code.in_(city_codes))
-        )
+    city_codes = []
+    for zone in scope["zones"]:
+        city_codes += [zone.code for zone in get_child(db, zone, "city")]
+        city_codes += [zone.code for zone in get_child(db, zone, "borough")]
+
+    query = (
+        query
+        .filter(JemarcheDataSurvey.postal_code != "")
+        .join(
+            GeoCity, GeoCity.postal_code.like("%" + JemarcheDataSurvey.postal_code + "%")
+        ).filter(GeoCity.code.in_(city_codes))
+    )
 
     return query.all()
 
