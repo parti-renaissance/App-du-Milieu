@@ -113,7 +113,7 @@ def get_survey_datas(db: Session, scope: dict):
         .filter(JemarcheDataSurvey.longitude != "")
     )
 
-    if not scope['code'] == 'national':
+    if scope['code'] != 'national':
         city_codes = []
         for zone in scope["zones"]:
             city_codes += [zone.code for zone in get_child(db, zone, "city")]
