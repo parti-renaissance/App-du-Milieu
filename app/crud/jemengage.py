@@ -6,6 +6,7 @@ from app.crud.enmarche import get_child, scope2dict
 from app.database.database_crm import engine_crm
 from app.models.models_crm import Downloads, Users
 from app.models.models_enmarche import (
+    Adherents,
     GeoBorough,
     GeoCity,
     GeoCountry,
@@ -15,7 +16,7 @@ from app.models.models_enmarche import (
     JemarcheDataSurvey,
     JecouteDataSurvey,
 )
-from sqlalchemy import Date
+from sqlalchemy import Date, func, and_, or_
 from sqlalchemy.orm import Session
 
 
@@ -102,18 +103,29 @@ def get_users(
     return big_df
 
 
-def get_survey_datas(db: Session, scope: dict):
+def survey_datas_export(query):
+    return {
+        "total_surveys": query.count(),
+        "survey_datas": (
+            query
+            .filter(JemarcheDataSurvey.latitude != "")
+            .filter(JemarcheDataSurvey.longitude != "")
+            .all()
+        )
+    }
+
+
+def get_survey_datas(db: Session, scope: dict, survey_id):
     query = (
         db.query(JemarcheDataSurvey)
-        .join(JemarcheDataSurvey.data_survey)
-        .join(JecouteDataSurvey.author)
-        .join(JecouteDataSurvey.survey)
-        .filter(JemarcheDataSurvey.latitude != "")
-        .filter(JemarcheDataSurvey.longitude != "")
+        .join(JemarcheDataSurvey.data_survey, JecouteDataSurvey.author, isouter=True)
     )
 
+    if survey_id:
+        query = query.filter(JecouteDataSurvey.survey_id == survey_id)
+
     if scope['code'] == 'national':
-        return query.all()
+        return survey_datas_export(query)
 
     city_codes = []
     for zone in scope["zones"]:
@@ -122,16 +134,20 @@ def get_survey_datas(db: Session, scope: dict):
 
     query = (
         query
-        .filter(JemarcheDataSurvey.postal_code != "")
-        .join(
-            GeoCity, GeoCity.postal_code.like("%" + JemarcheDataSurvey.postal_code + "%")
-        ).filter(GeoCity.code.in_(city_codes))
+        .join(GeoCity,
+            and_(GeoCity.postal_code.like("%" +
+                func.IF(JemarcheDataSurvey.postal_code != '', JemarcheDataSurvey.postal_code, Adherents.address_postal_code) + 
+                "%"
+                ), or_(JemarcheDataSurvey.postal_code != '', Adherents.address_postal_code)
+            )
+        )
+        .filter(GeoCity.code.in_(city_codes))
     )
 
-    return query.all()
+    return survey_datas_export(query)
 
 
-def get_survey(db: Session, scope: dict):
+def get_survey(db: Session, scope: dict, survey_id):
     returned_zone = scope2dict(scope, True)
     res = {"latitude": None, "longitude": None}
     if "pays" in returned_zone.keys():
@@ -188,5 +204,4 @@ def get_survey(db: Session, scope: dict):
     if not res["longitude"]:
         res["longitude"] = 2.418889
 
-    res["survey_datas"] = get_survey_datas(db, scope)
-    return res
+    return dict(get_survey_datas(db, scope, survey_id), **res)

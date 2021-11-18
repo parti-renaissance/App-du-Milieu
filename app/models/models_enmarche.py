@@ -24,6 +24,7 @@ class Adherents(Base):
     id = Column(Integer, primary_key=True, index=True)
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
+    address_postal_code = Column(String, nullable=True)
     uuid = Column(String(36), unique=True, nullable=False, index=True)
     managed_area_id = Column(
         Integer, ForeignKey("referent_managed_areas_tags.referent_managed_area_id")
