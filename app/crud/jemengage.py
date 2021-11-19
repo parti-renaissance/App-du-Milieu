@@ -195,4 +195,3 @@ def get_survey(db: Session, scope: dict, survey_id):
         "total_surveys": 0,
         "survey_datas": []
     }
-
