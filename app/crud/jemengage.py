@@ -148,27 +148,27 @@ def get_survey_datas(db: Session, scope: dict, survey_id):
 
 
 def get_geo_matched_zone(db: Session, zones: dict):
-    if "pays" in zones.keys():
+    if "pays" in zones:
         return (
             db.query(GeoCountry)
             .filter(GeoCountry.name == zones["pays"][0])
         )
-    if "region" in zones.keys():
+    if "region" in zones:
         return (
             db.query(GeoRegion)
             .filter(GeoRegion.name == zones["region"][0])
         )
-    if "departement" in zones.keys():
+    if "departement" in zones:
         return (
             db.query(GeoDepartment)
             .filter(GeoDepartment.name == zones["departement"][0])
         )
-    if "circonscription" in zones.keys():
+    if "circonscription" in zones:
         return (
             db.query(GeoDistrict)
             .filter(GeoDistrict.name == zones["circonscription"][0])
         )
-    if "arrondissement_commune" in zones.keys():
+    if "arrondissement_commune" in zones:
         return (
             db.query(GeoBorough)
             .filter(GeoBorough.name == zones["arrondissement_commune"][0])
@@ -182,9 +182,10 @@ def get_survey(db: Session, scope: dict, survey_id):
         geo_matched_zone = query.first()
         res = {
             "zone_name": geo_matched_zone.name,
-            "latitude": geo_matched_zone.latitude if geo_matched_zone.latitude else 47.260834, # not nullable
-            "longitude": geo_matched_zone.longitude if geo_matched_zone.longitude else 2.418889 # not nullable
+            "latitude": geo_matched_zone.latitude or 47.260834,
+            "longitude": geo_matched_zone.longitude or 2.418889,
         }
+
         return dict(get_survey_datas(db, scope, survey_id), **res)
 
     return {
