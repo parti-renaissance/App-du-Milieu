@@ -6,7 +6,6 @@ from app.crud.enmarche import get_child, scope2dict
 from app.database.database_crm import engine_crm
 from app.models.models_crm import Downloads, Users
 from app.models.models_enmarche import (
-    Adherents,
     GeoBorough,
     GeoCity,
     GeoCountry,
@@ -118,7 +117,7 @@ def survey_datas_export(query):
 def get_survey_datas(db: Session, scope: dict, survey_id):
     query = (
         db.query(JemarcheDataSurvey)
-        .join(JemarcheDataSurvey.data_survey, JecouteDataSurvey.author, isouter=True)
+        .join(JemarcheDataSurvey.data_survey, isouter=True)
     )
 
     if survey_id:
@@ -135,10 +134,7 @@ def get_survey_datas(db: Session, scope: dict, survey_id):
     query = (
         query
         .join(GeoCity,
-            and_(GeoCity.postal_code.like("%" +
-                func.IF(JemarcheDataSurvey.postal_code != '', JemarcheDataSurvey.postal_code, Adherents.address_postal_code) + 
-                "%"
-                ), or_(JemarcheDataSurvey.postal_code != '', Adherents.address_postal_code)
+            and_(GeoCity.postal_code.like("%" + JecouteDataSurvey.author_postal_code + "%")
             )
         )
         .filter(GeoCity.code.in_(city_codes))

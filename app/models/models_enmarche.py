@@ -234,6 +234,7 @@ class JecouteDataSurvey(Base):
     id = Column(Integer, primary_key=True, index=True)
     author_id = Column(Integer, ForeignKey("adherents.id"), nullable=True)
     author = relationship("Adherents", lazy="joined")
+    author_postal_code = Column(String, nullable=True)
     survey_id = Column(Integer, ForeignKey("jecoute_survey.id"))
     survey = relationship("JecouteSurvey", lazy="joined")
     posted_at = Column(DateTime, nullable=False)
