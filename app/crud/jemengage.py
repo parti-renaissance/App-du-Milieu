@@ -15,7 +15,7 @@ from app.models.models_enmarche import (
     JemarcheDataSurvey,
     JecouteDataSurvey,
 )
-from sqlalchemy import Date, func, and_, or_
+from sqlalchemy import Date, and_
 from sqlalchemy.orm import Session
 
 
