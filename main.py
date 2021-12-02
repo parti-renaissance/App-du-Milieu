@@ -13,6 +13,7 @@ from fastapi import Depends, FastAPI, Header, HTTPException, Query
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import ORJSONResponse
 from pydantic import conint, constr
+from typing import Optional
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
 from app.resources.strings import NO_SCOPE, NO_X_SCOPE, NO_CONTACT, NO_CONTENT
@@ -162,9 +163,11 @@ async def jemengage_users(
 
 @app.get("/jemengage/survey", response_class=ORJSONResponse, response_model=schemas.JemarcheDataSurveyOut)
 async def jemengage_survey(
-    selected_scope: dict = Depends(get_scopes), db: Session = Depends(get_db)
+    selected_scope: dict = Depends(get_scopes),
+    db: Session = Depends(get_db),
+    survey_id: Optional[conint(gt=0)] = None
 ):
-    return jemengage.get_survey(db, selected_scope)
+    return jemengage.get_survey(db, selected_scope, survey_id)
 
 
 @app.get("/mailCampaign/reports", response_class=ORJSONResponse)

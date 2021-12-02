@@ -15,7 +15,7 @@ from app.models.models_enmarche import (
     JemarcheDataSurvey,
     JecouteDataSurvey,
 )
-from sqlalchemy import Date
+from sqlalchemy import Date, and_
 from sqlalchemy.orm import Session
 
 
@@ -102,18 +102,29 @@ def get_users(
     return big_df
 
 
-def get_survey_datas(db: Session, scope: dict):
+def survey_datas_export(query):
+    return {
+        "total_surveys": query.count(),
+        "survey_datas": (
+            query
+            .filter(JemarcheDataSurvey.latitude != "")
+            .filter(JemarcheDataSurvey.longitude != "")
+            .all()
+        )
+    }
+
+
+def get_survey_datas(db: Session, scope: dict, survey_id):
     query = (
         db.query(JemarcheDataSurvey)
-        .join(JemarcheDataSurvey.data_survey)
-        .join(JecouteDataSurvey.author)
-        .join(JecouteDataSurvey.survey)
-        .filter(JemarcheDataSurvey.latitude != "")
-        .filter(JemarcheDataSurvey.longitude != "")
+        .join(JemarcheDataSurvey.data_survey, isouter=True)
     )
 
+    if survey_id:
+        query = query.filter(JecouteDataSurvey.survey_id == survey_id)
+
     if scope['code'] == 'national':
-        return query.all()
+        return survey_datas_export(query)
 
     city_codes = []
     for zone in scope["zones"]:
@@ -122,71 +133,61 @@ def get_survey_datas(db: Session, scope: dict):
 
     query = (
         query
-        .filter(JemarcheDataSurvey.postal_code != "")
-        .join(
-            GeoCity, GeoCity.postal_code.like("%" + JemarcheDataSurvey.postal_code + "%")
-        ).filter(GeoCity.code.in_(city_codes))
+        .join(GeoCity,
+            and_(GeoCity.postal_code.like("%" + JecouteDataSurvey.author_postal_code + "%")
+            )
+        )
+        .filter(GeoCity.code.in_(city_codes))
     )
 
-    return query.all()
+    return survey_datas_export(query)
 
 
-def get_survey(db: Session, scope: dict):
-    returned_zone = scope2dict(scope, True)
-    res = {"latitude": None, "longitude": None}
-    if "pays" in returned_zone.keys():
-        geo_nat = (
+def get_geo_matched_zone(db: Session, zones: dict):
+    if "pays" in zones:
+        return (
             db.query(GeoCountry)
-            .filter(GeoCountry.name == returned_zone["pays"][0])
-            .first()
+            .filter(GeoCountry.name == zones["pays"][0])
         )
-        res["zone_name"] = geo_nat.name
-        res["latitude"] = geo_nat.latitude
-        res["longitude"] = geo_nat.longitude
-    elif "region" in returned_zone.keys():
-        geo_reg = (
+    if "region" in zones:
+        return (
             db.query(GeoRegion)
-            .filter(GeoRegion.name == returned_zone["region"][0])
-            .first()
+            .filter(GeoRegion.name == zones["region"][0])
         )
-        res["zone_name"] = geo_reg.name
-        res["latitude"] = geo_reg.latitude
-        res["longitude"] = geo_reg.longitude
-    elif "departement" in returned_zone.keys():
-        geo_dpt = (
+    if "departement" in zones:
+        return (
             db.query(GeoDepartment)
-            .filter(GeoDepartment.name == returned_zone["departement"][0])
-            .first()
+            .filter(GeoDepartment.name == zones["departement"][0])
         )
-        res["zone_name"] = geo_dpt.name
-        res["latitude"] = geo_dpt.latitude
-        res["longitude"] = geo_dpt.longitude
-    elif "circonscription" in returned_zone.keys():
-        geo_district = (
+    if "circonscription" in zones:
+        return (
             db.query(GeoDistrict)
-            .filter(GeoDistrict.name == returned_zone["circonscription"][0])
-            .first()
+            .filter(GeoDistrict.name == zones["circonscription"][0])
         )
-        res["zone_name"] = geo_district.name
-        res["latitude"] = geo_district.latitude
-        res["longitude"] = geo_district.longitude
-    elif "arrondissement_commune" in returned_zone.keys():
-        geo_borough = (
+    if "arrondissement_commune" in zones:
+        return (
             db.query(GeoBorough)
-            .filter(GeoBorough.name == returned_zone["arrondissement_commune"][0])
-            .first()
+            .filter(GeoBorough.name == zones["arrondissement_commune"][0])
         )
-        res["zone_name"] = geo_borough.name
-        res["latitude"] = geo_borough.latitude
-        res["longitude"] = geo_borough.longitude
-    else:
-        res["zone_name"] = next(iter(returned_zone.values()))[0]
+    return None
 
-    # Si pas de latitude,longitude par defaut la France
-    if not res["latitude"]:
-        res["latitude"] = 47.260834
-    if not res["longitude"]:
-        res["longitude"] = 2.418889
 
-    res["survey_datas"] = get_survey_datas(db, scope)
-    return res
+def get_survey(db: Session, scope: dict, survey_id):
+    returned_zones = scope2dict(scope, True)
+    if (query := get_geo_matched_zone(db, returned_zones)):
+        geo_matched_zone = query.first()
+        res = {
+            "zone_name": geo_matched_zone.name,
+            "latitude": geo_matched_zone.latitude or 47.260834,
+            "longitude": geo_matched_zone.longitude or 2.418889,
+        }
+
+        return dict(get_survey_datas(db, scope, survey_id), **res)
+
+    return {
+        "zone_name": "Zone non implémentée", #next(iter(returned_zones.values()))[0],
+        "latitude": 47.260834,
+        "longitude": 2.418889,
+        "total_surveys": 0,
+        "survey_datas": []
+    }

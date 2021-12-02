@@ -24,6 +24,7 @@ class Adherents(Base):
     id = Column(Integer, primary_key=True, index=True)
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
+    address_postal_code = Column(String, nullable=True)
     uuid = Column(String(36), unique=True, nullable=False, index=True)
     managed_area_id = Column(
         Integer, ForeignKey("referent_managed_areas_tags.referent_managed_area_id")
@@ -233,6 +234,7 @@ class JecouteDataSurvey(Base):
     id = Column(Integer, primary_key=True, index=True)
     author_id = Column(Integer, ForeignKey("adherents.id"), nullable=True)
     author = relationship("Adherents", lazy="joined")
+    author_postal_code = Column(String, nullable=True)
     survey_id = Column(Integer, ForeignKey("jecoute_survey.id"))
     survey = relationship("JecouteSurvey", lazy="joined")
     posted_at = Column(DateTime, nullable=False)

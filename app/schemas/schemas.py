@@ -89,6 +89,7 @@ class JemarcheDataSurveyOut(BaseModel):
     zone_name: str
     latitude: float
     longitude: float
+    total_surveys: int
     survey_datas: List[JemarcheDataSurvey]
 
     class Config:
