@@ -232,6 +232,7 @@ class JecouteDataSurvey(Base):
     __tablename__ = "jecoute_data_survey"
 
     id = Column(Integer, primary_key=True, index=True)
+    uuid = Column(String(36), unique=True, nullable=False)
     author_id = Column(Integer, ForeignKey("adherents.id"), nullable=True)
     author = relationship("Adherents", lazy="joined")
     author_postal_code = Column(String, nullable=True)
@@ -246,6 +247,7 @@ class JecouteSurvey(Base):
     __tablename__ = "jecoute_survey"
 
     id = Column(Integer, primary_key=True, index=True)
+    uuid = Column(String(36), unique=True, nullable=False)
     author_id = Column(Integer, ForeignKey("adherents.id"), nullable=True)
     author = relationship("Adherents", lazy="joined")
     name = Column(String, nullable=False)

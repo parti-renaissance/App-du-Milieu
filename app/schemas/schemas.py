@@ -55,6 +55,7 @@ class AdherentName(BaseModel):
 
 class JecouteSurvey(BaseModel):
     name: str
+    uuid: str
     created_at: datetime
     updated_at: datetime
     survey_author: Optional[AdherentName] = Field(alias="survey_author")
@@ -64,6 +65,7 @@ class JecouteSurvey(BaseModel):
 
 
 class JecouteDataSurvey(BaseModel):
+    uuid: str
     posted_at: datetime
     author: Optional[AdherentName] = Field(alias="author")
     survey: JecouteSurvey = Field(alias="survey")
@@ -73,7 +75,6 @@ class JecouteDataSurvey(BaseModel):
 
 
 class JemarcheDataSurvey(BaseModel):
-    id: int
     postal_code: Optional[str]
     gender: Optional[str]
     age_range: Optional[str]

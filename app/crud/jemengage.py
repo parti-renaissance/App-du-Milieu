@@ -14,6 +14,7 @@ from app.models.models_enmarche import (
     GeoRegion,
     JemarcheDataSurvey,
     JecouteDataSurvey,
+    JecouteSurvey,
 )
 from sqlalchemy import Date, and_
 from sqlalchemy.orm import Session
@@ -114,14 +115,18 @@ def survey_datas_export(query):
     }
 
 
-def get_survey_datas(db: Session, scope: dict, survey_id):
+def get_survey_datas(db: Session, scope: dict, survey_uuid):
     query = (
         db.query(JemarcheDataSurvey)
         .join(JemarcheDataSurvey.data_survey, isouter=True)
     )
 
-    if survey_id:
-        query = query.filter(JecouteDataSurvey.survey_id == survey_id)
+    if survey_uuid:
+        query = (
+            query
+            .join(JecouteDataSurvey.survey, isouter=True)
+            .filter(JecouteSurvey.uuid == survey_uuid)
+        )
 
     if scope['code'] == 'national':
         return survey_datas_export(query)
@@ -172,7 +177,7 @@ def get_geo_matched_zone(db: Session, zones: dict):
     return None
 
 
-def get_survey(db: Session, scope: dict, survey_id):
+def get_survey(db: Session, scope: dict, survey_uuid):
     returned_zones = scope2dict(scope, True)
     if (query := get_geo_matched_zone(db, returned_zones)):
         geo_matched_zone = query.first()
@@ -182,7 +187,7 @@ def get_survey(db: Session, scope: dict, survey_id):
             "longitude": geo_matched_zone.longitude or 2.418889,
         }
 
-        return dict(get_survey_datas(db, scope, survey_id), **res)
+        return dict(get_survey_datas(db, scope, survey_uuid), **res)
 
     return {
         "zone_name": "Zone non implémentée", #next(iter(returned_zones.values()))[0],

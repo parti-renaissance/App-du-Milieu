@@ -165,9 +165,9 @@ async def jemengage_users(
 async def jemengage_survey(
     selected_scope: dict = Depends(get_scopes),
     db: Session = Depends(get_db),
-    survey_id: Optional[conint(gt=0)] = None
+    survey_uuid: Optional[constr(min_length=36, max_length=36)] = None
 ):
-    return jemengage.get_survey(db, selected_scope, survey_id)
+    return jemengage.get_survey(db, selected_scope, survey_uuid)
 
 
 @app.get("/mailCampaign/reports", response_class=ORJSONResponse)
