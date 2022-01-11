@@ -242,13 +242,13 @@ class JecouteDataSurvey(Base):
 
 
 class JecouteSurvey(Base):
-    """Table jecoute_data_survey"""
+    """Table jecoute_survey"""
 
     __tablename__ = "jecoute_survey"
 
     id = Column(Integer, primary_key=True, index=True)
     uuid = Column(String(36), unique=True, nullable=False)
-    author_id = Column(Integer, ForeignKey("adherents.id"), nullable=True)
+    created_by_adherent_id = Column(Integer, ForeignKey("adherents.id"), nullable=True)
     author = relationship("Adherents", lazy="joined")
     name = Column(String, nullable=False)
     created_at = Column(DateTime, nullable=False)
