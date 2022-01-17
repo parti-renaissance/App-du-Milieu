@@ -54,7 +54,7 @@ app.add_middleware(SentryAsgiMiddleware)
 # app.add_middleware(PyInstrumentProfilerMiddleware)
 
 # Constant VAR
-MAX_HISTORY = 90
+MAX_HISTORY = 30
 
 
 def get_db():
