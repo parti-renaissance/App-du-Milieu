@@ -1,5 +1,5 @@
 """Endpoints de notre api."""
-from datetime import datetime
+from datetime import date, timedelta
 from typing import List
 
 from app.crud.enmarche import get_child
@@ -50,7 +50,7 @@ def filter_role(db: Session, query: Query, zones: List[GeoZone], role: str):
     return query
 
 
-async def get_campaign_reports(db: Session, zone: GeoZone, since: datetime, role: str):
+async def get_campaign_reports(db: Session, zone: GeoZone, max_history: int, role: str):
     """Method to CRUD /campaign/reports"""
     query = (
         db.query(
@@ -80,7 +80,7 @@ async def get_campaign_reports(db: Session, zone: GeoZone, since: datetime, role
         )
         .join(MailChimpCampaign.message)
         .filter(AdherentMessages.status == "sent")
-        .filter(AdherentMessages.sent_at >= since)
+        .filter(AdherentMessages.sent_at >= date.today() - timedelta(days=max_history))
         .join(MailChimpCampaign.report)
         .join(AdherentMessages.author)
     )
@@ -91,12 +91,12 @@ async def get_campaign_reports(db: Session, zone: GeoZone, since: datetime, role
 
     return {
         "zone": zone.name,
-        "depuis": since,
+        "since": date.today() - timedelta(days=max_history),
         "campagnes": query.order_by(AdherentMessages.sent_at.desc()).all(),
     }
 
 
-async def get_mail_ratios(db: Session, zone: GeoZone, since: datetime, role: str):
+async def get_mail_ratios(db: Session, zone: GeoZone, max_history: int, role: str):
     """Method to CRUD /campaign/reportsRatios"""
     query = (
         db.query(
@@ -129,7 +129,7 @@ async def get_mail_ratios(db: Session, zone: GeoZone, since: datetime, role: str
         .select_from(MailChimpCampaignReport)
         .join(MailChimpCampaignReport.mailchimp_campaign)
         .join(MailChimpCampaign.message)
-        .filter(AdherentMessages.sent_at >= since)
+        .filter(AdherentMessages.sent_at >= date.today() - timedelta(days=max_history))
         .join(AdherentMessages.author)
     )
     if role != "national":
