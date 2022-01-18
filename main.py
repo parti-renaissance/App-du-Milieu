@@ -2,7 +2,7 @@
 """A FastAPI application on Cloud Run"""
 import base64
 import json
-from datetime import datetime, timedelta
+from datetime import date, timedelta
 from os import environ
 
 import sentry_sdk
@@ -199,7 +199,7 @@ async def mail_ratios(
     )
     return {
         "zones": [zone.name for zone in selected_scope["zones"]],
-        "since": datetime.now() - timedelta(days=max_history),
+        "since": date.today() - timedelta(days=max_history),
         **result,
     }
 
