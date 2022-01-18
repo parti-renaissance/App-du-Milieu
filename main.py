@@ -2,7 +2,7 @@
 """A FastAPI application on Cloud Run"""
 import base64
 import json
-from datetime import datetime
+from datetime import date, timedelta
 from os import environ
 
 import sentry_sdk
@@ -52,6 +52,9 @@ app.add_middleware(
 app.add_middleware(SentryAsgiMiddleware)
 
 # app.add_middleware(PyInstrumentProfilerMiddleware)
+
+# Constant VAR
+MAX_HISTORY = 30
 
 
 def get_db():
@@ -163,22 +166,23 @@ async def jemengage_users(
 
 @app.get("/jemengage/survey", response_class=ORJSONResponse, response_model=schemas.JemarcheDataSurveyOut)
 async def jemengage_survey(
+    max_history: Optional[conint(ge=1)] = MAX_HISTORY,
+    survey_uuid: Optional[constr(min_length=36, max_length=36)] = None,
     selected_scope: dict = Depends(get_scopes),
-    db: Session = Depends(get_db),
-    survey_uuid: Optional[constr(min_length=36, max_length=36)] = None
+    db: Session = Depends(get_db)
 ):
-    return jemengage.get_survey(db, selected_scope, survey_uuid)
+    return jemengage.get_survey(db, selected_scope, max_history, survey_uuid)
 
 
 @app.get("/mailCampaign/reports", response_class=ORJSONResponse)
 async def mail_reports(
+    max_history: Optional[conint(ge=1)] = MAX_HISTORY,
     selected_scope: dict = Depends(get_scopes),
-    db: Session = Depends(get_db),
-    since: datetime = datetime(2021, 1, 1),
+    db: Session = Depends(get_db)
 ):
     return [
         await mail_campaign.get_campaign_reports(
-            db, zone, since, selected_scope["code"]
+            db, zone, max_history, selected_scope["code"]
         )
         for zone in selected_scope["zones"]
     ]
@@ -186,16 +190,16 @@ async def mail_reports(
 
 @app.get("/mailCampaign/reportsRatios", response_class=ORJSONResponse)
 async def mail_ratios(
+    max_history: Optional[conint(ge=1)] = MAX_HISTORY,
     selected_scope: dict = Depends(get_scopes),
-    db: Session = Depends(get_db),
-    since: datetime = datetime(2021, 1, 1),
+    db: Session = Depends(get_db)
 ):
     result = await mail_campaign.get_mail_ratios(
-        db, selected_scope['zones'], since, selected_scope['code']
+        db, selected_scope['zones'], max_history, selected_scope['code']
     )
     return {
         "zones": [zone.name for zone in selected_scope["zones"]],
-        "depuis": since,
+        "since": date.today() - timedelta(days=max_history),
         **result,
     }
 

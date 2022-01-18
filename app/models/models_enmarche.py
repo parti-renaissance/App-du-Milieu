@@ -224,6 +224,8 @@ class JemarcheDataSurvey(Base):
     gender = Column(String, nullable=True)
     latitude = Column(Float, nullable=True)
     longitude = Column(Float, nullable=True)
+    created_at = Column(DateTime, nullable=False)
+    updated_at = Column(DateTime, nullable=False)
 
 
 class JecouteDataSurvey(Base):
