@@ -91,7 +91,7 @@ async def get_campaign_reports(db: Session, zone: GeoZone, max_history: int, rol
 
     return {
         "zone": zone.name,
-        "since": date.today() - timedelta(days=max_history),
+        "since": (date.today() - timedelta(days=max_history)).strftime("%d-%m-%yT%H:%M:%S"),
         "campagnes": query.order_by(AdherentMessages.sent_at.desc()).all(),
     }
 

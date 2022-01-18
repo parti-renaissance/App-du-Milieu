@@ -199,7 +199,7 @@ async def mail_ratios(
     )
     return {
         "zones": [zone.name for zone in selected_scope["zones"]],
-        "since": date.today() - timedelta(days=max_history),
+        "since": (date.today() - timedelta(days=max_history)).strftime("%d-%m-%yT%H:%M:%S"),
         **result,
     }
 
