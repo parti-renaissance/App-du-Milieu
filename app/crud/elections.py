@@ -27,7 +27,8 @@ ELECTION = Literal[
     "Régionales 2021",
     "Européennes 2014",
     "Européennes 2019",
-    "Présidentielles 2017"
+    "Présidentielles 2017",
+    "Présidentielles 2022"
 ]
 
 dict_base = {
@@ -39,7 +40,8 @@ dict_base = {
     "Régionales 2021": ("nuance",),
     "Européennes 2014": ("nuance",),
     "Européennes 2019": ("nom_liste",),
-    "Présidentielles 2017": ("nuance",)
+    "Présidentielles 2017": ("nuance",),
+    "Présidentielles 2022": ("nuance",)
 }
 """Always returned information by election"""
 
@@ -53,7 +55,8 @@ dict_detail = {
     "Régionales 2021": ("nom", "prenom",),
     "Européennes 2014": ("nom", "prenom",),
     "Européennes 2019": (),
-    "Présidentielles 2017": ("nom", "prenom",)
+    "Présidentielles 2017": ("nom", "prenom",),
+    "Présidentielles 2022": ("nom", "prenom",)
 }
 """Detailled returned information by election"""
 
