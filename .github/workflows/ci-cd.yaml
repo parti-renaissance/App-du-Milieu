@@ -73,7 +73,7 @@ jobs:
 
       - uses: google-github-actions/auth@v0.6.0
         with:
-          credentials_json: ${{ env.GCP_SA_KEY_GCR_PUSHER }}
+          credentials_json: ${{ secrets.GCP_SA_KEY_GCR_PUSHER }}
           
       - uses: google-github-actions/setup-gcloud@v0
         with:
@@ -117,7 +117,7 @@ jobs:
     steps:
       - uses: google-github-actions/auth@v0.6.0
         with:
-          credentials_json: ${{ env.GCP_SA_KEY_CLOUDRUN_DEPLOYER }}
+          credentials_json: ${{ secrets.GCP_SA_KEY_CLOUDRUN_DEPLOYER }}
 
       - uses: google-github-actions/deploy-cloudrun@main
         with:
