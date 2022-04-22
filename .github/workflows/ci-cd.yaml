@@ -134,9 +134,12 @@ jobs:
       environment: production
 
       steps:
+        - uses: google-github-actions/auth@v0.6.0
+          with:
+            credentials_json: ${{ secrets.GCP_SA_KEY_CLOUDRUN_DEPLOYER }}
+          
         - uses: google-github-actions/deploy-cloudrun@main
           with:
-            credentials: ${{ secrets.GCP_SA_KEY_CLOUDRUN_DEPLOYER }}
             project_id: ${{ secrets.GCP_PROJECT_ID }}
             service: ${{ secrets.GCP_CLOUDRUN_SERVICE }}
             image: ${{ env.IMAGE }}:${{ env.TAG }}
