@@ -71,9 +71,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - uses: google-github-actions/setup-gcloud@master
+      - uses: google-github-actions/auth@v0.6.0
         with:
-          service_account_key: ${{ secrets.GCP_SA_KEY_GCR_PUSHER }}
+          credentials_json: ${{ env.GCP_SA_KEY_GCR_PUSHER }}
+          
+      - uses: google-github-actions/setup-gcloud@v0
+        with:
           project_id: ${{ secrets.GCP_REGISTRY_PROJECT_ID }}
           export_default_credentials: true
 
@@ -112,9 +115,12 @@ jobs:
     environment: staging
 
     steps:
+      - uses: google-github-actions/auth@v0.6.0
+        with:
+          credentials_json: ${{ env.GCP_SA_KEY_CLOUDRUN_DEPLOYER }}
+
       - uses: google-github-actions/deploy-cloudrun@main
         with:
-          credentials: ${{ secrets.GCP_SA_KEY_CLOUDRUN_DEPLOYER }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           service: ${{ secrets.GCP_CLOUDRUN_SERVICE }}
           image: ${{ env.IMAGE }}:${{ env.TAG }}
