@@ -43,7 +43,7 @@ def filter_role(db: Session, query: Query, zones: List[GeoZone], role: str):
             .join(ReferentTags.zone.and_(GeoZone.id.in_(all_zones)))
         )
 
-    if role in {"candidate", "national"}:
+    if role in {"legislative_candidate", "candidate", "national"}:
         return query.join(AdherentMessages.filter).join(
             AdherentMessageFilters.zone.and_(GeoZone.id.in_(all_zones))
         )
