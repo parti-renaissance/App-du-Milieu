@@ -1,5 +1,5 @@
 # ---- Base python ----
-FROM python:3.9 AS base
+FROM python:3.10.5 AS base
 # Create app directory
 WORKDIR /app
 
@@ -16,7 +16,7 @@ WORKDIR /app
 COPY . /app
 
 # --- Release with Slim ----
-FROM python:3.9-slim AS release
+FROM python:3.10.5 AS release
 # Create app directory
 WORKDIR /app
 
