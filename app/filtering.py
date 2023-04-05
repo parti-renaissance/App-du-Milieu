@@ -55,10 +55,7 @@ def _parse_filter(filter_string: str) -> Union[tuple, None]:
     attribute_operator_parts = attribute_operator.split(".")
     attribute = attribute_operator_parts[0]
     operator = attribute_operator_parts[1] if len(attribute_operator_parts) == 2 else "eq"
-    if operator not in SCIM_OPERATORS:
-        return None
-
-    return attribute, operator, value
+    return None if operator not in SCIM_OPERATORS else (attribute, operator, value)
 
 
 def _add_unique_filter(attribute: str, operator: str, value: str, query: Query, myclass: Any) -> Query:
