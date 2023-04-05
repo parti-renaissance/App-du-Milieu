@@ -3,6 +3,7 @@ import io
 from enum import Enum
 from json import loads
 
+from typing import List
 import pandas as pd
 from app import filtering
 from app.crud.enmarche import scope2dict
@@ -27,12 +28,10 @@ class EmailSubscriptions(str, Enum):
     senator = "senator_email"
 
 
-def isSubscribed(role: str, subs: list):
+def isSubscribed(role: str, subs: List[str]) -> bool:
     """Retourne le subscription_type en fonction du role"""
-    if subs is not None:
-        for t in EmailSubscriptions:
-            if t.name == role:
-                return t.value in subs
+    if subs:
+        return EmailSubscriptions[role] in subs
     return False
 
 
@@ -272,20 +271,16 @@ def get_contacts_v02(db: Session, scope: dict, skip: int, limit: int, q: str):
     }
 
 
-def get_number_of_contacts(db: Session, scope: dict):
+def get_number_of_contacts(db: Session, scope: dict) -> dict:
     filter_zone = scope2dict(scope)
 
-    if scope["code"] == "national":
-        query = db.query(Contact)
-    else:
-        filter_zone = scope2dict(scope)
-        query = db.query(Contact).filter(
-            or_(getattr(Contact, k).in_(v) for k, v in filter_zone.items())
+    query = db.query(Contact)
+
+    if scope.code != "national":
+        query = query.filter(
+            or_(getattr(Contact, k).in_(v) for k, v in filter_zone.items() if k != "code")
         )
 
-    zones = [
-        {"zone_type": k, "zone_name": [v]}
-        for k, v in scope2dict(scope, name=True).items()
-    ]
+    zones = [{"zone_type": k, "zone_name": v} for k, v in filter_zone.items() if k != "code"]
 
     return {"adherentCount": query.count(), "zones": zones}
