@@ -1,23 +1,27 @@
 # -*- coding: utf-8 -*-
-"""A FastAPI application on Cloud Run"""
+
+# Standard library imports
+from os import environ
+from datetime import date, timedelta
 import base64
 import json
-from datetime import date, timedelta
-from os import environ
 
+# Third-party imports
 import sentry_sdk
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
-
 import uvicorn
 from fastapi import Depends, FastAPI, Header, HTTPException, Query
 from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.responses import ORJSONResponse
 from pydantic import conint, constr
-from typing import Optional
 from sqlalchemy.orm import Session
 from starlette.middleware.cors import CORSMiddleware
-from app.resources.strings import NO_SCOPE, NO_X_SCOPE, NO_CONTACT, NO_CONTENT
+from typing import Optional
 
+# Local application imports
+from app.database import SessionLocal
+from app.resources.strings import NO_CONTENT, NO_CONTACT, NO_SCOPE, NO_X_SCOPE
+from app.schemas import schemas
 from app.crud import (
     contact,
     elections,
@@ -25,22 +29,19 @@ from app.crud import (
     jemengage,
     mail_campaign,
 )
-from app.database import SessionLocal
-from app.schemas import schemas
 
-# profiling
-# from fastapi_profiler.profiler_middleware import PyInstrumentProfilerMiddleware
-
-
+# Sentry error tracking setup
 sentry_sdk.init(dsn="https://3c3c435fe4f245a3ba551475ff8dfa53@o62282.ingest.sentry.io/5890683")
 
+# FastAPI app setup
 app = FastAPI(
     title="API pour le CRM de LaREM",
     description="GET uniquements pour récupérer les données des contacts de notre base",
     version="1.0.0",
 )
-app.add_middleware(GZipMiddleware, minimum_size=1000)
 
+# Middleware setup
+app.add_middleware(GZipMiddleware, minimum_size=1000)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -48,15 +49,12 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
 app.add_middleware(SentryAsgiMiddleware)
 
-# app.add_middleware(PyInstrumentProfilerMiddleware)
-
-# Constant VAR
+# Constant variables
 MAX_HISTORY = 30
 
-
+# API endpoints
 def get_db():
     db = SessionLocal()
     try:
@@ -65,6 +63,7 @@ def get_db():
         db.close()
 
 
+# define scope dependency
 async def get_scopes(
     scope: str, X_Scope: str = Header(None), db: Session = Depends(get_db)
 ) -> dict:
@@ -74,14 +73,9 @@ async def get_scopes(
         raise HTTPException(status_code=400, detail=NO_X_SCOPE)
 
     try:
-        scope = enmarche.decode_scopes(db, X_Scope)
-    except base64.binascii.Error as err:
+        return enmarche.decode_scopes(db, X_Scope)
+    except (base64.binascii.Error, json.decoder.JSONDecodeError) as err:
         raise HTTPException(status_code=422, detail=f"Could not decode scope - {err}")
-    except json.decoder.JSONDecodeError as err:
-        raise HTTPException(status_code=422, detail=f"Could not decode scope - {err}")
-
-    return scope
-
 
 @app.get("/")
 async def home():
