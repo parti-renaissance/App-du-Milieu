@@ -23,6 +23,11 @@ WORKDIR /app
 COPY --from=dependencies /app/requirements.txt ./
 COPY --from=dependencies /root/.cache /root/.cache
 
+# Remove unnecessary files and folders
+RUN find . -type d -name __pycache__ -exec rm -r {} + \
+    && find . -type f -name "*.py[co]" -delete \
+    && rm -rf /root/.cache/pip/*
+
 # Install app dependencies
 RUN pip install --upgrade pip \
     pip install -r requirements.txt
