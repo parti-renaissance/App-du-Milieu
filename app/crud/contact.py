@@ -30,9 +30,7 @@ class EmailSubscriptions(str, Enum):
 
 def isSubscribed(role: str, subs: List[str]) -> bool:
     """Retourne le subscription_type en fonction du role"""
-    if subs:
-        return EmailSubscriptions[role] in subs
-    return False
+    return EmailSubscriptions[role] in subs if subs else False
 
 
 def get_contacts(db: Session, scope: dict):
