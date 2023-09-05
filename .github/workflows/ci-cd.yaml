@@ -28,7 +28,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Setup Python
         uses: actions/setup-python@v4
@@ -69,7 +69,7 @@ jobs:
     if: github.event.ref == 'refs/heads/master' || github.event_name == 'release'
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - uses: google-github-actions/auth@v0.8.1
         with:
